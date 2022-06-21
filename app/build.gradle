@@ -48,7 +48,11 @@ android {
 }
 
 dependencies {
-    implementation project(":imageViewer")
+    if (isApplyModule.toBoolean()) {
+        implementation project(":imageViewer")
+    } else {
+        implementation 'com.github.jvziyaoyao:ImageViewer:1.0.1-alpha.1'
+    }
 
     implementation 'io.coil-kt:coil:2.0.0-rc02'
     implementation 'io.coil-kt:coil-svg:2.0.0-rc02'

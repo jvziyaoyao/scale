@@ -45,15 +45,6 @@ const val MAX_SCALE_RATE = 3.2F
 // 最小手指手势间距
 const val MIN_GESTURE_FINGER_DISTANCE = 200
 
-fun testTime(tag: String = "TAST_TIME", content: () -> Unit): Long {
-    val t0 = System.currentTimeMillis()
-    content()
-    val t1 = System.currentTimeMillis()
-    val delta = t1 - t0
-    Log.i(tag, "testTime: delta $delta")
-    return delta
-}
-
 class ImageViewerState(
     offsetX: Float = DEFAULT_OFFSET_X,
     offsetY: Float = DEFAULT_OFFSET_Y,

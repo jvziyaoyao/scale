@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -30,7 +31,7 @@ const val SYSTEM_UI_VISIBILITY = "SYSTEM_UI_VISIBILITY"
 
 class MainActivity : BaseActivity() {
 
-    var systemUIVisible = true
+    private var systemUIVisible = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,37 +68,14 @@ fun MainBody(
     onImageViewVisible: (Boolean) -> Unit = {},
 ) {
 
-    val imageUrls = listOf(
-        "https://t7.baidu.com/it/u=3631608752,3069876728&fm=193&f=GIF",
-        "https://t7.baidu.com/it/u=1595072465,3644073269&fm=193&f=GIF",
-        "https://t7.baidu.com/it/u=1423490396,3473826719&fm=193&f=GIF",
-        "https://t7.baidu.com/it/u=938052523,709452322&fm=193&f=GIF",
-        "https://t7.baidu.com/it/u=2984822884,629429889&fm=193&f=GIF",
-        "https://t7.baidu.com/it/u=4151878322,2414972490&fm=193&f=GIF"
-    )
-
-    val painterResources = listOf(
+    val images = listOf(
         painterResource(id = R.drawable.img_01),
         painterResource(id = R.drawable.img_02),
         painterResource(id = R.drawable.img_03),
         painterResource(id = R.drawable.img_04),
+        painterResource(id = R.drawable.img_05),
+        painterResource(id = R.drawable.img_06),
     )
-
-    val vectorList = listOf(
-        ImageVector.vectorResource(id = R.drawable.ic_cn),
-        ImageVector.vectorResource(id = R.drawable.ic_cm),
-    )
-
-//    val resources = LocalContext.current.resources
-//    val bitmapList = listOf(
-//        BitmapFactory.decodeResource(resources, R.drawable.img_01).asImageBitmap(),
-//        BitmapFactory.decodeResource(resources, R.drawable.img_02).asImageBitmap(),
-//        BitmapFactory.decodeResource(resources, R.drawable.img_03).asImageBitmap(),
-//        BitmapFactory.decodeResource(resources, R.drawable.img_04).asImageBitmap(),
-//    )
-
-//    val images: List<Any> = bitmapList
-    val images: List<Any> = imageUrls
 
     val imageViewerState = rememberPreviewerState()
 
@@ -130,40 +108,12 @@ fun MainBody(
                         imageViewerState.show(index = index)
                     }
                     .fillMaxSize()
-                when (item) {
-                    is String -> {
-                        Image(
-                            painter = rememberAsyncImagePainter(model = item),
-                            modifier = gridModifier,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                        )
-                    }
-                    is ImageBitmap -> {
-                        Image(
-                            bitmap = item,
-                            modifier = gridModifier,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                        )
-                    }
-                    is ImageVector -> {
-                        Image(
-                            imageVector = item,
-                            modifier = gridModifier,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                        )
-                    }
-                    is Painter -> {
-                        Image(
-                            painter = item,
-                            modifier = gridModifier,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                        )
-                    }
-                }
+                Image(
+                    painter = item,
+                    modifier = gridModifier,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                )
             }
         }
     }
@@ -174,13 +124,7 @@ fun MainBody(
     ImagePreviewer(
         count = images.size,
         state = imageViewerState,
-        imageLoader = { index ->
-            when (val image = images[index]) {
-                is String -> rememberCoilImagePainter(image = image)
-                is Painter,is ImageVector, is ImageBitmap -> image
-                else -> throw Exception("不支持这种类型的model")
-            }
-        },
+        imageLoader = { index -> images[index] },
         onTap = {
             imageViewerState.hide()
         }
