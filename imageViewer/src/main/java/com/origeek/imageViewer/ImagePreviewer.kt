@@ -1,6 +1,5 @@
 package com.origeek.imageViewer
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.Spring
@@ -21,11 +20,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlin.math.absoluteValue
 
 val DEEP_DARK_FANTASY = Color(0xFF000000)
 val DEFAULT_ITEM_SPACE = 12.dp
