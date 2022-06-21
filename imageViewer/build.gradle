@@ -6,7 +6,7 @@ plugins {
 
 def GROUP_NAME = 'com.github.jvziyaoyao'
 def ARTIFACT_NAME = 'image-viewer'
-def VERSION_NAME = '1.0.1'
+def VERSION_NAME = '1.0.1-alpha.1'
 
 group GROUP_NAME
 version VERSION_NAME
@@ -18,12 +18,6 @@ afterEvaluate {
                 from components.release
                 groupId = GROUP_NAME
                 artifactId = ARTIFACT_NAME
-                version = VERSION_NAME
-            }
-            snapshot(MavenPublication) {
-                from components.debug
-                groupId = GROUP_NAME
-                artifactId = ARTIFACT_NAME + '-SNAPSHOT'
                 version = VERSION_NAME
             }
         }
@@ -44,10 +38,6 @@ android {
     }
 
     buildTypes {
-        debug {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
