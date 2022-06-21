@@ -7,29 +7,23 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.insets.systemBarsPadding
 import com.origeek.imageViewer.ImagePreviewer
 import com.origeek.imageViewer.rememberPreviewerState
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.GridLayout
-import com.origeek.viewerDemo.ui.component.rememberCoilImagePainter
 import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
 
 const val SYSTEM_UI_VISIBILITY = "SYSTEM_UI_VISIBILITY"
 
-class MainActivity : BaseActivity() {
+class PreviewerActivity : BaseActivity() {
 
     private var systemUIVisible = true
 
@@ -38,7 +32,7 @@ class MainActivity : BaseActivity() {
         handlerSystemUI(savedInstanceState?.getBoolean(SYSTEM_UI_VISIBILITY) ?: true)
         setBasicContent {
             ViewerDemoTheme {
-                MainBody {
+                PreviewerBody {
                     if (systemUIVisible != !it) {
                         handlerSystemUI(!it)
                     }
@@ -64,18 +58,20 @@ class MainActivity : BaseActivity() {
 }
 
 @Composable
-fun MainBody(
+fun PreviewerBody(
     onImageViewVisible: (Boolean) -> Unit = {},
 ) {
 
-    val images = listOf(
-        painterResource(id = R.drawable.img_01),
-        painterResource(id = R.drawable.img_02),
-        painterResource(id = R.drawable.img_03),
-        painterResource(id = R.drawable.img_04),
-        painterResource(id = R.drawable.img_05),
-        painterResource(id = R.drawable.img_06),
-    )
+    val images = remember {
+        listOf(
+            R.drawable.img_01,
+            R.drawable.img_02,
+            R.drawable.img_03,
+            R.drawable.img_04,
+            R.drawable.img_05,
+            R.drawable.img_06,
+        )
+    }
 
     val imageViewerState = rememberPreviewerState()
 
@@ -109,7 +105,7 @@ fun MainBody(
                     }
                     .fillMaxSize()
                 Image(
-                    painter = item,
+                    painter = painterResource(id = item),
                     modifier = gridModifier,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
@@ -124,7 +120,7 @@ fun MainBody(
     ImagePreviewer(
         count = images.size,
         state = imageViewerState,
-        imageLoader = { index -> images[index] },
+        imageLoader = { index -> painterResource(id = images[index]) },
         onTap = {
             imageViewerState.hide()
         }

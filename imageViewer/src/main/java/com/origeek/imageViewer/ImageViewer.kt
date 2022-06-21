@@ -474,7 +474,7 @@ fun ImageViewer(
                 )
             }
             else -> {
-                throw Exception("不支持这种model类型！")
+                throw Exception("不支持这种model类型！ ${model::class.java.name}")
             }
         }
         if (debugMode) {
