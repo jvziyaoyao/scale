@@ -66,8 +66,6 @@ dependencies {
 
     implementation "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha07"
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
-
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.0'
     implementation 'com.google.android.material:material:1.4.0'
