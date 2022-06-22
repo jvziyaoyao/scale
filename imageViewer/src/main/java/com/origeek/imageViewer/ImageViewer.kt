@@ -192,7 +192,6 @@ fun rememberViewerState(
 /**
  * model仅支持Painter或BitmapRegionDecoder
  */
-@Throws(Exception::class)
 @Composable
 fun ImageViewer(
     modifier: Modifier = Modifier,
