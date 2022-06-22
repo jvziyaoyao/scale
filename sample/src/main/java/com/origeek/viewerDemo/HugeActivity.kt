@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -47,6 +48,7 @@ fun HugeBody() {
         )
     }
     val scope = rememberCoroutineScope()
+    val textColor = MaterialTheme.colors.onBackground.copy(0.4F)
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -77,10 +79,10 @@ fun HugeBody() {
                     .background(Color.LightGray.copy(0.2F))
                     .fillMaxSize()
             ) {
-                Text(text = "in container")
+                Text(text = "In container", color = textColor)
             }
         }
-        Text(text = "outside the container")
+        Text(text = "Outside the container", color = textColor)
     }
 
 }
