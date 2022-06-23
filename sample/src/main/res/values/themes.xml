@@ -1,0 +1,38 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.ImageViewer" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- 隐藏标题栏 -->
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/accent_f</item>
+        <item name="colorPrimaryVariant">@color/accentDark</item>
+        <item name="colorOnPrimary">@color/light_m</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/second_f</item>
+        <item name="colorSecondaryVariant">@color/secondDark</item>
+        <item name="colorOnSecondary">@color/light_d</item>
+        <!-- button -->
+        <item name="textAllCaps">false</item>
+        <!-- info -->
+        <item name="colorError">@color/error_f</item>
+        <item name="colorSurface">@color/light_m</item>
+        <item name="backgroundColor">@color/light_f</item>
+        <item name="colorAccent">@color/accent_m</item>
+        <!-- 文字相关 -->
+        <item name="android:textColor">@color/font_m</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Theme.ImageViewer.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.ImageViewer.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.ImageViewer.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>

@@ -253,7 +253,6 @@ fun ImageGallery(
                             }
                         },
                         onLongPress = { onLongPress() },
-                        debugMode = true
                     )
                 }
             }

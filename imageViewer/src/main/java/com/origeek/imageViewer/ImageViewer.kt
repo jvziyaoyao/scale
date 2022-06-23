@@ -1,6 +1,5 @@
 package com.origeek.imageViewer
 
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.generateDecayAnimationSpec
@@ -44,15 +43,6 @@ const val MAX_SCALE_RATE = 3.2F
 
 // 最小手指手势间距
 const val MIN_GESTURE_FINGER_DISTANCE = 200
-
-fun testTime(tag: String = "TAST_TIME", content: () -> Unit): Long {
-    val t0 = System.currentTimeMillis()
-    content()
-    val t1 = System.currentTimeMillis()
-    val delta = t1 - t0
-    Log.i(tag, "testTime: delta $delta")
-    return delta
-}
 
 class ImageViewerState(
     offsetX: Float = DEFAULT_OFFSET_X,
@@ -199,9 +189,8 @@ fun rememberViewerState(
 }
 
 /**
- * model仅支持Painter或BitmapRegionDecoder
+ * model支持Painter、ImageBitmap、ImageVector、BitmapRegionDecoder
  */
-@Throws(Exception::class)
 @Composable
 fun ImageViewer(
     modifier: Modifier = Modifier,
@@ -483,7 +472,7 @@ fun ImageViewer(
                 )
             }
             else -> {
-                throw Exception("不支持这种model类型！")
+                throw Exception("不支持这种model类型！ ${model::class.java.name}")
             }
         }
         if (debugMode) {

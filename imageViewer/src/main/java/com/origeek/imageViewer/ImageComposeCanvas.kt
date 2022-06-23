@@ -26,17 +26,8 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.concurrent.LinkedBlockingDeque
-import kotlin.concurrent.timerTask
 import kotlin.math.absoluteValue
 import kotlin.math.ceil
-
-enum class DecoderMineType(val mimeType: String) {
-    JPEG("image/jpeg"),
-    PNG("image/png"),
-    WEBP("image/webp"),
-    SVG("image/svg+xml"),
-    ;
-}
 
 data class RenderBlock(
     var inBound: Boolean = false,
@@ -182,9 +173,7 @@ class ImageDecoder(
                 while (!decoder.isRecycled) {
                     val block = renderQueue.take()
                     if (decoder.isRecycled) break
-                    testTime("decodeRegion - ${block.inSampleSize}") {
-                        block.bitmap = decodeRegion(block.inSampleSize, block.sliceRect)
-                    }
+                    block.bitmap = decodeRegion(block.inSampleSize, block.sliceRect)
                     onUpdate()
                 }
             } catch (e: InterruptedException) {
