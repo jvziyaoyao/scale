@@ -33,7 +33,8 @@ dependencyResolutionManagement {
 ```
 Add dependencies to your project's `build.gradle`.
 ```gradle
-implementation 'com.github.jvziyaoyao:ImageViewer:1.0.1-alpha.1'
+// Select the version you want to install.
+implementation 'com.github.jvziyaoyao:ImageViewer:VERSION'
 ```
 
 👓 Samples

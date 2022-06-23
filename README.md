@@ -33,7 +33,8 @@ dependencyResolutionManagement {
 ```
 在`build.gradle`增加依赖的引入
 ```gradle
-implementation 'com.github.jvziyaoyao:ImageViewer:1.0.1-alpha.1'
+// 从releases里面选一个版本
+implementation 'com.github.jvziyaoyao:ImageViewer:VERSION'
 ```
 
 👓 示例
