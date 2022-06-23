@@ -1,6 +1,5 @@
 package com.origeek.imageViewer
 
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.generateDecayAnimationSpec
@@ -190,7 +189,7 @@ fun rememberViewerState(
 }
 
 /**
- * model仅支持Painter或BitmapRegionDecoder
+ * model支持Painter、ImageBitmap、ImageVector、BitmapRegionDecoder
  */
 @Composable
 fun ImageViewer(

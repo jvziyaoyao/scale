@@ -1,15 +1,25 @@
 # ImageViewer
-🖼 ImageViewer for jetpack compose.一款基于Jekpack Compose开发的图片预览库，支持超大图片的显示
+🖼 ImageViewer for jetpack compose.
+
+中文介绍 | [English](/README_en.md)
+
+一款基于Jekpack Compose开发的图片预览库，支持超大图片的显示
+
 [![](https://www.jitpack.io/v/jvziyaoyao/ImageViewer.svg)](https://www.jitpack.io/#jvziyaoyao/ImageViewer)
 
-支持特性
+👌 特性
 --------
-- 基于Jetpack Compose开发
-- 符合直觉的手势动效
-- 支持超大图片显示
-- 提供图片列表浏览组件
+- 基于Jetpack Compose开发；
+- 符合直觉的手势动效；
+- 支持超大图片显示；
+- 提供图片列表浏览组件；
 
-引入组件
+🧐 预览
+--------
+<img src="doc/huge_image.gif" height="413" width="200"></img>
+<img src="doc/previewer_images.gif" height="413" width="200"></img>
+
+🛒 引入
 --------
 在`settings.gradle`增加jitpack的地址
 ```groovy
@@ -26,8 +36,9 @@ dependencyResolutionManagement {
 implementation 'com.github.jvziyaoyao:ImageViewer:1.0.1-alpha.1'
 ```
 
-使用示例
+👓 示例
 --------
+### 👋 示例代码请参考[sample](https://github.com/jvziyaoyao/ImageViewer/tree/main/sample)
 ### 一般使用
 ```kotlin
 @Composable
@@ -47,6 +58,7 @@ fun NormalBody() {
 }
 ```
 ### 加载超大图
+‼ 仅在model类型为`BitmapRegionDecoder`才会被当做大图进行加载
 ```kotlin
 @Composable
 fun HugeBody() {
@@ -113,10 +125,12 @@ ImagePreviewer(
     imageViewerState.hide()
   }
 )
+// 弹出Popup
+imageViewerState.show()
 ```
-方法详情
+📓 API
 --------
- ### `ImageViewer`
+## `ImageViewer`
 ```kotlin
 @Composable
 fun ImageViewer(
@@ -135,7 +149,7 @@ fun ImageViewer(
 | 名称 | 描述 | 默认值 |
 | --- | --- | :---: |
 | `modifier` | Composable修改参数 | `Modifier` |
-| `model` | 传入图片数据，仅支持Painter或BitmapRegionDecoder | `无` |
+| `model` | 传入图片数据，支持 `Painter`、`ImageBitmap`、`ImageVector`、`BitmapRegionDecoder` | `无` |
 | `state` | 组件状态对象，可通过其获取图片的位置信息等 | `ImageViewerState` |
 | `onTap` | 图片的单击事件，传入参数为点击的坐标 | `{}` |
 | `onDoubleTap` | 图片的双击事件，传入参数为点击的坐标 | `{}` |
@@ -143,7 +157,7 @@ fun ImageViewer(
 | `boundClip` | 图片超出容器部分是否需要裁剪 | `true` |
 | `debugMode` | 调试模式，调试模式会显示手指操作的中心坐标 | `false` |
 
-### `ImageViewerState`
+## `ImageViewerState`
 ```kotlin
 val state = rememberViewerState()
 // 在viewer中使用
@@ -154,7 +168,7 @@ ImageViewer(
 // 设置图片归位
 state.reset()
 ```
-⚖ 属性
+💾 属性
 
 | 名称 | 描述 | 默认值 |
 | --- | --- | :---: |
@@ -163,7 +177,7 @@ state.reset()
 | `scale` | 图片放大倍率 | `1` |
 | `rotation` | 图片转角度 | `0` |
 
-⚖ 方法
+🛠 方法
 
 | 名称 | 参数 | 描述 |
 | --- | --- | --- |
@@ -172,7 +186,7 @@ state.reset()
 | `toggleScale` | (offset: Offset) | 图片在显示区域内最大和最小之间切换 |
 | `fixToBound` | 无 | 图片如超出显示范围则回到显示范围内 |
 
-### `ImageGallery`
+## `ImageGallery`
 ```kotlin
 @Composable
 fun ImageGallery(
@@ -197,7 +211,7 @@ fun ImageGallery(
 | `modifier` | Composable修改参数 | `Modifier` |
 | `count` | 传入图片数组的长度 | `无` |
 | `state` | Pager状态 | `无` |
-| `imageLoader` | 图片加载器，入参为当前页码，用户返回Painter或BitmapRegionDecoder | `无` |
+| `imageLoader` | 图片加载器，入参为当前页码，用户返回 `Painter`、`ImageBitmap`、`ImageVector` 或 `BitmapRegionDecoder` | `无` |
 | `itemSpacing` | 相邻两个图片之间的间隔 | `12.dp` |
 | `currentViewerState` | 该方法允许用户获取当前预览图片的`ImageViewerState` | `{}` |
 | `onTap` | 当前图片的单击事件 | `{}` |
@@ -206,7 +220,7 @@ fun ImageGallery(
 | `background` | 设置图片浏览器的背景，入参为当前页码 | `{}` |
 | `foreground` | 设置图片浏览器的前景，入参为当前页码 | `{}` |
 
-### `ImagePreviewer`
+## `ImagePreviewer`
 ```kotlin
 @Composable
 fun ImagePreviewer(
@@ -235,7 +249,7 @@ fun ImagePreviewer(
 | `modifier` | Composable修改参数 | `Modifier` |
 | `state` | 当前组件显示和图片浏览的状态 | `ImagePreviewerState` |
 | `count` | 传入图片数组的长度 | `无` |
-| `imageLoader` | 图片加载器，入参为当前页码，用户返回Painter或BitmapRegionDecoder | `无` |
+| `imageLoader` | 图片加载器，入参为当前页码，用户返回 `Painter`、`ImageBitmap`、`ImageVector` 或 `BitmapRegionDecoder` | `无` |
 | `background` | 图片浏览器的背景，入参为当前总页数和页码 | `Default` |
 | `foreground` | 图片浏览器的前景，入参为当前总页数和页码 | `{ _, _ -> }` |
 | `currentViewerState` | 该方法允许用户获取当前预览图片的`ImageViewerState` | `{}` |
@@ -246,7 +260,7 @@ fun ImagePreviewer(
 | `enter` | 组件的弹出动画 | `Default` |
 | `exit` | 组件的隐藏动画 | `Default` |
 
-### `ImagePreviewerState`
+## `ImagePreviewerState`
 ```kotlin
 val imageViewerState = rememberPreviewerState()
 // 组件中引用
@@ -257,14 +271,14 @@ ImagePreviewer(
 // 隐藏组件 
 imageViewerState.hide()
 ```
-⚖ 属性
+💾 属性
 
 | 名称 | 描述 | 默认值 |
 | --- | --- | :---: |
 | `index` | 当前页码 | `0` |
 | `show` | 组件标识显示 | `false` |
 
-⚖ 方法
+🛠 方法
 
 | 名称 | 参数 | 描述 |
 | --- | --- | --- |
@@ -272,7 +286,7 @@ imageViewerState.hide()
 | `scrollTo` | (index: Int) | 滚动到目标页码 |
 | `hide` | 无 | 隐藏组件 |
 
-开源许可
+🕵️‍♀️ 开源许可
 --------
 MIT License
 
