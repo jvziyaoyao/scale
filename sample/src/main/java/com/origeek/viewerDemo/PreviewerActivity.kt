@@ -79,52 +79,43 @@ fun PreviewerBody(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .systemBarsPadding()
     ) {
-        GridLayout(
-            columns = lineCount,
-            size = images.size,
-        ) { index ->
-            val item = images[index]
-            val lp = index % lineCount == 0
-            val rp = index % lineCount == lineCount - 1
-            val p = 2.dp
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .padding(
-                        bottom = p * 2,
-                        start = if (lp) 0.dp else p,
-                        end = if (rp) 0.dp else p
-                    ),
-            ) {
-                val gridModifier = Modifier
-                    .clickable {
-                        imageViewerState.show(index = index)
-                    }
-                    .fillMaxSize()
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+        ) {
+            GridLayout(
+                columns = lineCount,
+                size = images.size,
+                padding = 2.dp,
+            ) { index ->
+                val item = images[index]
                 Image(
+                    modifier = Modifier
+                        .clickable {
+                            imageViewerState.show(index = index)
+                        }
+                        .fillMaxWidth()
+                        .aspectRatio(1F),
                     painter = painterResource(id = item),
-                    modifier = gridModifier,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                 )
             }
         }
+        LaunchedEffect(key1 = imageViewerState.show, block = {
+            onImageViewVisible(imageViewerState.show)
+        })
+        ImagePreviewer(
+            count = images.size,
+            state = imageViewerState,
+            imageLoader = { index -> painterResource(id = images[index]) },
+            onTap = {
+                imageViewerState.hide()
+            }
+        )
     }
-
-    LaunchedEffect(key1 = imageViewerState.show, block = {
-        onImageViewVisible(imageViewerState.show)
-    })
-    ImagePreviewer(
-        count = images.size,
-        state = imageViewerState,
-        imageLoader = { index -> painterResource(id = images[index]) },
-        onTap = {
-            imageViewerState.hide()
-        }
-    )
 }
 
 fun hideSystemUI(window: Window) {

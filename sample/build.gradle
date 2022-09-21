@@ -51,7 +51,7 @@ dependencies {
     if (isApplyModule.toBoolean()) {
         implementation project(":imageViewer")
     } else {
-        implementation 'com.github.jvziyaoyao:ImageViewer:1.0.1-alpha.1'
+        implementation 'com.github.jvziyaoyao:ImageViewer:1.0.1-alpha.2'
     }
 
     implementation 'io.coil-kt:coil:2.0.0-rc02'
