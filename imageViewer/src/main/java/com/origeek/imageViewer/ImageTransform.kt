@@ -5,7 +5,6 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -16,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -41,13 +41,14 @@ import kotlin.coroutines.suspendCoroutine
 
 @Composable
 fun TransformImageView(
+    modifier: Modifier = Modifier,
     painter: Painter,
-    transformContentState: TransformContentState = rememberTransformContentState(),
+    itemState: TransformItemState = rememberTransformItemState(),
+    contentState: TransformContentState = rememberTransformContentState(),
 ) {
-    var itemState = rememberTransformItemState()
     TransformItemView(
-        contentState = transformContentState,
-        itemState = { itemState = it }
+        itemState = itemState,
+        contentState = contentState,
     ) {
         LaunchedEffect(key1 = painter.intrinsicSize) {
             if (painter.intrinsicSize.isSpecified) {
@@ -55,15 +56,7 @@ fun TransformImageView(
             }
         }
         Image(
-            modifier = Modifier
-                .clickable {
-                    if (transformContentState.onAction) {
-                        transformContentState.end()
-                    } else {
-                        transformContentState.start(itemState)
-                    }
-                }
-                .fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             painter = painter,
             contentDescription = null,
             contentScale = ContentScale.Crop,
@@ -81,6 +74,7 @@ fun TransformContentView(
             .fillMaxSize()
             .onGloballyPositioned {
                 bSize = it.size
+                transformContentState.bSize = bSize
             },
     ) {
         if (
@@ -104,7 +98,7 @@ fun TransformContentView(
             // 显示大小
             val uSize by remember {
                 derivedStateOf {
-                    if (oRatio > bRatio) {
+                    transformContentState.uSize = if (oRatio > bRatio) {
                         // 宽度一致
                         val uW = bSize.width
                         val uH = uW / oRatio
@@ -117,6 +111,7 @@ fun TransformContentView(
                         widthFixed = false
                         IntSize(uW.toInt(), uH)
                     }
+                    transformContentState.uSize
                 }
             }
             val ux by remember {
@@ -139,14 +134,17 @@ fun TransformContentView(
             }
             val uOffset by remember { derivedStateOf { Offset(ux, uy) } }
             LaunchedEffect(key1 = transformContentState.onActionTarget) {
-                if (transformContentState.onActionTarget) {
+                if (transformContentState.onActionTarget == true) {
                     transformContentState.enterTransform(uSize, uOffset)
-                } else {
+                } else if (transformContentState.onActionTarget == false) {
                     transformContentState.exitTransform()
                 }
             }
             Box(
                 modifier = Modifier
+                    .graphicsLayer {
+
+                    }
                     .size(
                         width = LocalDensity.current.run { transformContentState.bw.value.toDp() },
                         height = LocalDensity.current.run { transformContentState.bh.value.toDp() },
@@ -181,7 +179,7 @@ class TransformContentState(
 
     var onAction by mutableStateOf(false)
 
-    var onActionTarget by mutableStateOf(false)
+    var onActionTarget by mutableStateOf<Boolean?>(null)
 
     var bw = Animatable(0F)
 
@@ -190,6 +188,10 @@ class TransformContentState(
     var bx = Animatable(0F)
 
     var by = Animatable(0F)
+
+    var uSize: IntSize by mutableStateOf(IntSize.Zero)
+
+    var bSize: IntSize by mutableStateOf(IntSize.Zero)
 
     var contentVisible by mutableStateOf(true)
 
@@ -212,6 +214,9 @@ class TransformContentState(
         fun goCallEnd() {
             callEnd()
             c.resume(Unit)
+            endAsyncCallBack?.invoke()
+            endAsyncCallBack = null
+            onActionTarget = null
         }
 
         fun goEndAction(endAction: suspend () -> Unit) {
@@ -260,6 +265,9 @@ class TransformContentState(
         var endCount = 0
         fun goCallEnd() {
             c.resume(Unit)
+            startAsyncCallBack?.invoke()
+            startAsyncCallBack = null
+            onActionTarget = null
         }
 
         fun goEndAction(endAction: suspend () -> Unit) {
@@ -310,6 +318,24 @@ class TransformContentState(
         onActionTarget = false
     }
 
+    var startAsyncCallBack: (() -> Unit)? = null
+
+    suspend fun startAsync(transformItemState: TransformItemState) = suspendCoroutine<Unit> { c ->
+        startAsyncCallBack = {
+            c.resume(Unit)
+        }
+        start(transformItemState)
+    }
+
+    var endAsyncCallBack: (() -> Unit)? = null
+
+    suspend fun endAsync() = suspendCoroutine<Unit> { c ->
+        endAsyncCallBack = {
+            c.resume(Unit)
+        }
+        end()
+    }
+
 }
 
 @Composable
@@ -334,13 +360,11 @@ fun rememberTransformItemState(): TransformItemState {
 @Composable
 fun TransformItemView(
     modifier: Modifier = Modifier,
+    itemState: TransformItemState = rememberTransformItemState(),
     contentState: TransformContentState,
-    itemState: (TransformItemState) -> Unit = {},
     content: @Composable () -> Unit,
 ) {
-    val transformItemState = rememberTransformItemState()
-    itemState(transformItemState)
-    transformItemState.blockCompose = remember {
+    itemState.blockCompose = remember {
         movableContentOf {
             content()
         }
@@ -348,15 +372,15 @@ fun TransformItemView(
     Box(
         modifier = modifier
             .onGloballyPositioned {
-                transformItemState.blockPosition = it.positionInRoot()
-                transformItemState.blockSize = it.size
+                itemState.blockPosition = it.positionInRoot()
+                itemState.blockSize = it.size
             }
             .fillMaxSize()
     ) {
         if (
-            contentState.itemState != transformItemState || !contentState.onAction
+            contentState.itemState != itemState || !contentState.onAction
         ) {
-            transformItemState.blockCompose()
+            itemState.blockCompose()
         }
     }
 }

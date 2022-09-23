@@ -104,7 +104,6 @@ class ImagePreviewerState(
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun rememberPreviewerState(
     index: Int = 0,

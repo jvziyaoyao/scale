@@ -63,11 +63,11 @@ class ImageViewerState(
     // 旋转
     val rotation = Animatable(rotation)
 
+    // 默认显示大小
+    var defaultSize by mutableStateOf(IntSize(0, 0))
+
     // 容器大小
     internal var containerSize by mutableStateOf(IntSize(0, 0))
-
-    // 默认显示大小
-    internal var defaultSize by mutableStateOf(IntSize(0, 0))
 
     // 最大缩放
     internal var maxScale by mutableStateOf(1F)
@@ -87,6 +87,16 @@ class ImageViewerState(
                 || offsetX.isRunning
                 || offsetY.isRunning
                 || rotation.isRunning
+    }
+
+    /**
+     * 立即设置回初始值
+     */
+    suspend fun resetImmediately() {
+        rotation.snapTo(DEFAULT_ROTATION)
+        offsetX.snapTo(DEFAULT_OFFSET_X)
+        offsetY.snapTo(DEFAULT_OFFSET_Y)
+        scale.snapTo(DEFAULT_SCALE)
     }
 
     /**
