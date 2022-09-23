@@ -4,17 +4,16 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -68,94 +67,41 @@ fun TransformImageView(
 fun TransformContentView(
     transformContentState: TransformContentState = rememberTransformContentState(),
 ) {
-    var bSize by remember { mutableStateOf(IntSize.Zero) }
-    if (transformContentState.contentVisible) Box(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .onGloballyPositioned {
-                bSize = it.size
-                transformContentState.bSize = bSize
+                transformContentState.containerSize = it.size
             },
     ) {
         if (
-            transformContentState.displayCompose != null
+            transformContentState.srcCompose != null
             && transformContentState.onAction
         ) {
-            // 容器比例
-            val bRatio by remember {
-                derivedStateOf {
-                    bSize.width.toFloat() / bSize.height.toFloat()
-                }
-            }
-            // 图片原始比例
-            val oRatio by remember {
-                derivedStateOf {
-                    transformContentState.displayIntrinsicSize!!.width / transformContentState.displayIntrinsicSize!!.height
-                }
-            }
-            // 是否宽度与容器大小一致
-            var widthFixed by remember { mutableStateOf(false) }
-            // 显示大小
-            val uSize by remember {
-                derivedStateOf {
-                    transformContentState.uSize = if (oRatio > bRatio) {
-                        // 宽度一致
-                        val uW = bSize.width
-                        val uH = uW / oRatio
-                        widthFixed = true
-                        IntSize(uW, uH.toInt())
-                    } else {
-                        // 高度一致
-                        val uH = bSize.height
-                        val uW = uH * oRatio
-                        widthFixed = false
-                        IntSize(uW.toInt(), uH)
-                    }
-                    transformContentState.uSize
-                }
-            }
-            val ux by remember {
-                derivedStateOf {
-                    if (widthFixed) {
-                        0F
-                    } else {
-                        (bSize.width - uSize.width).div(2).toFloat()
-                    }
-                }
-            }
-            val uy by remember {
-                derivedStateOf {
-                    if (!widthFixed) {
-                        0F
-                    } else {
-                        (bSize.height - uSize.height).div(2).toFloat()
-                    }
-                }
-            }
-            val uOffset by remember { derivedStateOf { Offset(ux, uy) } }
             LaunchedEffect(key1 = transformContentState.onActionTarget) {
                 if (transformContentState.onActionTarget == true) {
-                    transformContentState.enterTransform(uSize, uOffset)
+                    transformContentState.enterTransform()
                 } else if (transformContentState.onActionTarget == false) {
                     transformContentState.exitTransform()
                 }
             }
             Box(
                 modifier = Modifier
-                    .graphicsLayer {
-
-                    }
-                    .size(
-                        width = LocalDensity.current.run { transformContentState.bw.value.toDp() },
-                        height = LocalDensity.current.run { transformContentState.bh.value.toDp() },
-                    )
                     .offset(
-                        x = LocalDensity.current.run { transformContentState.bx.value.toDp() },
-                        y = LocalDensity.current.run { transformContentState.by.value.toDp() },
+                        x = LocalDensity.current.run { transformContentState.offsetX.value.toDp() },
+                        y = LocalDensity.current.run { transformContentState.offsetY.value.toDp() },
                     )
-                    .background(MaterialTheme.colors.error.copy(0.2F)),
+                    .size(
+                        width = LocalDensity.current.run { transformContentState.displayWidth.value.toDp() },
+                        height = LocalDensity.current.run { transformContentState.displayHeight.value.toDp() },
+                    )
+                    .graphicsLayer {
+                        transformOrigin = TransformOrigin(0F, 0F)
+                        scaleX = transformContentState.graphicScaleX.value
+                        scaleY = transformContentState.graphicScaleY.value
+                    },
             ) {
-                transformContentState.displayCompose!!()
+                transformContentState.srcCompose!!()
             }
         }
     }
@@ -168,39 +114,91 @@ class TransformContentState(
 
     var itemState: TransformItemState? by mutableStateOf(null)
 
-    val displayIntrinsicSize: Size?
-        get() = itemState?.intrinsicSize
+    val intrinsicSize: Size
+        get() = itemState?.intrinsicSize ?: Size.Zero
 
-    var displayPosition: Offset by mutableStateOf(Offset.Zero)
+    val intrinsicRatio: Float
+        get() {
+            if (intrinsicSize.height == 0F) return 1F
+            return intrinsicSize.width.div(intrinsicSize.height)
+        }
 
-    var displaySize: IntSize by mutableStateOf(IntSize.Zero)
+    val srcPosition: Offset
+        get() = itemState?.blockPosition ?: Offset.Zero
 
-    var displayCompose: (@Composable () -> Unit)? by mutableStateOf(null)
+    val srcSize: IntSize
+        get() = itemState?.blockSize ?: IntSize.Zero
+
+    val srcCompose: (@Composable () -> Unit)?
+        get() = itemState?.blockCompose
 
     var onAction by mutableStateOf(false)
 
     var onActionTarget by mutableStateOf<Boolean?>(null)
 
-    var bw = Animatable(0F)
+    var displayWidth = Animatable(0F)
 
-    var bh = Animatable(0F)
+    var displayHeight = Animatable(0F)
 
-    var bx = Animatable(0F)
+    var graphicScaleX = Animatable(1F)
 
-    var by = Animatable(0F)
+    var graphicScaleY = Animatable(1F)
 
-    var uSize: IntSize by mutableStateOf(IntSize.Zero)
+    var offsetX = Animatable(0F)
 
-    var bSize: IntSize by mutableStateOf(IntSize.Zero)
+    var offsetY = Animatable(0F)
 
-    var contentVisible by mutableStateOf(true)
+    var containerSize by mutableStateOf(IntSize.Zero)
 
-    private fun setPreStartParams() {
-        bw = Animatable(displaySize.width.toFloat())
-        bh = Animatable(displaySize.height.toFloat())
-        bx = Animatable(displayPosition.x)
-        by = Animatable(displayPosition.y)
-    }
+    val containerRatio: Float
+        get() {
+            if (containerSize.height == 0) return 1F
+            return containerSize.width.toFloat().div(containerSize.height)
+        }
+
+    val widthFixed: Boolean
+        get() = intrinsicRatio > containerRatio
+
+    val fitSize: Size
+        get() {
+            return if (intrinsicRatio > containerRatio) {
+                // 宽度一致
+                val uW = containerSize.width
+                val uH = uW / intrinsicRatio
+                Size(uW.toFloat(), uH)
+            } else {
+                // 高度一致
+                val uH = containerSize.height
+                val uW = uH * intrinsicRatio
+                Size(uW, uH.toFloat())
+            }
+        }
+
+    val fitOffsetX: Float
+        get() {
+            return if (widthFixed) {
+                0F
+            } else {
+                (containerSize.width - fitSize.width).div(2).toFloat()
+            }
+        }
+
+    val fitOffsetY: Float
+        get() {
+            return if (!widthFixed) {
+                0F
+            } else {
+                (containerSize.height - fitSize.height).div(2).toFloat()
+            }
+        }
+
+    val fitScale: Float
+        get() = fitSize.width.div(displayRatioSize.width)
+
+    val displayRatioSize: Size
+        get() {
+            return Size(width = srcSize.width.toFloat(), height = srcSize.width.div(intrinsicRatio))
+        }
 
     private fun callEnd() {
         onAction = false
@@ -224,41 +222,33 @@ class TransformContentState(
                 endAction()
                 mutex.withLock {
                     endCount++
-                    if (endCount >= 4) {
+                    if (endCount >= 6) {
                         goCallEnd()
                     }
                 }
             }
         }
         goEndAction {
-            bw.animateTo(
-                displaySize.width.toFloat(),
-                animationSpec = animationSpec
-            )
+            displayWidth.animateTo(srcSize.width.toFloat(), animationSpec)
         }
         goEndAction {
-            bh.animateTo(
-                displaySize.height.toFloat(),
-                animationSpec = animationSpec
-            )
+            displayHeight.animateTo(srcSize.height.toFloat(), animationSpec)
         }
         goEndAction {
-            bx.animateTo(
-                displayPosition.x,
-                animationSpec = animationSpec
-            )
+            graphicScaleX.animateTo(1F, animationSpec)
         }
         goEndAction {
-            by.animateTo(
-                displayPosition.y,
-                animationSpec = animationSpec
-            )
+            graphicScaleY.animateTo(1F, animationSpec)
+        }
+        goEndAction {
+            offsetX.animateTo(srcPosition.x, animationSpec)
+        }
+        goEndAction {
+            offsetY.animateTo(srcPosition.y, animationSpec)
         }
     }
 
     suspend fun enterTransform(
-        uSize: IntSize,
-        uOffset: Offset,
         animationSpec: AnimationSpec<Float> = defaultAnimationSpec
     ) = suspendCoroutine<Unit> { c ->
         val mutex = Mutex()
@@ -275,41 +265,43 @@ class TransformContentState(
                 endAction()
                 mutex.withLock {
                     endCount++
-                    if (endCount >= 4) {
+                    if (endCount >= 6) {
                         goCallEnd()
                     }
                 }
             }
         }
         goEndAction {
-            bw.animateTo(
-                uSize.width.toFloat(),
-                animationSpec = animationSpec
-            )
+            displayWidth.animateTo(displayRatioSize.width, animationSpec)
         }
         goEndAction {
-            bh.animateTo(
-                uSize.height.toFloat(),
-                animationSpec = animationSpec
-            )
+            displayHeight.animateTo(displayRatioSize.height, animationSpec)
         }
         goEndAction {
-            bx.animateTo(uOffset.x, animationSpec = animationSpec)
+            graphicScaleX.animateTo(fitScale, animationSpec)
         }
         goEndAction {
-            by.animateTo(uOffset.y, animationSpec = animationSpec)
+            graphicScaleY.animateTo(fitScale, animationSpec)
+        }
+        goEndAction {
+            offsetX.animateTo(fitOffsetX, animationSpec)
+        }
+        goEndAction {
+            offsetY.animateTo(fitOffsetY, animationSpec)
         }
     }
 
     fun start(transformItemState: TransformItemState) {
         itemState = transformItemState
-        displayPosition = transformItemState.blockPosition.copy()
-        displaySize = IntSize(
-            width = transformItemState.blockSize.width,
-            height = transformItemState.blockSize.height
-        )
-        displayCompose = transformItemState.blockCompose
-        setPreStartParams()
+
+        displayWidth = Animatable(srcSize.width.toFloat())
+        displayHeight = Animatable(srcSize.height.toFloat())
+        graphicScaleX = Animatable(1F)
+        graphicScaleY = Animatable(1F)
+
+        offsetX = Animatable(srcPosition.x)
+        offsetY = Animatable(srcPosition.y)
+
         onActionTarget = true
         onAction = true
     }
@@ -340,9 +332,10 @@ class TransformContentState(
 
 @Composable
 fun rememberTransformContentState(
-    scope: CoroutineScope = rememberCoroutineScope()
+    scope: CoroutineScope = rememberCoroutineScope(),
+    animationSpec: AnimationSpec<Float> = SpringSpec()
 ): TransformContentState {
-    return remember { TransformContentState(scope) }
+    return remember { TransformContentState(scope, animationSpec) }
 }
 
 class TransformItemState(
