@@ -13,9 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
@@ -38,14 +40,27 @@ import kotlin.coroutines.suspendCoroutine
  * @create: 2022-09-22 10:13
  **/
 
+val imageTransformMutex = Mutex()
+val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>()
+
 @Composable
 fun TransformImageView(
     modifier: Modifier = Modifier,
     painter: Painter,
+    key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
     contentState: TransformContentState = rememberTransformContentState(),
 ) {
-    TransformItemView(
+    val scope = rememberCoroutineScope()
+    SideEffect {
+        scope.launch {
+            imageTransformMutex.withLock {
+                transformItemStateMap[key] = itemState
+            }
+        }
+    }
+    TransformImageView(
+        modifier = modifier,
         itemState = itemState,
         contentState = contentState,
     ) {
@@ -55,11 +70,87 @@ fun TransformImageView(
             }
         }
         Image(
-            modifier = modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             painter = painter,
             contentDescription = null,
             contentScale = ContentScale.Crop,
         )
+    }
+    DisposableEffect(key1 = painter) {
+        scope.launch {
+            imageTransformMutex.withLock {
+                transformItemStateMap.remove(key)
+            }
+        }
+        onDispose {}
+    }
+}
+
+@Composable
+fun TransformImageView(
+    modifier: Modifier = Modifier,
+    bitmap: ImageBitmap,
+    itemState: TransformItemState = rememberTransformItemState(),
+    contentState: TransformContentState = rememberTransformContentState(),
+) {
+    TransformImageView(
+        modifier = modifier,
+        itemState = itemState,
+        contentState = contentState,
+    ) {
+        itemState.intrinsicSize = Size(
+            bitmap.width.toFloat(),
+            bitmap.height.toFloat()
+        )
+        Image(
+            modifier = Modifier.fillMaxSize(),
+            bitmap = bitmap,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+        )
+    }
+}
+
+@Composable
+fun TransformImageView(
+    modifier: Modifier = Modifier,
+    imageVector: ImageVector,
+    itemState: TransformItemState = rememberTransformItemState(),
+    contentState: TransformContentState = rememberTransformContentState(),
+) {
+    TransformImageView(
+        modifier = modifier,
+        itemState = itemState,
+        contentState = contentState,
+    ) {
+        LocalDensity.current.run {
+            itemState.intrinsicSize = Size(
+                imageVector.defaultWidth.toPx(),
+                imageVector.defaultHeight.toPx(),
+            )
+        }
+        Image(
+            modifier = Modifier.fillMaxSize(),
+            imageVector = imageVector,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+        )
+    }
+}
+
+@Composable
+fun TransformImageView(
+    modifier: Modifier = Modifier,
+    itemState: TransformItemState = rememberTransformItemState(),
+    contentState: TransformContentState = rememberTransformContentState(),
+    content: @Composable () -> Unit,
+) {
+    TransformItemView(
+        modifier = modifier,
+        itemState = itemState,
+        contentState = contentState,
+    ) {
+        content()
     }
 }
 

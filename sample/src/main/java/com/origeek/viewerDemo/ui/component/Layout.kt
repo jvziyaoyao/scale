@@ -78,3 +78,42 @@ fun GridLayout(
         }
     }
 }
+
+@Composable
+fun LazyGridLayout(
+    modifier: Modifier = Modifier,
+    columns: Int,
+    size: Int,
+    padding: Dp = 0.dp,
+    state: LazyListState = rememberLazyListState(),
+    contentPadding: PaddingValues = PaddingValues(),
+    block: @Composable (Int) -> Unit,
+) {
+    val line = ceil(size.toDouble() / columns).toInt()
+    val halfPadding = padding.div(2)
+    LazyColumn(
+        modifier = modifier,
+        state = state,
+        content = {
+            items(count = line, key = { it }) { c ->
+                if (c != 0) Spacer(modifier = Modifier.height(halfPadding))
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    for (r in 0 until columns) {
+                        val index = c * columns + r
+                        if (r != 0) Spacer(modifier = Modifier.width(halfPadding))
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                        ) {
+                            if (index < size) {
+                                block(index)
+                            }
+                        }
+                        if (r != columns - 1) Spacer(modifier = Modifier.width(halfPadding))
+                    }
+                }
+                if (c != line - 1) Spacer(modifier = Modifier.height(halfPadding))
+            }
+        }, contentPadding = contentPadding
+    )
+}
