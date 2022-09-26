@@ -191,7 +191,7 @@ fun ImagePreviewer(
     }
 }
 
-@OptIn(ExperimentalPagerApi::class, InternalCoroutinesApi::class)
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ImageGallery(
     modifier: Modifier = Modifier,

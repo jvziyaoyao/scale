@@ -72,6 +72,7 @@ fun TransformContentView(
             .fillMaxSize()
             .onGloballyPositioned {
                 transformContentState.containerSize = it.size
+                transformContentState.containerOffset = it.positionInRoot()
             },
     ) {
         if (
@@ -88,8 +89,8 @@ fun TransformContentView(
             Box(
                 modifier = Modifier
                     .offset(
-                        x = LocalDensity.current.run { transformContentState.offsetX.value.toDp() },
-                        y = LocalDensity.current.run { transformContentState.offsetY.value.toDp() },
+                        x = LocalDensity.current.run { (transformContentState.offsetX.value).toDp() },
+                        y = LocalDensity.current.run { (transformContentState.offsetY.value).toDp() },
                     )
                     .size(
                         width = LocalDensity.current.run { transformContentState.displayWidth.value.toDp() },
@@ -124,7 +125,10 @@ class TransformContentState(
         }
 
     val srcPosition: Offset
-        get() = itemState?.blockPosition ?: Offset.Zero
+        get() {
+            val offset = itemState?.blockPosition ?: Offset.Zero
+            return offset.copy(x = offset.x - containerOffset.x, y = offset.y - containerOffset.y)
+        }
 
     val srcSize: IntSize
         get() = itemState?.blockSize ?: IntSize.Zero
@@ -147,6 +151,8 @@ class TransformContentState(
     var offsetX = Animatable(0F)
 
     var offsetY = Animatable(0F)
+
+    var containerOffset by mutableStateOf(Offset.Zero)
 
     var containerSize by mutableStateOf(IntSize.Zero)
 
@@ -310,7 +316,7 @@ class TransformContentState(
         onActionTarget = false
     }
 
-    var startAsyncCallBack: (() -> Unit)? = null
+    private var startAsyncCallBack: (() -> Unit)? = null
 
     suspend fun startAsync(transformItemState: TransformItemState) = suspendCoroutine<Unit> { c ->
         startAsyncCallBack = {
@@ -319,7 +325,7 @@ class TransformContentState(
         start(transformItemState)
     }
 
-    var endAsyncCallBack: (() -> Unit)? = null
+    private var endAsyncCallBack: (() -> Unit)? = null
 
     suspend fun endAsync() = suspendCoroutine<Unit> { c ->
         endAsyncCallBack = {
