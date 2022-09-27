@@ -94,7 +94,7 @@ fun PreviewerBody(
                 Image(
                     modifier = Modifier
                         .clickable {
-                            imageViewerState.show(index = index)
+                            imageViewerState.open(index = index)
                         }
                         .fillMaxWidth()
                         .aspectRatio(1F),
@@ -104,15 +104,15 @@ fun PreviewerBody(
                 )
             }
         }
-        LaunchedEffect(key1 = imageViewerState.show, block = {
-            onImageViewVisible(imageViewerState.show)
+        LaunchedEffect(key1 = imageViewerState.visible, block = {
+            onImageViewVisible(imageViewerState.visible)
         })
         ImagePreviewer(
             count = images.size,
             state = imageViewerState,
             imageLoader = { index -> painterResource(id = images[index]) },
             onTap = {
-                imageViewerState.hide()
+                imageViewerState.close()
             }
         )
     }

@@ -40,8 +40,8 @@ import kotlin.coroutines.suspendCoroutine
  * @create: 2022-09-22 10:13
  **/
 
-val imageTransformMutex = Mutex()
-val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>()
+internal val imageTransformMutex = Mutex()
+internal val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>()
 
 @Composable
 fun TransformImageView(

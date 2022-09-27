@@ -30,6 +30,8 @@ class HomeActivity : BaseActivity() {
                     goActivity(GalleryActivity::class.java)
                 }, goPreviewer = {
                     goActivity(PreviewerActivity::class.java)
+                }, goTransform = {
+                    goActivity(TransformActivity::class.java)
                 })
             }
         }
@@ -48,6 +50,7 @@ fun HomeBody(
     goHuge: () -> Unit,
     goGallery: () -> Unit,
     goPreviewer: () -> Unit,
+    goTransform: () -> Unit,
 ) {
     val state = rememberScrollState()
     Column(
@@ -65,6 +68,8 @@ fun HomeBody(
         HomeLargeButton(title = "ImageGallery", onClick = goGallery)
         Spacer(modifier = Modifier.height(24.dp))
         HomeLargeButton(title = "ImagePreviewer", onClick = goPreviewer)
+        Spacer(modifier = Modifier.height(24.dp))
+        HomeLargeButton(title = "TransformPreviewer", onClick = goTransform)
     }
 }
 
