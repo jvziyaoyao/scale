@@ -1,18 +1,25 @@
 package com.origeek.viewerDemo
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -22,6 +29,7 @@ import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.LazyGridLayout
 import com.origeek.viewerDemo.ui.component.rememberCoilImagePainter
 import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.stream.Collectors
 
@@ -78,6 +86,7 @@ data class DrawableItem(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun TransformBody(images: List<DrawableItem>) {
+    val scope = rememberCoroutineScope()
     val transformContentState = rememberTransformContentState()
     val previewerState = rememberPreviewerState(transformState = transformContentState)
     val lineCount = 3
@@ -86,9 +95,11 @@ fun TransformBody(images: List<DrawableItem>) {
         val id = images[index].id
         previewerState.closeTransform(id)
     }
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .systemBarsPadding()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -113,16 +124,32 @@ fun TransformBody(images: List<DrawableItem>) {
                 val item = images[index]
                 val painter = painterResource(id = item.res)
                 val itemState = rememberTransformItemState()
+                val itemScale = remember { Animatable(1F) }
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1F)
+                        .scale(itemScale.value)
                         .pointerInput(Unit) {
-                            detectTapGestures {
-                                previewerState.openTransform(
-                                    index = index,
-                                    itemState = itemState,
-                                )
+                            forEachGesture {
+                                awaitPointerEventScope {
+                                    awaitFirstDown()
+                                    // 这里开始
+                                    scope.launch {
+                                        itemScale.animateTo(0.84F)
+                                    }
+                                    do {
+                                        val event = awaitPointerEvent()
+                                    } while (event.changes.any { it.pressed })
+                                    // 这里结束
+                                    scope.launch {
+                                        itemScale.animateTo(1F)
+                                    }
+                                    previewerState.openTransform(
+                                        index = index,
+                                        itemState = itemState,
+                                    )
+                                }
                             }
                         }
                 ) {
