@@ -67,7 +67,8 @@ class ImageViewerState(
     var defaultSize by mutableStateOf(IntSize(0, 0))
 
     // 容器大小
-    internal var containerSize by mutableStateOf(IntSize(0, 0))
+    // TODO 先开放public
+    var containerSize by mutableStateOf(IntSize(0, 0))
 
     // 最大缩放
     internal var maxScale by mutableStateOf(1F)
