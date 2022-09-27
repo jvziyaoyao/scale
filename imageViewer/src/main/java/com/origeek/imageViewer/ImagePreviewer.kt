@@ -298,6 +298,7 @@ fun ImagePreviewer(
     onTap: () -> Unit = {},
     onDoubleTap: () -> Boolean = { false },
     onLongPress: () -> Unit = {},
+    viewerContainer: @Composable (viewer: @Composable () -> Unit) -> Unit = { it() },
     background: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> DefaultPreviewerBackground() },
     foreground: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> },
 ) {
@@ -322,6 +323,7 @@ fun ImagePreviewer(
                     onTap = onTap,
                     onDoubleTap = onDoubleTap,
                     onLongPress = onLongPress,
+                    viewerContainer = viewerContainer,
                     background = {
                         background(count, it)
                     },
@@ -362,6 +364,7 @@ fun ImageGallery(
     onTap: () -> Unit = {},
     onDoubleTap: () -> Boolean = { false },
     onLongPress: () -> Unit = {},
+    viewerContainer: @Composable (viewer: @Composable () -> Unit) -> Unit = { it() },
     background: @Composable ((Int) -> Unit) = {},
     foreground: @Composable ((Int) -> Unit) = {},
 ) {
@@ -392,26 +395,28 @@ fun ImageGallery(
                 if (currentPage != page) imageState.reset()
                 if (currentPage == page) currentViewerState(imageState)
             }
-            Box(
-                modifier = Modifier
-                    .fillMaxSize(),
-            ) {
-                key(count, page) {
-                    ImageViewer(
-                        model = imageLoader(page),
-                        state = imageState,
-                        boundClip = false,
-                        onTap = {
-                            onTap()
-                        },
-                        onDoubleTap = {
-                            val consumed = onDoubleTap()
-                            if (!consumed) scope.launch {
-                                imageState.toggleScale(it)
-                            }
-                        },
-                        onLongPress = { onLongPress() },
-                    )
+            viewerContainer {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                ) {
+                    key(count, page) {
+                        ImageViewer(
+                            model = imageLoader(page),
+                            state = imageState,
+                            boundClip = false,
+                            onTap = {
+                                onTap()
+                            },
+                            onDoubleTap = {
+                                val consumed = onDoubleTap()
+                                if (!consumed) scope.launch {
+                                    imageState.toggleScale(it)
+                                }
+                            },
+                            onLongPress = { onLongPress() },
+                        )
+                    }
                 }
             }
         }
