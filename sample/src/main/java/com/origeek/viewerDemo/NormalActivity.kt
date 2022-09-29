@@ -40,7 +40,6 @@ fun NormalBody() {
 
     Box(modifier = Modifier
         .fillMaxSize()
-        .background(MaterialTheme.colors.error.copy(0.2F))
         .pointerInput(Unit) {
             detectVerticalDragGestures(
                 onDragStart = {},

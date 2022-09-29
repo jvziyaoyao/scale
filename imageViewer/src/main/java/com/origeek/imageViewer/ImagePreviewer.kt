@@ -1,16 +1,10 @@
 package com.origeek.imageViewer
 
-import android.util.Log
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.compose.animation.*
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.SpringSpec
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.Box
@@ -80,9 +74,9 @@ class ImagePreviewerState @OptIn(ExperimentalPagerApi::class) constructor(
 
     var visibleTarget by mutableStateOf<Boolean?>(false)
 
-    val canOpen by derivedStateOf { !visible && visibleTarget == null }
+    val canOpen by derivedStateOf { !visible && visibleTarget == null && !animating }
 
-    val canClose by derivedStateOf { visible && visibleTarget == null }
+    val canClose by derivedStateOf { visible && visibleTarget == null && !animating }
 
     val viewerVisibleOpenAnimateSpec: AnimationSpec<Float> = SpringSpec()
 
@@ -128,12 +122,19 @@ class ImagePreviewerState @OptIn(ExperimentalPagerApi::class) constructor(
     private suspend fun stateCloseEnd() =
         updateState(animating = false, visible = false, visibleTarget = null)
 
+    private fun findTransformItem(key: Any) = transformItemStateMap[key]
+
     internal suspend fun verticalDrag(pointerInputScope: PointerInputScope) {
         pointerInputScope.apply {
             var vStartOffset by mutableStateOf<Offset?>(null)
             var vOrientationDown by mutableStateOf<Boolean?>(null)
             if (getKey != null) detectVerticalDragGestures(
                 onDragStart = {
+                    getKey?.apply {
+                        findTransformItem(invoke(currentPage))?.apply {
+                            transformState.itemState = this
+                        }
+                    }
                     if (imageViewerState?.scale?.value == 1F) {
                         vStartOffset = it
                         imageViewerState?.allowGestureInput = false
@@ -271,9 +272,9 @@ class ImagePreviewerState @OptIn(ExperimentalPagerApi::class) constructor(
             contentVisible = true
             galleryVisible = true
             ticket.awaitNextTicket()
+            pagerState.scrollToPage(index)
             imageViewerVisible.snapTo(0F)
             transformState.startAsync(itemState)
-            pagerState.scrollToPage(index)
             imageViewerVisible.animateTo(
                 targetValue = 1F,
                 animationSpec = viewerVisibleOpenAnimateSpec
@@ -290,7 +291,7 @@ class ImagePreviewerState @OptIn(ExperimentalPagerApi::class) constructor(
         transformState.onAction = true
         scope.launch {
             stateCloseStart()
-            val itemState = transformItemStateMap[key]
+            val itemState = findTransformItem(key)
             if (itemState != null) {
                 contentVisible = true
                 transformState.itemState = itemState
