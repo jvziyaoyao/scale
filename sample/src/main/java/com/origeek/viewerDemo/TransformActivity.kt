@@ -12,11 +12,8 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -89,6 +86,12 @@ fun TransformBody(images: List<DrawableItem>) {
     val scope = rememberCoroutineScope()
     val transformContentState = rememberTransformContentState()
     val previewerState = rememberPreviewerState(transformState = transformContentState)
+    var openVerticalDrag by remember { mutableStateOf(true) }
+    if (openVerticalDrag) {
+        previewerState.enableVerticalDrag { images[it].id }
+    } else {
+        previewerState.disableVerticalDrag()
+    }
     val lineCount = 3
     if (previewerState.canClose) BackHandler {
         val index = previewerState.currentPage
@@ -100,14 +103,33 @@ fun TransformBody(images: List<DrawableItem>) {
             .fillMaxSize()
             .systemBarsPadding()
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(3F)
                 .padding(top = 24.dp),
-            contentAlignment = Alignment.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
             Text(text = "🎈 Transform")
+            Spacer(modifier = Modifier.height(24.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "👋 VerticalDrag:")
+                Spacer(modifier = Modifier.width(12.dp))
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = if (openVerticalDrag) MaterialTheme.colors.error else MaterialTheme.colors.primary
+                    ),
+                    onClick = {
+                        openVerticalDrag = !openVerticalDrag
+                    }) {
+                    if (openVerticalDrag) {
+                        Text(text = "OFF")
+                    } else {
+                        Text(text = "ON")
+                    }
+                }
+            }
         }
         Box(
             modifier = Modifier

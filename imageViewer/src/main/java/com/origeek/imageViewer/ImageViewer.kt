@@ -63,6 +63,9 @@ class ImageViewerState(
     // 旋转
     val rotation = Animatable(rotation)
 
+    // 是否允许手势输入
+    var allowGestureInput by mutableStateOf(true)
+
     // 默认显示大小
     var defaultSize by mutableStateOf(IntSize(0, 0))
 
@@ -266,20 +269,22 @@ fun ImageViewer(
             onDoubleTap = onDoubleTap,
             onLongPress = onLongPress,
             gestureStart = {
-                eventChangeCount = 0
-                velocityTracker = VelocityTracker()
-                scope.launch {
-                    state.offsetX.stop()
-                    state.offsetY.stop()
-                    state.offsetX.updateBounds(null, null)
-                    state.offsetY.updateBounds(null, null)
+                if (state.allowGestureInput) {
+                    eventChangeCount = 0
+                    velocityTracker = VelocityTracker()
+                    scope.launch {
+                        state.offsetX.stop()
+                        state.offsetY.stop()
+                        state.offsetX.updateBounds(null, null)
+                        state.offsetY.updateBounds(null, null)
+                    }
+                    asyncDesParams()
                 }
-                asyncDesParams()
             },
             gestureEnd = { transformOnly ->
                 // transformOnly记录手势事件中是否有位移，如果只是点击或双击，会返回false
                 // 如果正在动画中，就不要执行后续动作，如：reset指令执行时
-                if (transformOnly && !state.isRunning()) {
+                if (transformOnly && !state.isRunning() && state.allowGestureInput) {
                     // 处理加速度添加的点为空的情况
                     var velocity = try {
                         velocityTracker.calculateVelocity()
@@ -352,6 +357,8 @@ fun ImageViewer(
                 }
             },
         ) { center, pan, _zoom, _rotate, event ->
+            // 当禁止手势输入时
+            if (!state.allowGestureInput) return@RawGesture true
             // 这里只记录最大手指数
             if (event.changes.size > eventChangeCount) eventChangeCount = event.changes.size
             // 如果手指数从多个变成一个，就结束本次手势操作
