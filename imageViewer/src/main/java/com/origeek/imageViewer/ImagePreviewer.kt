@@ -1,15 +1,20 @@
 package com.origeek.imageViewer
 
+import android.util.Log
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
@@ -43,26 +48,28 @@ fun DefaultPreviewerBackground() {
     )
 }
 
+class ImagePreviewerState internal constructor() {
 
-class ImagePreviewerState @OptIn(ExperimentalPagerApi::class) constructor(
-    val pagerState: PagerState,
-    val transformState: TransformContentState,
-    private val scope: CoroutineScope,
-) {
+    lateinit var scope: CoroutineScope
+
+    @OptIn(ExperimentalPagerApi::class)
+    lateinit var pagerState: PagerState
+
+    lateinit var transformState: TransformContentState
 
     private var mutex = Mutex()
 
     internal var imageViewerState by mutableStateOf<ImageViewerState?>(null)
 
-    internal val imageViewerVisible = Animatable(0F)
+    internal var imageViewerVisible = Animatable(0F)
 
-    internal var animateGalleryItems by mutableStateOf(false)
+    internal var animateGalleryItems by mutableStateOf(true)
 
     internal var contentVisible by mutableStateOf(false)
 
     internal var galleryVisible by mutableStateOf(false)
 
-    internal val uiAlpha = Animatable(1F)
+    internal var uiAlpha = Animatable(1F)
 
     internal val ticket = Ticket()
 
@@ -72,11 +79,13 @@ class ImagePreviewerState @OptIn(ExperimentalPagerApi::class) constructor(
 
     var visible by mutableStateOf(false)
 
-    var visibleTarget by mutableStateOf<Boolean?>(false)
+    var visibleTarget by mutableStateOf<Boolean?>(null)
 
-    val canOpen by derivedStateOf { !visible && visibleTarget == null && !animating }
+    val canOpen: Boolean
+        get() = !visible && visibleTarget == null && !animating
 
-    val canClose by derivedStateOf { visible && visibleTarget == null && !animating }
+    val canClose: Boolean
+        get() = visible && visibleTarget == null && !animating
 
     val viewerVisibleOpenAnimateSpec: AnimationSpec<Float> = SpringSpec()
 
@@ -130,11 +139,13 @@ class ImagePreviewerState @OptIn(ExperimentalPagerApi::class) constructor(
             var vOrientationDown by mutableStateOf<Boolean?>(null)
             if (getKey != null) detectVerticalDragGestures(
                 onDragStart = {
+                    var tramsformItemState: TransformItemState? = null
                     getKey?.apply {
                         findTransformItem(invoke(currentPage))?.apply {
-                            transformState.itemState = this
+                            tramsformItemState = this
                         }
                     }
+                    transformState.itemState = tramsformItemState
                     if (imageViewerState?.scale?.value == 1F) {
                         vStartOffset = it
                         imageViewerState?.allowGestureInput = false
@@ -147,7 +158,16 @@ class ImagePreviewerState @OptIn(ExperimentalPagerApi::class) constructor(
                         allowGestureInput = true
                         if (scale.value < 0.8F && getKey != null) {
                             scope.launch {
-                                closeTransformAsync(getKey!!(currentPage))
+                                val key = getKey!!(currentPage)
+                                val transformItem = findTransformItem(key)
+                                if (transformItem != null) {
+                                    closeTransformAsync(key)
+                                } else {
+                                    scale.animateTo(0F)
+                                    transformState.onAction = false
+                                    contentVisible = false
+                                    galleryVisible = false
+                                }
                                 uiAlpha.snapTo(1F)
                             }
                         } else {
@@ -244,7 +264,7 @@ class ImagePreviewerState @OptIn(ExperimentalPagerApi::class) constructor(
     fun close(callback: () -> Unit = {}) {
         scope.launch {
             stateCloseStart()
-            animateGalleryItems = true
+            animateGalleryItems = false
             contentVisible = false
             transformState.onActionTarget = null
             transformState.onAction = false
@@ -268,12 +288,12 @@ class ImagePreviewerState @OptIn(ExperimentalPagerApi::class) constructor(
     ) {
         scope.launch {
             stateOpenStart()
-            animateGalleryItems = false
+            animateGalleryItems = true
             contentVisible = true
             galleryVisible = true
+            imageViewerVisible.snapTo(0F)
             ticket.awaitNextTicket()
             pagerState.scrollToPage(index)
-            imageViewerVisible.snapTo(0F)
             transformState.startAsync(itemState)
             imageViewerVisible.animateTo(
                 targetValue = 1F,
@@ -317,15 +337,16 @@ class ImagePreviewerState @OptIn(ExperimentalPagerApi::class) constructor(
                     animationSpec = viewerVisibleCloseAnimateSpec
                 )
                 transformState.exitTransform()
+                galleryVisible = false
             } else {
-                animateGalleryItems = true
+                galleryVisible = true
+                animateGalleryItems = false
             }
             transformState.onActionTarget = null
             transformState.onAction = false
             imageViewerState!!.resetImmediately()
             ticket.awaitNextTicket()
             contentVisible = false
-            galleryVisible = false
 
             // 执行完成后的回调
             stateCloseEnd()
@@ -341,6 +362,30 @@ class ImagePreviewerState @OptIn(ExperimentalPagerApi::class) constructor(
         this.getKey = null
     }
 
+    companion object {
+        val Saver: Saver<ImagePreviewerState, *> = listSaver(
+            save = {
+                listOf<Any>(
+                    it.imageViewerVisible.value,
+                    it.animateGalleryItems,
+                    it.contentVisible,
+                    it.galleryVisible,
+                    it.uiAlpha.value,
+                    it.visible,
+                )
+            },
+            restore = {
+                val previewerState = ImagePreviewerState()
+                previewerState.imageViewerVisible = Animatable(it[0] as Float)
+                previewerState.animateGalleryItems = it[1] as Boolean
+                previewerState.contentVisible = it[2] as Boolean
+                previewerState.galleryVisible = it[3] as Boolean
+                previewerState.uiAlpha = Animatable(it[4] as Float)
+                previewerState.visible = it[5] as Boolean
+                previewerState
+            }
+        )
+    }
 }
 
 @OptIn(ExperimentalPagerApi::class)
@@ -350,13 +395,13 @@ fun rememberPreviewerState(
     transformState: TransformContentState = rememberTransformContentState(),
     scope: CoroutineScope = rememberCoroutineScope(),
 ): ImagePreviewerState {
-    return remember {
-        ImagePreviewerState(
-            pagerState = pagerState,
-            transformState = transformState,
-            scope = scope,
-        )
+    val previewerState = rememberSaveable(saver = ImagePreviewerState.Saver) {
+        ImagePreviewerState()
     }
+    previewerState.pagerState = pagerState
+    previewerState.transformState = transformState
+    previewerState.scope = scope
+    return previewerState
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -390,72 +435,64 @@ fun ImagePreviewer(
     foreground: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> },
 ) {
     if (state.contentVisible) TransformContentView(state.transformState)
-    val galleryItems = remember {
-        movableContentOf {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(state.imageViewerVisible.value)
-                    .pointerInput(state.getKey) {
-                        state.verticalDrag(this)
-                    }
-            ) {
-                @Composable
-                fun UIContainer(content: @Composable () -> Unit) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .alpha(state.uiAlpha.value)
-                    ) {
-                        content()
-                    }
+    @Composable
+    fun GalleryItems() {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .alpha(state.imageViewerVisible.value)
+                .pointerInput(state.getKey) {
+                    state.verticalDrag(this)
                 }
-                ImageGallery(
-                    modifier = modifier.fillMaxSize(),
-                    count = count,
-                    state = state.pagerState,
-                    imageLoader = imageLoader,
-                    currentViewerState = {
-                        state.imageViewerState = it
-                        currentViewerState(it)
-                    },
-                    itemSpacing = itemSpacing,
-                    onTap = onTap,
-                    onDoubleTap = onDoubleTap,
-                    onLongPress = onLongPress,
-                    viewerContainer = viewerContainer,
-                    background = {
-                        UIContainer {
-                            background(count, it)
-                        }
-                    },
-                    foreground = {
-                        UIContainer {
-                            foreground(count, it)
-                        }
-                    },
-                )
-//                LaunchedEffect(state.imageViewerVisible.value) {
-//                    state.imageViewerState?.allowGestureInput = state.imageViewerVisible.value != 1F
-//                }
-//                if (state.imageViewerVisible.value != 1F)
-//                    Box(modifier = Modifier
-//                        .fillMaxSize()
-//                        .pointerInput(Unit) { detectTapGestures { } }) { }
+        ) {
+            @Composable
+            fun UIContainer(content: @Composable () -> Unit) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .alpha(state.uiAlpha.value)
+                ) {
+                    content()
+                }
             }
+            ImageGallery(
+                modifier = modifier.fillMaxSize(),
+                count = count,
+                state = state.pagerState,
+                imageLoader = imageLoader,
+                currentViewerState = {
+                    state.imageViewerState = it
+                    currentViewerState(it)
+                },
+                itemSpacing = itemSpacing,
+                onTap = onTap,
+                onDoubleTap = onDoubleTap,
+                onLongPress = onLongPress,
+                viewerContainer = viewerContainer,
+                background = {
+                    UIContainer {
+                        background(count, it)
+                    }
+                },
+                foreground = {
+                    UIContainer {
+                        foreground(count, it)
+                    }
+                },
+            )
+            if (state.imageViewerVisible.value != 1F)
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) { detectTapGestures { } }) { }
         }
     }
-    if (state.animateGalleryItems) {
-        AnimatedVisibility(
-            modifier = Modifier.fillMaxSize(),
-            visible = state.galleryVisible,
-            enter = enter,
-            exit = exit
-        ) {
-            galleryItems()
-        }
-    } else {
-        if (state.galleryVisible) galleryItems()
+    if (state.galleryVisible) AnimatedVisibility(
+        modifier = Modifier.fillMaxSize(),
+        visible = state.animateGalleryItems,
+        enter = enter,
+        exit = exit
+    ) {
+        GalleryItems()
     }
     state.ticket.Next()
 }

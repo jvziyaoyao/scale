@@ -38,21 +38,10 @@ fun NormalBody() {
     val scope = rememberCoroutineScope()
     val state = rememberViewerState()
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .pointerInput(Unit) {
-            detectVerticalDragGestures(
-                onDragStart = {},
-                onDragEnd = {},
-                onDragCancel = {},
-                onVerticalDrag = { _, _ ->
-
-                }
-            )
-            detectVerticalDragGestures { change, dragAmount ->
-                Log.i("TAG", "NormalBody: detectVerticalDragGestures ${change.position}")
-            }
-        }) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
         ImageViewer(
             state = state,
             model = painterResource(id = R.drawable.light_02),

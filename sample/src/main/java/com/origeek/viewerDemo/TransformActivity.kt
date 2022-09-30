@@ -14,6 +14,7 @@ import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -65,7 +66,7 @@ class TransformActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val images = getItemList()
+        val images = getItemList(10)
         setBasicContent {
             ViewerDemoTheme {
                 TransformBody(images)
@@ -86,113 +87,117 @@ fun TransformBody(images: List<DrawableItem>) {
     val scope = rememberCoroutineScope()
     val transformContentState = rememberTransformContentState()
     val previewerState = rememberPreviewerState(transformState = transformContentState)
-    var openVerticalDrag by remember { mutableStateOf(true) }
+    var openVerticalDrag by rememberSaveable { mutableStateOf(true) }
     if (openVerticalDrag) {
         previewerState.enableVerticalDrag { images[it].id }
     } else {
         previewerState.disableVerticalDrag()
     }
-    val lineCount = 3
     if (previewerState.canClose) BackHandler {
-        val index = previewerState.currentPage
-        val id = images[index].id
+        val id = images[previewerState.currentPage].id
         previewerState.closeTransform(id)
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-    ) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val horizontal = maxWidth > 400.dp
+        val lineCount = if (horizontal) 6 else 3
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(3F)
-                .padding(top = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+                .fillMaxSize()
+                .systemBarsPadding()
         ) {
-            Text(text = "🎈 Transform")
-            Spacer(modifier = Modifier.height(24.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "👋 VerticalDrag:")
-                Spacer(modifier = Modifier.width(12.dp))
-                Button(
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = if (openVerticalDrag) MaterialTheme.colors.error else MaterialTheme.colors.primary
-                    ),
-                    onClick = {
-                        openVerticalDrag = !openVerticalDrag
-                    }) {
-                    if (openVerticalDrag) {
-                        Text(text = "OFF")
-                    } else {
-                        Text(text = "ON")
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(3F),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                if (!horizontal) Spacer(modifier = Modifier.height(24.dp))
+                Text(text = "🎈 Transform")
+                Spacer(modifier = Modifier.height(if (horizontal) 12.dp else 24.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = "👋 VerticalDrag:")
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Button(
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = if (openVerticalDrag) MaterialTheme.colors.error else MaterialTheme.colors.primary
+                        ),
+                        onClick = {
+                            openVerticalDrag = !openVerticalDrag
+                        }) {
+                        if (openVerticalDrag) {
+                            Text(text = "OFF")
+                        } else {
+                            Text(text = "ON")
+                        }
+                    }
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .weight(if (horizontal) 6F else 7F)
+            ) {
+                LazyGridLayout(
+                    modifier = Modifier.fillMaxSize(),
+                    columns = lineCount,
+                    size = images.size,
+                    padding = 2.dp,
+                ) { index ->
+                    val item = images[index]
+                    val painter = painterResource(id = item.res)
+                    val itemState = rememberTransformItemState()
+                    val itemScale = remember { Animatable(1F) }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1F)
+                            .scale(itemScale.value)
+                            .pointerInput(Unit) {
+                                forEachGesture {
+                                    awaitPointerEventScope {
+                                        awaitFirstDown()
+                                        // 这里开始
+                                        scope.launch {
+                                            itemScale.animateTo(0.84F)
+                                        }
+                                        do {
+                                            val event = awaitPointerEvent()
+                                        } while (event.changes.any { it.pressed })
+                                        // 这里结束
+                                        scope.launch {
+                                            itemScale.animateTo(1F)
+                                        }
+                                        previewerState.openTransform(
+                                            index = index,
+                                            itemState = itemState,
+                                        )
+                                    }
+                                }
+                            }
+                    ) {
+                        TransformImageView(
+                            painter = painter,
+                            itemState = itemState,
+                            key = item.id,
+                            contentState = transformContentState,
+                        )
                     }
                 }
             }
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .weight(7F)
-        ) {
-            LazyGridLayout(
-                modifier = Modifier.fillMaxSize(),
-                columns = lineCount,
-                size = images.size,
-                padding = 2.dp,
-            ) { index ->
-                val item = images[index]
-                val painter = painterResource(id = item.res)
-                val itemState = rememberTransformItemState()
-                val itemScale = remember { Animatable(1F) }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1F)
-                        .scale(itemScale.value)
-                        .pointerInput(Unit) {
-                            forEachGesture {
-                                awaitPointerEventScope {
-                                    awaitFirstDown()
-                                    // 这里开始
-                                    scope.launch {
-                                        itemScale.animateTo(0.84F)
-                                    }
-                                    do {
-                                        val event = awaitPointerEvent()
-                                    } while (event.changes.any { it.pressed })
-                                    // 这里结束
-                                    scope.launch {
-                                        itemScale.animateTo(1F)
-                                    }
-                                    previewerState.openTransform(
-                                        index = index,
-                                        itemState = itemState,
-                                    )
-                                }
-                            }
-                        }
-                ) {
-                    TransformImageView(
-                        painter = painter,
-                        itemState = itemState,
-                        key = item.id,
-                        contentState = transformContentState,
-                    )
-                }
-            }
-        }
+        ImagePreviewer(
+            modifier = Modifier.fillMaxSize(),
+            count = images.size,
+            state = previewerState,
+            imageLoader = { index ->
+                val image = images[index].res
+                rememberCoilImagePainter(image = image)
+            },
+            currentViewerState = {},
+            enter = fadeIn(tween(1200)),
+            exit = fadeOut(tween(1200)),
+        )
     }
-    ImagePreviewer(
-        modifier = Modifier.fillMaxSize(),
-        count = images.size,
-        state = previewerState,
-        imageLoader = { index ->
-            val image = images[index].res
-            rememberCoilImagePainter(image = image)
-        },
-        currentViewerState = {},
-    )
 }

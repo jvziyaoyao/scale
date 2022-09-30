@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -199,10 +202,11 @@ fun TransformContentView(
     }
 }
 
-class TransformContentState(
-    private val scope: CoroutineScope,
+class TransformContentState internal constructor() {
+
+    lateinit var scope: CoroutineScope
+
     var defaultAnimationSpec: AnimationSpec<Float> = SpringSpec()
-) {
 
     var itemState: TransformItemState? by mutableStateOf(null)
 
@@ -425,6 +429,21 @@ class TransformContentState(
         end()
     }
 
+    companion object {
+        val Saver: Saver<TransformContentState, *> = listSaver(
+            save = {
+                listOf<Any>(
+                    it.onAction,
+                )
+            },
+            restore = {
+                val transformContentState = TransformContentState()
+                transformContentState.onAction = it[0] as Boolean
+                transformContentState
+            }
+        )
+    }
+
 }
 
 @Composable
@@ -432,7 +451,12 @@ fun rememberTransformContentState(
     scope: CoroutineScope = rememberCoroutineScope(),
     animationSpec: AnimationSpec<Float> = SpringSpec()
 ): TransformContentState {
-    return remember { TransformContentState(scope, animationSpec) }
+    val transformContentState = rememberSaveable(saver = TransformContentState.Saver) {
+        TransformContentState()
+    }
+    transformContentState.scope = scope
+    transformContentState.defaultAnimationSpec = animationSpec
+    return transformContentState
 }
 
 class TransformItemState(
