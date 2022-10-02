@@ -27,6 +27,8 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -305,94 +307,79 @@ class TransformContentState internal constructor() {
         onAction = false
     }
 
+    private var exitAnimateSpec: AnimationSpec<Float>? = null
+
     suspend fun exitTransform(
-        animationSpec: AnimationSpec<Float> = defaultAnimationSpec
+        animationSpec: AnimationSpec<Float>? = null
     ) = suspendCoroutine<Unit> { c ->
-        val mutex = Mutex()
-        var endCount = 0
-        fun goCallEnd() {
+        val currentAnimateSpec = animationSpec ?: exitAnimateSpec ?: defaultAnimationSpec
+        scope.launch {
+            listOf(
+                scope.async {
+                    displayWidth.animateTo(srcSize.width.toFloat(), currentAnimateSpec)
+                },
+                scope.async {
+                    displayHeight.animateTo(srcSize.height.toFloat(), currentAnimateSpec)
+                },
+                scope.async {
+                    graphicScaleX.animateTo(1F, currentAnimateSpec)
+                },
+                scope.async {
+                    graphicScaleY.animateTo(1F, currentAnimateSpec)
+                },
+                scope.async {
+                    offsetX.animateTo(srcPosition.x, currentAnimateSpec)
+                },
+                scope.async {
+                    offsetY.animateTo(srcPosition.y, currentAnimateSpec)
+                },
+            ).awaitAll()
             callEnd()
             c.resume(Unit)
             endAsyncCallBack?.invoke()
             endAsyncCallBack = null
+            exitAnimateSpec = null
             onActionTarget = null
-        }
-
-        fun goEndAction(endAction: suspend () -> Unit) {
-            scope.launch {
-                endAction()
-                mutex.withLock {
-                    endCount++
-                    if (endCount >= 6) {
-                        goCallEnd()
-                    }
-                }
-            }
-        }
-        goEndAction {
-            displayWidth.animateTo(srcSize.width.toFloat(), animationSpec)
-        }
-        goEndAction {
-            displayHeight.animateTo(srcSize.height.toFloat(), animationSpec)
-        }
-        goEndAction {
-            graphicScaleX.animateTo(1F, animationSpec)
-        }
-        goEndAction {
-            graphicScaleY.animateTo(1F, animationSpec)
-        }
-        goEndAction {
-            offsetX.animateTo(srcPosition.x, animationSpec)
-        }
-        goEndAction {
-            offsetY.animateTo(srcPosition.y, animationSpec)
         }
     }
 
+    private var enterAnimateSpec: AnimationSpec<Float>? = null
+
     suspend fun enterTransform(
-        animationSpec: AnimationSpec<Float> = defaultAnimationSpec
+        animationSpec: AnimationSpec<Float>? = null
     ) = suspendCoroutine<Unit> { c ->
-        val mutex = Mutex()
-        var endCount = 0
-        fun goCallEnd() {
+        val currentAnimationSpec = animationSpec ?: enterAnimateSpec ?: defaultAnimationSpec
+        scope.launch {
+            listOf(
+                scope.async {
+                    displayWidth.animateTo(displayRatioSize.width, currentAnimationSpec)
+                },
+                scope.async {
+                    displayHeight.animateTo(displayRatioSize.height, currentAnimationSpec)
+                },
+                scope.async {
+                    graphicScaleX.animateTo(fitScale, currentAnimationSpec)
+                },
+                scope.async {
+                    graphicScaleY.animateTo(fitScale, currentAnimationSpec)
+                },
+                scope.async {
+                    offsetX.animateTo(fitOffsetX, currentAnimationSpec)
+                },
+                scope.async {
+                    offsetY.animateTo(fitOffsetY, currentAnimationSpec)
+                },
+            ).awaitAll()
             c.resume(Unit)
             startAsyncCallBack?.invoke()
             startAsyncCallBack = null
+            enterAnimateSpec = null
             onActionTarget = null
-        }
-
-        fun goEndAction(endAction: suspend () -> Unit) {
-            scope.launch {
-                endAction()
-                mutex.withLock {
-                    endCount++
-                    if (endCount >= 6) {
-                        goCallEnd()
-                    }
-                }
-            }
-        }
-        goEndAction {
-            displayWidth.animateTo(displayRatioSize.width, animationSpec)
-        }
-        goEndAction {
-            displayHeight.animateTo(displayRatioSize.height, animationSpec)
-        }
-        goEndAction {
-            graphicScaleX.animateTo(fitScale, animationSpec)
-        }
-        goEndAction {
-            graphicScaleY.animateTo(fitScale, animationSpec)
-        }
-        goEndAction {
-            offsetX.animateTo(fitOffsetX, animationSpec)
-        }
-        goEndAction {
-            offsetY.animateTo(fitOffsetY, animationSpec)
         }
     }
 
-    fun start(transformItemState: TransformItemState) {
+    fun start(transformItemState: TransformItemState, animationSpec: AnimationSpec<Float>? = null) {
+        enterAnimateSpec = animationSpec
         itemState = transformItemState
 
         displayWidth = Animatable(srcSize.width.toFloat())
@@ -407,26 +394,30 @@ class TransformContentState internal constructor() {
         onAction = true
     }
 
-    fun end() {
+    fun end(animationSpec: AnimationSpec<Float>? = null) {
+        exitAnimateSpec = animationSpec
         onActionTarget = false
     }
 
     private var startAsyncCallBack: (() -> Unit)? = null
 
-    suspend fun startAsync(transformItemState: TransformItemState) = suspendCoroutine<Unit> { c ->
+    suspend fun startAsync(
+        transformItemState: TransformItemState,
+        animationSpec: AnimationSpec<Float>? = null
+    ) = suspendCoroutine<Unit> { c ->
         startAsyncCallBack = {
             c.resume(Unit)
         }
-        start(transformItemState)
+        start(transformItemState, animationSpec)
     }
 
     private var endAsyncCallBack: (() -> Unit)? = null
 
-    suspend fun endAsync() = suspendCoroutine<Unit> { c ->
+    suspend fun endAsync(animationSpec: AnimationSpec<Float>?) = suspendCoroutine<Unit> { c ->
         endAsyncCallBack = {
             c.resume(Unit)
         }
-        end()
+        end(animationSpec)
     }
 
     companion object {

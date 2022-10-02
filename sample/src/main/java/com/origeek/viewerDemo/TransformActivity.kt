@@ -89,7 +89,10 @@ data class DrawableItem(
 fun TransformBody(images: List<DrawableItem>) {
     val scope = rememberCoroutineScope()
     val transformContentState = rememberTransformContentState()
-    val previewerState = rememberPreviewerState(transformState = transformContentState)
+    val previewerState = rememberPreviewerState(
+        transformState = transformContentState,
+        animationSpec = tween(1200)
+    )
     var openVerticalDrag by rememberSaveable { mutableStateOf(true) }
     if (openVerticalDrag) {
         previewerState.enableVerticalDrag { images[it].id }
@@ -97,9 +100,11 @@ fun TransformBody(images: List<DrawableItem>) {
         previewerState.disableVerticalDrag()
     }
     if (previewerState.canClose) BackHandler {
-        val id = images[previewerState.currentPage].id
-        previewerState.closeTransform(id)
-//        previewerState.close()
+        scope.launch {
+            val id = images[previewerState.currentPage].id
+            previewerState.closeTransform(id)
+//            previewerState.close()
+        }
     }
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val horizontal = maxWidth > 400.dp
@@ -179,11 +184,13 @@ fun TransformBody(images: List<DrawableItem>) {
                                             itemScale.animateTo(1F)
                                         }
                                         if (move) return@awaitPointerEventScope
-//                                        previewerState.open(index)
-                                        previewerState.openTransform(
-                                            index = index,
-                                            itemState = itemState,
-                                        )
+                                        scope.launch {
+//                                            previewerState.open(index)
+                                            previewerState.openTransform(
+                                                index = index,
+                                                itemState = itemState,
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -207,8 +214,6 @@ fun TransformBody(images: List<DrawableItem>) {
                 rememberCoilImagePainter(image = image)
             },
             currentViewerState = {},
-            enter = fadeIn(tween(1200)),
-            exit = fadeOut(tween(1200)),
         )
     }
 }
