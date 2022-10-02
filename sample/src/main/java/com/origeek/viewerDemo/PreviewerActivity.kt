@@ -2,15 +2,16 @@ package com.origeek.viewerDemo
 
 import android.os.Bundle
 import android.view.Window
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -23,6 +24,7 @@ import com.origeek.imageViewer.rememberPreviewerState
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.GridLayout
 import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
+import kotlinx.coroutines.launch
 
 const val SYSTEM_UI_VISIBILITY = "SYSTEM_UI_VISIBILITY"
 
@@ -77,6 +79,7 @@ fun PreviewerBody(
     }
 
     val imageViewerState = rememberPreviewerState()
+    val scope = rememberCoroutineScope()
 
     val lineCount = 3
     Box(
@@ -97,7 +100,9 @@ fun PreviewerBody(
                 Image(
                     modifier = Modifier
                         .clickable {
-                            imageViewerState.open(index = index)
+                            scope.launch {
+                                imageViewerState.open(index = index)
+                            }
                         }
                         .fillMaxWidth()
                         .aspectRatio(1F),
@@ -115,7 +120,9 @@ fun PreviewerBody(
             state = imageViewerState,
             imageLoader = { index -> painterResource(id = images[index]) },
             onTap = {
-                imageViewerState.close()
+                scope.launch {
+                    imageViewerState.close()
+                }
             },
         )
     }

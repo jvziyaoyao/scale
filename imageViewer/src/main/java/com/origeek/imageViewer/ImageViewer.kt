@@ -1,8 +1,6 @@
 package com.origeek.imageViewer
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FloatExponentialDecaySpec
-import androidx.compose.animation.core.generateDecayAnimationSpec
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.Box
@@ -49,7 +47,10 @@ class ImageViewerState(
     offsetY: Float = DEFAULT_OFFSET_Y,
     scale: Float = DEFAULT_SCALE,
     rotation: Float = DEFAULT_ROTATION,
+    animationSpec: AnimationSpec<Float>? = null,
 ) : CoroutineScope by MainScope() {
+
+    var defaultAnimateSpec: AnimationSpec<Float> = animationSpec ?: SpringSpec()
 
     // x偏移
     val offsetX = Animatable(offsetX)
@@ -105,22 +106,23 @@ class ImageViewerState(
     /**
      * 设置回初始值
      */
-    suspend fun reset() {
+    suspend fun reset(animationSpec: AnimationSpec<Float>? = null) {
+        val currentAnimateSpec = animationSpec ?: defaultAnimateSpec
         coroutineScope {
             launch {
-                rotation.animateTo(DEFAULT_ROTATION)
+                rotation.animateTo(DEFAULT_ROTATION, currentAnimateSpec)
                 resetTimeStamp = System.currentTimeMillis()
             }
             launch {
-                offsetX.animateTo(DEFAULT_OFFSET_X)
+                offsetX.animateTo(DEFAULT_OFFSET_X, currentAnimateSpec)
                 resetTimeStamp = System.currentTimeMillis()
             }
             launch {
-                offsetY.animateTo(DEFAULT_OFFSET_Y)
+                offsetY.animateTo(DEFAULT_OFFSET_Y, currentAnimateSpec)
                 resetTimeStamp = System.currentTimeMillis()
             }
             launch {
-                scale.animateTo(DEFAULT_SCALE)
+                scale.animateTo(DEFAULT_SCALE, currentAnimateSpec)
                 resetTimeStamp = System.currentTimeMillis()
             }
         }
@@ -129,7 +131,11 @@ class ImageViewerState(
     /**
      * 放大到最大
      */
-    suspend fun scaleToMax(offset: Offset) {
+    suspend fun scaleToMax(
+        offset: Offset,
+        animationSpec: AnimationSpec<Float>? = null
+    ) {
+        val currentAnimateSpec = animationSpec ?: defaultAnimateSpec
         // 计算x和y偏移量和范围，并确保不会在放大过程中超出范围
         var bcx = (containerSize.width / 2 - offset.x) * maxScale
         val boundX = getBound(defaultSize.width.toFloat() * maxScale, containerSize.width.toFloat())
@@ -141,13 +147,13 @@ class ImageViewerState(
         // 启动
         coroutineScope {
             launch {
-                scale.animateTo(maxScale)
+                scale.animateTo(maxScale, currentAnimateSpec)
             }
             launch {
-                offsetX.animateTo(bcx)
+                offsetX.animateTo(bcx, currentAnimateSpec)
             }
             launch {
-                offsetY.animateTo(bcy)
+                offsetY.animateTo(bcy, currentAnimateSpec)
             }
         }
     }
@@ -155,12 +161,15 @@ class ImageViewerState(
     /**
      * 放大或缩小
      */
-    suspend fun toggleScale(offset: Offset) {
+    suspend fun toggleScale(
+        offset: Offset,
+        animationSpec: AnimationSpec<Float>? = null
+    ) {
         // 如果不等于1，就调回1
         if (scale.value != 1F) {
-            reset()
+            reset(animationSpec)
         } else {
-            scaleToMax(offset)
+            scaleToMax(offset, animationSpec)
         }
     }
 
@@ -197,8 +206,9 @@ fun rememberViewerState(
     offsetY: Float = DEFAULT_OFFSET_Y,
     scale: Float = DEFAULT_SCALE,
     rotation: Float = DEFAULT_ROTATION,
+    animationSpec: AnimationSpec<Float>? = null,
 ): ImageViewerState = rememberSaveable(saver = ImageViewerState.SAVER) {
-    ImageViewerState(offsetX, offsetY, scale, rotation)
+    ImageViewerState(offsetX, offsetY, scale, rotation, animationSpec)
 }
 
 /**

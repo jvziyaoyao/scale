@@ -26,9 +26,14 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlin.math.absoluteValue
 
 val DEEP_DARK_FANTASY = Color(0xFF000000)
@@ -179,7 +184,7 @@ class ImagePreviewerState internal constructor() {
                                 uiAlpha.snapTo(1F)
                             }
                             scope.launch {
-                                reset()
+                                reset(defaultAnimationSpec)
                             }
                         }
                     }
@@ -218,6 +223,14 @@ class ImagePreviewerState internal constructor() {
         }
     }
 
+    internal fun onAnimateContainerStateChanged() {
+        if (animateContainerState.currentState) {
+            openCallback?.invoke()
+        } else {
+            closeCallback?.invoke()
+        }
+    }
+
     @OptIn(ExperimentalPagerApi::class)
     suspend fun scrollToPage(
         @IntRange(from = 0) page: Int,
@@ -230,35 +243,57 @@ class ImagePreviewerState internal constructor() {
         @FloatRange(from = 0.0, to = 1.0) pageOffset: Float = 0f,
     ) = pagerState.animateScrollToPage(page, pageOffset)
 
-    @OptIn(ExperimentalPagerApi::class)
-    fun open(index: Int = 0, callback: () -> Unit = {}) {
-        scope.launch {
-            stateOpenStart()
-            animateContainerState = MutableTransitionState(false)
-            uiAlpha.snapTo(1F)
-            viewerContainerAlpha.snapTo(1F)
-            ticket.awaitNextTicket()
-            animateContainerState.targetState = true
-            // 可能要跳两次才行，否则会闪退
-            ticket.awaitNextTicket()
-            ticket.awaitNextTicket()
-            pagerState.scrollToPage(index)
-            // 执行完成后的回调
-            stateOpenEnd()
-            callback()
-        }
-    }
+    private var openCallback: (() -> Unit)? = null
 
-    fun close(callback: () -> Unit = {}) {
+    internal var enterTransition: EnterTransition? = null
+
+    @OptIn(ExperimentalPagerApi::class)
+    suspend fun open(index: Int = 0, enterTransition: EnterTransition? = null) =
+        suspendCoroutine<Unit> { c ->
+            this.enterTransition = enterTransition
+            openCallback = {
+                c.resume(Unit)
+                openCallback = null
+                this.enterTransition = null
+                scope.launch {
+                    stateOpenEnd()
+                }
+            }
+            scope.launch {
+                stateOpenStart()
+                animateContainerState = MutableTransitionState(false)
+                uiAlpha.snapTo(1F)
+                viewerContainerAlpha.snapTo(1F)
+                ticket.awaitNextTicket()
+                animateContainerState.targetState = true
+                // 可能要跳两次才行，否则会闪退
+                ticket.awaitNextTicket()
+                ticket.awaitNextTicket()
+                pagerState.scrollToPage(index)
+            }
+        }
+
+    private var closeCallback: (() -> Unit)? = null
+
+    internal var exitTransition: ExitTransition? = null
+
+    suspend fun close(exitTransition: ExitTransition? = null) = suspendCoroutine<Unit> { c ->
+        this.exitTransition = exitTransition
+        closeCallback = {
+            c.resume(Unit)
+            closeCallback = null
+            this.exitTransition = null
+            scope.launch {
+                stateCloseEnd()
+            }
+        }
         scope.launch {
             stateCloseStart()
+            // 这里创建一个全新的state是为了让exitTransition的设置得到响应
+            animateContainerState = MutableTransitionState(true)
             animateContainerState.targetState = false
             ticket.awaitNextTicket()
-            // 执行完成后的回调
-            stateCloseEnd()
-            callback()
         }
-
     }
 
     @OptIn(ExperimentalPagerApi::class)
@@ -427,11 +462,17 @@ fun ImagePreviewer(
     background: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> DefaultPreviewerBackground() },
     foreground: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> },
 ) {
+    LaunchedEffect(
+        key1 = state.animateContainerState,
+        key2 = state.animateContainerState.currentState
+    ) {
+        state.onAnimateContainerStateChanged()
+    }
     AnimatedVisibility(
         modifier = Modifier.fillMaxSize(),
         visibleState = state.animateContainerState,
-        enter = enter,
-        exit = exit
+        enter = state.enterTransition ?: enter,
+        exit = state.exitTransition ?: exit,
     ) {
         Box(
             modifier = Modifier
