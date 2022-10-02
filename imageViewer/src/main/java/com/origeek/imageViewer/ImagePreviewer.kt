@@ -1,6 +1,5 @@
 package com.origeek.imageViewer
 
-import android.util.Log
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.compose.animation.*
@@ -63,11 +62,9 @@ class ImagePreviewerState internal constructor() {
 
     internal var imageViewerVisible = Animatable(0F)
 
-    internal var animateGalleryItems by mutableStateOf(true)
+    internal var animateGalleryItems by mutableStateOf(MutableTransitionState(false))
 
     internal var contentVisible by mutableStateOf(false)
-
-    internal var galleryVisible by mutableStateOf(false)
 
     internal var uiAlpha = Animatable(1F)
 
@@ -133,6 +130,15 @@ class ImagePreviewerState internal constructor() {
 
     private fun findTransformItem(key: Any) = transformItemStateMap[key]
 
+    private suspend fun shrinkDown() {
+        stateCloseStart()
+        imageViewerState?.scale?.animateTo(0F)
+        transformState.onAction = false
+        contentVisible = false
+        animateGalleryItems = MutableTransitionState(false)
+        stateCloseEnd()
+    }
+
     internal suspend fun verticalDrag(pointerInputScope: PointerInputScope) {
         pointerInputScope.apply {
             var vStartOffset by mutableStateOf<Offset?>(null)
@@ -163,10 +169,7 @@ class ImagePreviewerState internal constructor() {
                                 if (transformItem != null) {
                                     closeTransformAsync(key)
                                 } else {
-                                    scale.animateTo(0F)
-                                    transformState.onAction = false
-                                    contentVisible = false
-                                    galleryVisible = false
+                                    shrinkDown()
                                 }
                                 uiAlpha.snapTo(1F)
                             }
@@ -247,11 +250,10 @@ class ImagePreviewerState internal constructor() {
     fun open(index: Int = 0, callback: () -> Unit = {}) {
         scope.launch {
             stateOpenStart()
-            animateGalleryItems = true
-            galleryVisible = false
+            animateGalleryItems = MutableTransitionState(false)
             imageViewerVisible.snapTo(1F)
             ticket.awaitNextTicket()
-            galleryVisible = true
+            animateGalleryItems.targetState = true
             ticket.awaitNextTicket()
             delay(20)
             pagerState.scrollToPage(index)
@@ -264,15 +266,11 @@ class ImagePreviewerState internal constructor() {
     fun close(callback: () -> Unit = {}) {
         scope.launch {
             stateCloseStart()
-            animateGalleryItems = false
+            animateGalleryItems.targetState = false
             contentVisible = false
             transformState.onActionTarget = null
             transformState.onAction = false
-
-            galleryVisible = true
             ticket.awaitNextTicket()
-            galleryVisible = false
-
             // 执行完成后的回调
             stateCloseEnd()
             callback()
@@ -288,9 +286,8 @@ class ImagePreviewerState internal constructor() {
     ) {
         scope.launch {
             stateOpenStart()
-            animateGalleryItems = true
+            animateGalleryItems = MutableTransitionState(true)
             contentVisible = true
-            galleryVisible = true
             imageViewerVisible.snapTo(0F)
             ticket.awaitNextTicket()
             pagerState.scrollToPage(index)
@@ -337,10 +334,9 @@ class ImagePreviewerState internal constructor() {
                     animationSpec = viewerVisibleCloseAnimateSpec
                 )
                 transformState.exitTransform()
-                galleryVisible = false
+                animateGalleryItems = MutableTransitionState(false)
             } else {
-                galleryVisible = true
-                animateGalleryItems = false
+                animateGalleryItems.targetState = false
             }
             transformState.onActionTarget = null
             transformState.onAction = false
@@ -367,9 +363,8 @@ class ImagePreviewerState internal constructor() {
             save = {
                 listOf<Any>(
                     it.imageViewerVisible.value,
-                    it.animateGalleryItems,
+                    it.animateGalleryItems.currentState,
                     it.contentVisible,
-                    it.galleryVisible,
                     it.uiAlpha.value,
                     it.visible,
                 )
@@ -377,11 +372,10 @@ class ImagePreviewerState internal constructor() {
             restore = {
                 val previewerState = ImagePreviewerState()
                 previewerState.imageViewerVisible = Animatable(it[0] as Float)
-                previewerState.animateGalleryItems = it[1] as Boolean
+                previewerState.animateGalleryItems = MutableTransitionState(it[1] as Boolean)
                 previewerState.contentVisible = it[2] as Boolean
-                previewerState.galleryVisible = it[3] as Boolean
-                previewerState.uiAlpha = Animatable(it[4] as Float)
-                previewerState.visible = it[5] as Boolean
+                previewerState.uiAlpha = Animatable(it[3] as Float)
+                previewerState.visible = it[4] as Boolean
                 previewerState
             }
         )
@@ -435,8 +429,12 @@ fun ImagePreviewer(
     foreground: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> },
 ) {
     if (state.contentVisible) TransformContentView(state.transformState)
-    @Composable
-    fun GalleryItems() {
+    AnimatedVisibility(
+        modifier = Modifier.fillMaxSize(),
+        visibleState = state.animateGalleryItems,
+        enter = enter,
+        exit = exit
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -485,14 +483,6 @@ fun ImagePreviewer(
                     .fillMaxSize()
                     .pointerInput(Unit) { detectTapGestures { } }) { }
         }
-    }
-    if (state.galleryVisible) AnimatedVisibility(
-        modifier = Modifier.fillMaxSize(),
-        visible = state.animateGalleryItems,
-        enter = enter,
-        exit = exit
-    ) {
-        GalleryItems()
     }
     state.ticket.Next()
 }

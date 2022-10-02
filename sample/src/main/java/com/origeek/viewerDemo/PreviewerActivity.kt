@@ -2,6 +2,9 @@ package com.origeek.viewerDemo
 
 import android.os.Bundle
 import android.view.Window
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -113,7 +116,7 @@ fun PreviewerBody(
             imageLoader = { index -> painterResource(id = images[index]) },
             onTap = {
                 imageViewerState.close()
-            }
+            },
         )
     }
 }

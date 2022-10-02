@@ -7,17 +7,19 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -30,6 +32,7 @@ import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.stream.Collectors
+import kotlin.math.log
 
 /**
  * @program: ImageViewer
@@ -96,6 +99,7 @@ fun TransformBody(images: List<DrawableItem>) {
     if (previewerState.canClose) BackHandler {
         val id = images[previewerState.currentPage].id
         previewerState.closeTransform(id)
+//        previewerState.close()
     }
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val horizontal = maxWidth > 400.dp
@@ -162,13 +166,20 @@ fun TransformBody(images: List<DrawableItem>) {
                                         scope.launch {
                                             itemScale.animateTo(0.84F)
                                         }
+                                        var move = false
                                         do {
                                             val event = awaitPointerEvent()
+                                            if (!move) {
+                                                move = event.type == PointerEventType.Move
+                                                break
+                                            }
                                         } while (event.changes.any { it.pressed })
                                         // 这里结束
                                         scope.launch {
                                             itemScale.animateTo(1F)
                                         }
+                                        if (move) return@awaitPointerEventScope
+//                                        previewerState.open(index)
                                         previewerState.openTransform(
                                             index = index,
                                             itemState = itemState,
