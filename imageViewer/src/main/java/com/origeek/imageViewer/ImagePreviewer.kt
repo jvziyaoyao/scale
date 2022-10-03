@@ -181,7 +181,7 @@ class ImagePreviewerState internal constructor() {
                             }
                         } else {
                             scope.launch {
-                                uiAlpha.snapTo(1F)
+                                uiAlpha.animateTo(1F, defaultAnimationSpec)
                             }
                             scope.launch {
                                 reset(defaultAnimationSpec)

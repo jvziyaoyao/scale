@@ -19,6 +19,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
@@ -161,46 +162,53 @@ fun TransformBody(images: List<DrawableItem>) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .aspectRatio(1F)
-                            .scale(itemScale.value)
-                            .pointerInput(Unit) {
-                                forEachGesture {
-                                    awaitPointerEventScope {
-                                        awaitFirstDown()
-                                        // 这里开始
-                                        scope.launch {
-                                            itemScale.animateTo(0.84F)
-                                        }
-                                        var move = false
-                                        do {
-                                            val event = awaitPointerEvent()
-                                            if (!move) {
-                                                move = event.type == PointerEventType.Move
-                                                break
+                            .aspectRatio(1F),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize(itemScale.value)
+                                .pointerInput(Unit) {
+                                    forEachGesture {
+                                        awaitPointerEventScope {
+                                            awaitFirstDown()
+                                            // 这里开始
+                                            scope.launch {
+                                                itemScale.animateTo(0.84F)
                                             }
-                                        } while (event.changes.any { it.pressed })
-                                        // 这里结束
-                                        scope.launch {
-                                            itemScale.animateTo(1F)
-                                        }
-                                        if (move) return@awaitPointerEventScope
-                                        scope.launch {
-//                                            previewerState.open(index)
-                                            previewerState.openTransform(
-                                                index = index,
-                                                itemState = itemState,
-                                            )
+                                            var move = false
+                                            do {
+                                                val event = awaitPointerEvent()
+                                                if (!move) {
+                                                    move = event.type == PointerEventType.Move
+                                                    break
+                                                }
+                                            } while (event.changes.any { it.pressed })
+                                            // 这里结束
+                                            scope.launch {
+                                                itemScale.animateTo(1F)
+                                            }
+                                            if (move) {
+                                                return@awaitPointerEventScope
+                                            }
+                                            scope.launch {
+                                                // previewerState.open(index)
+                                                previewerState.openTransform(
+                                                    index = index,
+                                                    itemState = itemState,
+                                                )
+                                            }
                                         }
                                     }
                                 }
-                            }
-                    ) {
-                        TransformImageView(
-                            painter = painter,
-                            itemState = itemState,
-                            key = item.id,
-                            contentState = transformContentState,
-                        )
+                        ) {
+                            TransformImageView(
+                                painter = painter,
+                                itemState = itemState,
+                                key = item.id,
+                                contentState = transformContentState,
+                            )
+                        }
                     }
                 }
             }
