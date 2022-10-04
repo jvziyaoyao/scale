@@ -402,15 +402,21 @@ fun ImageComposeCanvas(
     // 先前的偏移量
     var previousOffset by remember { mutableStateOf<Offset?>(null) }
 
+    // 记录最长边的最大方块数
+    var blockDividerCount by remember { mutableStateOf(1) }
+    // 用来标识这个参数是否有改变
+    var preBlockDividerCount by remember { mutableStateOf(blockDividerCount) }
+
     // 更新渲染方块的信息
     fun updateRenderList() {
         // 如果此时正在重新计算渲染方块的数目，就退出
         if (calcMaxCountPending) return
-        // 更新的时候如果缩放和偏移量没有变化，就没有必要计算了
+        // 更新的时候如果缩放和偏移量没有变化，方块数量也没变，就没有必要计算了
         if (
             previousOffset?.x == offsetX
             && previousOffset?.y == offsetY
             && previousScale == scale
+            && preBlockDividerCount == blockDividerCount
         ) return
         previousScale = scale
         previousOffset = Offset(offsetX, offsetY)
@@ -507,8 +513,6 @@ fun ImageComposeCanvas(
         }
     }
 
-    // 记录最长边的最大方块数
-    var blockDividerCount by remember { mutableStateOf(1) }
     LaunchedEffect(key1 = rSize, key2 = rectW, key3 = rectH) {
         // 可视区域面积
         val rectArea = BigDecimal(rectW.toDouble()).multiply(BigDecimal(rectH.toDouble()))
@@ -527,6 +531,7 @@ fun ImageComposeCanvas(
         }
         // 如果没变，就不要修改
         if (goBlockDividerCount == blockDividerCount) return@LaunchedEffect
+        preBlockDividerCount = blockDividerCount
         blockDividerCount = goBlockDividerCount
         scope.launch(Dispatchers.IO) {
             // 清空解码队列

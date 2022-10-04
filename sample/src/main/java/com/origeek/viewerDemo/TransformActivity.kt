@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,7 +18,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.HighlightOff
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
@@ -29,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -42,7 +39,7 @@ import com.origeek.imageViewer.*
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.LazyGridLayout
 import com.origeek.viewerDemo.ui.component.rememberCoilImagePainter
-import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
+import com.origeek.viewerDemo.ui.theme.*
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.stream.Collectors
@@ -142,14 +139,14 @@ fun TransformBody(images: List<DrawableItem>) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
+                    .padding(start = pxxl, end = pxxl, bottom = pxxl)
                     .weight(if (horizontal) 6F else 7F)
             ) {
                 LazyGridLayout(
                     modifier = Modifier.fillMaxSize(),
                     columns = lineCount,
                     size = images.size,
-                    padding = 2.dp,
+                    padding = pxxs,
                 ) { index ->
                     val item = images[index]
                     val painter = painterResource(id = item.res)
@@ -219,7 +216,7 @@ fun SettingItemSwitch(
     checked: Boolean,
     onCheckedChanged: (Boolean) -> Unit,
 ) {
-    Box(modifier = Modifier.padding(vertical = 12.dp)) {
+    Box(modifier = Modifier.padding(vertical = pm)) {
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChanged,
@@ -289,19 +286,19 @@ fun SettingPanel(state: TransformSettingState, onClose: () -> Unit) {
                     state.verticalDrag = it
                 })
             }
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(pm))
             SettingItem(label = "Transform Enter") {
                 SettingItemSwitch(checked = state.transformEnter, onCheckedChanged = {
                     state.transformEnter = it
                 })
             }
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(pm))
             SettingItem(label = "Transform Exit") {
                 SettingItemSwitch(checked = state.transformExit, onCheckedChanged = {
                     state.transformExit = it
                 })
             }
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(pm))
             SettingItem(label = "Animation Duration") {
                 Slider(
                     modifier = Modifier
@@ -318,7 +315,7 @@ fun SettingPanel(state: TransformSettingState, onClose: () -> Unit) {
                     },
                 )
             }
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(pxxl))
             Button(modifier = Modifier.fillMaxWidth(), onClick = {
                 state.reset()
                 Toast.makeText(context, "👌 Reset", Toast.LENGTH_SHORT)
@@ -326,7 +323,7 @@ fun SettingPanel(state: TransformSettingState, onClose: () -> Unit) {
             }) {
                 Text(text = "Reset")
             }
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(pxxl))
         }
     }
 }
@@ -349,7 +346,7 @@ fun SettingPanelBanner(onClose: () -> Unit) {
             .clickable {
                 onClose()
             }
-            .padding(8.dp)
+            .padding(ps)
         ) {
             Icon(
                 imageVector = Icons.Filled.Close,
@@ -383,13 +380,13 @@ fun SettingSurface(
         val guideFromBottom = createGuidelineFromBottom(0.28F)
         Box(modifier = Modifier
             .constrainAs(btn) {
-                end.linkTo(parent.end, 12.dp)
+                end.linkTo(parent.end, pm)
                 bottom.linkTo(guideFromBottom)
             }
             .size(54.dp)
             .shadow(12.dp, shape = CircleShape)
             .clip(CircleShape)
-            .background(Color.White)
+            .background(MaterialTheme.colors.surface)
             .clickable {
                 visible = true
             },
@@ -437,8 +434,8 @@ fun SettingSurface(
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight(0.6F)
-                        .background(Color.White)
-                        .padding(horizontal = 12.dp)
+                        .background(MaterialTheme.colors.surface)
+                        .padding(horizontal = pm)
                 ) {
                     SettingPanel(settingState) {
                         visible = false
