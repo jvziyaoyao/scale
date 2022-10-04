@@ -54,7 +54,7 @@ fun TransformImageView(
     painter: Painter,
     key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
-    contentState: TransformContentState = rememberTransformContentState(),
+    previewerState: ImagePreviewerState = rememberPreviewerState(),
 ) {
     val scope = rememberCoroutineScope()
     SideEffect {
@@ -67,7 +67,7 @@ fun TransformImageView(
     TransformImageView(
         modifier = modifier,
         itemState = itemState,
-        contentState = contentState,
+        contentState = previewerState.transformState,
     ) {
         LaunchedEffect(key1 = painter.intrinsicSize) {
             if (painter.intrinsicSize.isSpecified) {
@@ -96,12 +96,12 @@ fun TransformImageView(
     modifier: Modifier = Modifier,
     bitmap: ImageBitmap,
     itemState: TransformItemState = rememberTransformItemState(),
-    contentState: TransformContentState = rememberTransformContentState(),
+    previewerState: ImagePreviewerState = rememberPreviewerState(),
 ) {
     TransformImageView(
         modifier = modifier,
         itemState = itemState,
-        contentState = contentState,
+        previewerState = previewerState,
     ) {
         itemState.intrinsicSize = Size(
             bitmap.width.toFloat(),
@@ -121,12 +121,12 @@ fun TransformImageView(
     modifier: Modifier = Modifier,
     imageVector: ImageVector,
     itemState: TransformItemState = rememberTransformItemState(),
-    contentState: TransformContentState = rememberTransformContentState(),
+    previewerState: ImagePreviewerState = rememberPreviewerState(),
 ) {
     TransformImageView(
         modifier = modifier,
         itemState = itemState,
-        contentState = contentState,
+        previewerState = previewerState,
     ) {
         LocalDensity.current.run {
             itemState.intrinsicSize = Size(
@@ -142,6 +142,14 @@ fun TransformImageView(
         )
     }
 }
+
+@Composable
+fun TransformImageView(
+    modifier: Modifier = Modifier,
+    itemState: TransformItemState = rememberTransformItemState(),
+    previewerState: ImagePreviewerState = rememberPreviewerState(),
+    content: @Composable () -> Unit,
+) = TransformImageView(modifier, itemState, previewerState.transformState, content)
 
 @Composable
 fun TransformImageView(
@@ -295,6 +303,16 @@ class TransformContentState internal constructor() {
         get() {
             return Size(width = srcSize.width.toFloat(), height = srcSize.width.div(intrinsicRatio))
         }
+
+    fun setEnterState() {
+        onAction = true
+        onActionTarget = null
+    }
+
+    fun setExitState() {
+        onAction = false
+        onActionTarget = null
+    }
 
     suspend fun exitTransform(
         animationSpec: AnimationSpec<Float>? = null

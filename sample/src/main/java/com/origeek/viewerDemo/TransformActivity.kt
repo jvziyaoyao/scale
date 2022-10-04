@@ -99,9 +99,7 @@ data class DrawableItem(
 fun TransformBody(images: List<DrawableItem>) {
     val settingState = rememberSettingState()
     val scope = rememberCoroutineScope()
-    val transformContentState = rememberTransformContentState()
     val previewerState = rememberPreviewerState(
-        transformState = transformContentState,
         animationSpec = tween(settingState.animationDuration)
     )
     if (settingState.verticalDrag) {
@@ -171,9 +169,9 @@ fun TransformBody(images: List<DrawableItem>) {
                         }) {
                             TransformImageView(
                                 painter = painter,
-                                itemState = itemState,
                                 key = item.id,
-                                contentState = transformContentState,
+                                itemState = itemState,
+                                previewerState = previewerState,
                             )
                         }
                     }
@@ -225,20 +223,26 @@ fun SettingItemSwitch(
     }
 }
 
+const val DEFAULT_VERTICAL_DRAG = true
+const val DEFAULT_TRANSFORM_ENTER = true
+const val DEFAULT_TRANSFORM_EXIT = true
+const val DEFAULT_ANIMATION_DURATION = 400
+
 class TransformSettingState {
-    var verticalDrag by mutableStateOf(true)
 
-    var transformEnter by mutableStateOf(true)
+    var verticalDrag by mutableStateOf(DEFAULT_VERTICAL_DRAG)
 
-    var transformExit by mutableStateOf(true)
+    var transformEnter by mutableStateOf(DEFAULT_TRANSFORM_ENTER)
 
-    var animationDuration by mutableStateOf(400)
+    var transformExit by mutableStateOf(DEFAULT_TRANSFORM_EXIT)
+
+    var animationDuration by mutableStateOf(DEFAULT_ANIMATION_DURATION)
 
     fun reset() {
-        verticalDrag = true
-        transformEnter = true
-        transformExit = true
-        animationDuration = 400
+        verticalDrag = DEFAULT_VERTICAL_DRAG
+        transformEnter = DEFAULT_TRANSFORM_ENTER
+        transformExit = DEFAULT_TRANSFORM_EXIT
+        animationDuration = DEFAULT_ANIMATION_DURATION
     }
 
     companion object {

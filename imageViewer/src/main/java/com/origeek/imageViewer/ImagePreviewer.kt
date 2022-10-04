@@ -151,13 +151,13 @@ class ImagePreviewerState internal constructor() {
             var vOrientationDown by mutableStateOf<Boolean?>(null)
             if (getKey != null) detectVerticalDragGestures(
                 onDragStart = {
-                    var tramsformItemState: TransformItemState? = null
+                    var transformItemState: TransformItemState? = null
                     getKey?.apply {
                         findTransformItem(invoke(currentPage))?.apply {
-                            tramsformItemState = this
+                            transformItemState = this
                         }
                     }
-                    transformState.itemState = tramsformItemState
+                    transformState.itemState = transformItemState
                     if (imageViewerState?.scale?.value == 1F) {
                         vStartOffset = it
                         imageViewerState?.allowGestureInput = false
@@ -226,6 +226,7 @@ class ImagePreviewerState internal constructor() {
     internal fun onAnimateContainerStateChanged() {
         if (animateContainerState.currentState) {
             openCallback?.invoke()
+            transformState.setEnterState()
         } else {
             closeCallback?.invoke()
         }
@@ -293,6 +294,7 @@ class ImagePreviewerState internal constructor() {
             animateContainerState = MutableTransitionState(true)
             animateContainerState.targetState = false
             ticket.awaitNextTicket()
+            transformState.setExitState()
         }
     }
 
@@ -303,9 +305,6 @@ class ImagePreviewerState internal constructor() {
         animationSpec: AnimationSpec<Float>? = null
     ) {
         stateOpenStart()
-        transformState.onActionTarget = null
-        transformState.onAction = false
-
         val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
         animateContainerState = MutableTransitionState(true)
         viewerContainerAlpha.snapTo(0F)
@@ -332,8 +331,6 @@ class ImagePreviewerState internal constructor() {
         key: Any,
         animationSpec: AnimationSpec<Float>? = null,
     ) {
-        transformState.onAction = true
-
         val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
         stateCloseStart()
         val itemState = findTransformItem(key)
