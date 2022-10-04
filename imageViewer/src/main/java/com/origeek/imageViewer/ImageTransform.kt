@@ -175,13 +175,6 @@ fun TransformContentView(
             transformContentState.srcCompose != null
             && transformContentState.onAction
         ) {
-            LaunchedEffect(key1 = transformContentState.onActionTarget) {
-                if (transformContentState.onActionTarget == true) {
-                    transformContentState.enterTransform()
-                } else if (transformContentState.onActionTarget == false) {
-                    transformContentState.exitTransform()
-                }
-            }
             Box(
                 modifier = Modifier
                     .offset(
@@ -303,16 +296,10 @@ class TransformContentState internal constructor() {
             return Size(width = srcSize.width.toFloat(), height = srcSize.width.div(intrinsicRatio))
         }
 
-    private fun callEnd() {
-        onAction = false
-    }
-
-    private var exitAnimateSpec: AnimationSpec<Float>? = null
-
     suspend fun exitTransform(
         animationSpec: AnimationSpec<Float>? = null
     ) = suspendCoroutine<Unit> { c ->
-        val currentAnimateSpec = animationSpec ?: exitAnimateSpec ?: defaultAnimationSpec
+        val currentAnimateSpec = animationSpec ?: defaultAnimationSpec
         scope.launch {
             listOf(
                 scope.async {
@@ -334,21 +321,30 @@ class TransformContentState internal constructor() {
                     offsetY.animateTo(srcPosition.y, currentAnimateSpec)
                 },
             ).awaitAll()
-            callEnd()
-            c.resume(Unit)
-            endAsyncCallBack?.invoke()
-            endAsyncCallBack = null
-            exitAnimateSpec = null
+            onAction = false
             onActionTarget = null
+            c.resume(Unit)
         }
     }
 
-    private var enterAnimateSpec: AnimationSpec<Float>? = null
-
     suspend fun enterTransform(
+        itemState: TransformItemState,
         animationSpec: AnimationSpec<Float>? = null
     ) = suspendCoroutine<Unit> { c ->
-        val currentAnimationSpec = animationSpec ?: enterAnimateSpec ?: defaultAnimationSpec
+        val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
+        this.itemState = itemState
+
+        displayWidth = Animatable(srcSize.width.toFloat())
+        displayHeight = Animatable(srcSize.height.toFloat())
+        graphicScaleX = Animatable(1F)
+        graphicScaleY = Animatable(1F)
+
+        offsetX = Animatable(srcPosition.x)
+        offsetY = Animatable(srcPosition.y)
+
+        onActionTarget = true
+        onAction = true
+
         scope.launch {
             listOf(
                 scope.async {
@@ -371,53 +367,8 @@ class TransformContentState internal constructor() {
                 },
             ).awaitAll()
             c.resume(Unit)
-            startAsyncCallBack?.invoke()
-            startAsyncCallBack = null
-            enterAnimateSpec = null
             onActionTarget = null
         }
-    }
-
-    fun start(transformItemState: TransformItemState, animationSpec: AnimationSpec<Float>? = null) {
-        enterAnimateSpec = animationSpec
-        itemState = transformItemState
-
-        displayWidth = Animatable(srcSize.width.toFloat())
-        displayHeight = Animatable(srcSize.height.toFloat())
-        graphicScaleX = Animatable(1F)
-        graphicScaleY = Animatable(1F)
-
-        offsetX = Animatable(srcPosition.x)
-        offsetY = Animatable(srcPosition.y)
-
-        onActionTarget = true
-        onAction = true
-    }
-
-    fun end(animationSpec: AnimationSpec<Float>? = null) {
-        exitAnimateSpec = animationSpec
-        onActionTarget = false
-    }
-
-    private var startAsyncCallBack: (() -> Unit)? = null
-
-    suspend fun startAsync(
-        transformItemState: TransformItemState,
-        animationSpec: AnimationSpec<Float>? = null
-    ) = suspendCoroutine<Unit> { c ->
-        startAsyncCallBack = {
-            c.resume(Unit)
-        }
-        start(transformItemState, animationSpec)
-    }
-
-    private var endAsyncCallBack: (() -> Unit)? = null
-
-    suspend fun endAsync(animationSpec: AnimationSpec<Float>?) = suspendCoroutine<Unit> { c ->
-        endAsyncCallBack = {
-            c.resume(Unit)
-        }
-        end(animationSpec)
     }
 
     companion object {

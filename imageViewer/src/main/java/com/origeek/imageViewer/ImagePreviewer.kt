@@ -315,7 +315,7 @@ class ImagePreviewerState internal constructor() {
         pagerState.scrollToPage(index)
         listOf(
             scope.async {
-                transformState.startAsync(itemState, animationSpec = currentAnimationSpec)
+                transformState.enterTransform(itemState, animationSpec = currentAnimationSpec)
                 transformContentAlpha.snapTo(0F)
                 viewerContainerAlpha.snapTo(1F)
             },
