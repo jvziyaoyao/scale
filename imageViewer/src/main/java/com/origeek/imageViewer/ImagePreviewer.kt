@@ -97,8 +97,8 @@ class ImagePreviewerState(
             listOf(it.index, it.show)
         }, restore = {
             ImagePreviewerState(
-                index = it[1] as Int,
-                show = it[2] as Boolean,
+                index = it[0] as Int,
+                show = it[1] as Boolean,
             )
         })
     }
