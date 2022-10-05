@@ -30,7 +30,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.google.accompanist.pager.ExperimentalPagerApi
 import com.origeek.imageViewer.ImagePreviewer
 import com.origeek.imageViewer.TransformImageView
 import com.origeek.imageViewer.rememberPreviewerState
@@ -94,7 +93,6 @@ data class DrawableItem(
     val res: Int,
 )
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun TransformBody(images: List<DrawableItem>) {
     val settingState = rememberSettingState()

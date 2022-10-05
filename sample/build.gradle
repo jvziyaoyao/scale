@@ -58,11 +58,8 @@ dependencies {
     implementation 'io.coil-kt:coil-svg:2.0.0-rc02'
     implementation 'io.coil-kt:coil-compose:2.0.0-rc02'
 
-    implementation 'com.google.code.gson:gson:2.8.8'
-
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.24.1-alpha"
     implementation 'com.google.accompanist:accompanist-insets:0.24.1-alpha'
-    implementation "com.google.accompanist:accompanist-pager:0.24.3-alpha"
 
     implementation "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha07"
 

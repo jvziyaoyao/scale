@@ -22,8 +22,6 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.CoroutineScope
@@ -52,8 +50,7 @@ class ImagePreviewerState internal constructor() {
 
     lateinit var scope: CoroutineScope
 
-    @OptIn(ExperimentalPagerApi::class)
-    lateinit var pagerState: PagerState
+    lateinit var pagerState: ImagePagerState
 
     lateinit var transformState: TransformContentState
 
@@ -88,23 +85,18 @@ class ImagePreviewerState internal constructor() {
     val canClose: Boolean
         get() = visible && visibleTarget == null && !animating
 
-    @OptIn(ExperimentalPagerApi::class)
     val currentPage: Int
         get() = pagerState.currentPage
 
-    @OptIn(ExperimentalPagerApi::class)
     val targetPage: Int
         get() = pagerState.targetPage
 
-    @OptIn(ExperimentalPagerApi::class)
     val pageCount: Int
         get() = pagerState.pageCount
 
-    @OptIn(ExperimentalPagerApi::class)
     val currentPageOffset: Float
         get() = pagerState.currentPageOffset
 
-    @OptIn(ExperimentalPagerApi::class)
     val interactionSource: InteractionSource
         get() = pagerState.interactionSource
 
@@ -232,13 +224,11 @@ class ImagePreviewerState internal constructor() {
         }
     }
 
-    @OptIn(ExperimentalPagerApi::class)
     suspend fun scrollToPage(
         @IntRange(from = 0) page: Int,
         @FloatRange(from = 0.0, to = 1.0) pageOffset: Float = 0f,
     ) = pagerState.scrollToPage(page, pageOffset)
 
-    @OptIn(ExperimentalPagerApi::class)
     suspend fun animateScrollToPage(
         @IntRange(from = 0) page: Int,
         @FloatRange(from = 0.0, to = 1.0) pageOffset: Float = 0f,
@@ -248,7 +238,6 @@ class ImagePreviewerState internal constructor() {
 
     internal var enterTransition: EnterTransition? = null
 
-    @OptIn(ExperimentalPagerApi::class)
     suspend fun open(index: Int = 0, enterTransition: EnterTransition? = null) =
         suspendCoroutine<Unit> { c ->
             this.enterTransition = enterTransition
@@ -298,7 +287,6 @@ class ImagePreviewerState internal constructor() {
         }
     }
 
-    @OptIn(ExperimentalPagerApi::class)
     suspend fun openTransform(
         index: Int,
         itemState: TransformItemState,
@@ -412,10 +400,9 @@ class ImagePreviewerState internal constructor() {
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun rememberPreviewerState(
-    pagerState: PagerState = rememberPagerState(),
+    pagerState: ImagePagerState = rememberImagePagerState(),
     transformState: TransformContentState = rememberTransformContentState(),
     scope: CoroutineScope = rememberCoroutineScope(),
     animationSpec: AnimationSpec<Float>? = null,
@@ -442,7 +429,6 @@ val DEFAULT_PREVIEWER_ENTER_TRANSITION =
 val DEFAULT_PREVIEWER_EXIT_TRANSITION =
     fadeOut(animationSpec = spring(stiffness = 2000f)) + scaleOut(animationSpec = spring(stiffness = Spring.StiffnessMedium))
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ImagePreviewer(
     modifier: Modifier = Modifier,
@@ -542,12 +528,11 @@ fun ImagePreviewer(
     state.ticket.Next()
 }
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ImageGallery(
     modifier: Modifier = Modifier,
     count: Int,
-    state: PagerState = rememberPagerState(),
+    state: ImagePagerState = rememberImagePagerState(),
     imageLoader: @Composable (Int) -> Any,
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     currentViewerState: (ImageViewerState) -> Unit = {},
@@ -573,7 +558,7 @@ fun ImageGallery(
             .fillMaxSize()
     ) {
         background(currentPage)
-        HorizontalPager(
+        ImageHorizonPager(
             count = count,
             state = state,
             modifier = Modifier
