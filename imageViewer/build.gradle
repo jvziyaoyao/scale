@@ -6,8 +6,8 @@ plugins {
 
 def GROUP_NAME = 'com.github.jvziyaoyao'
 def ARTIFACT_NAME = 'image-viewer'
-def VERSION_CODE = 2
-def VERSION_NAME = '1.0.1-alpha.2'
+def VERSION_CODE = 3
+def VERSION_NAME = '1.0.1-alpha.3'
 
 group GROUP_NAME
 version VERSION_NAME
