@@ -56,16 +56,9 @@ fun TransformImageView(
     itemState: TransformItemState = rememberTransformItemState(),
     previewerState: ImagePreviewerState = rememberPreviewerState(),
 ) {
-    val scope = rememberCoroutineScope()
-    SideEffect {
-        scope.launch {
-            imageTransformMutex.withLock {
-                transformItemStateMap[key] = itemState
-            }
-        }
-    }
     TransformImageView(
         modifier = modifier,
+        key = key,
         itemState = itemState,
         contentState = previewerState.transformState,
     ) {
@@ -81,25 +74,19 @@ fun TransformImageView(
             contentScale = ContentScale.Crop,
         )
     }
-    DisposableEffect(key1 = painter) {
-        scope.launch {
-            imageTransformMutex.withLock {
-                transformItemStateMap.remove(key)
-            }
-        }
-        onDispose {}
-    }
 }
 
 @Composable
 fun TransformImageView(
     modifier: Modifier = Modifier,
     bitmap: ImageBitmap,
+    key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
     previewerState: ImagePreviewerState = rememberPreviewerState(),
 ) {
     TransformImageView(
         modifier = modifier,
+        key = key,
         itemState = itemState,
         previewerState = previewerState,
     ) {
@@ -120,11 +107,13 @@ fun TransformImageView(
 fun TransformImageView(
     modifier: Modifier = Modifier,
     imageVector: ImageVector,
+    key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
     previewerState: ImagePreviewerState = rememberPreviewerState(),
 ) {
     TransformImageView(
         modifier = modifier,
+        key = key,
         itemState = itemState,
         previewerState = previewerState,
     ) {
@@ -146,24 +135,77 @@ fun TransformImageView(
 @Composable
 fun TransformImageView(
     modifier: Modifier = Modifier,
+    key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
     previewerState: ImagePreviewerState = rememberPreviewerState(),
     content: @Composable () -> Unit,
-) = TransformImageView(modifier, itemState, previewerState.transformState, content)
+) = TransformImageView(modifier, key, itemState, previewerState.transformState, content)
 
 @Composable
 fun TransformImageView(
     modifier: Modifier = Modifier,
+    key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
     contentState: TransformContentState = rememberTransformContentState(),
     content: @Composable () -> Unit,
 ) {
     TransformItemView(
         modifier = modifier,
+        key = key,
         itemState = itemState,
         contentState = contentState,
     ) {
         content()
+    }
+}
+
+@Composable
+fun rememberTransformItemState(): TransformItemState {
+    return remember { TransformItemState() }
+}
+
+@Composable
+fun TransformItemView(
+    modifier: Modifier = Modifier,
+    key: Any,
+    itemState: TransformItemState = rememberTransformItemState(),
+    contentState: TransformContentState,
+    content: @Composable () -> Unit,
+) {
+    val scope = rememberCoroutineScope()
+    itemState.blockCompose = remember {
+        movableContentOf {
+            content()
+        }
+    }
+    SideEffect {
+        scope.launch {
+            imageTransformMutex.withLock {
+                transformItemStateMap[key] = itemState
+            }
+        }
+    }
+    Box(
+        modifier = modifier
+            .onGloballyPositioned {
+                itemState.blockPosition = it.positionInRoot()
+                itemState.blockSize = it.size
+            }
+            .fillMaxSize()
+    ) {
+        if (
+            contentState.itemState != itemState || !contentState.onAction
+        ) {
+            itemState.blockCompose()
+        }
+    }
+    DisposableEffect(key1 = key) {
+        scope.launch {
+            imageTransformMutex.withLock {
+                transformItemStateMap.remove(key)
+            }
+        }
+        onDispose {}
     }
 }
 
@@ -425,36 +467,3 @@ class TransformItemState(
     var blockCompose: (@Composable () -> Unit) = {},
     var intrinsicSize: Size? = null,
 )
-
-@Composable
-fun rememberTransformItemState(): TransformItemState {
-    return remember { TransformItemState() }
-}
-
-@Composable
-fun TransformItemView(
-    modifier: Modifier = Modifier,
-    itemState: TransformItemState = rememberTransformItemState(),
-    contentState: TransformContentState,
-    content: @Composable () -> Unit,
-) {
-    itemState.blockCompose = remember {
-        movableContentOf {
-            content()
-        }
-    }
-    Box(
-        modifier = modifier
-            .onGloballyPositioned {
-                itemState.blockPosition = it.positionInRoot()
-                itemState.blockSize = it.size
-            }
-            .fillMaxSize()
-    ) {
-        if (
-            contentState.itemState != itemState || !contentState.onAction
-        ) {
-            itemState.blockCompose()
-        }
-    }
-}

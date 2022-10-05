@@ -4,13 +4,10 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -27,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -35,9 +31,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.origeek.imageViewer.*
+import com.origeek.imageViewer.ImagePreviewer
+import com.origeek.imageViewer.TransformImageView
+import com.origeek.imageViewer.rememberPreviewerState
+import com.origeek.imageViewer.rememberTransformItemState
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.LazyGridLayout
+import com.origeek.viewerDemo.ui.component.ScaleGrid
 import com.origeek.viewerDemo.ui.component.rememberCoilImagePainter
 import com.origeek.viewerDemo.ui.theme.*
 import kotlinx.coroutines.launch
@@ -447,47 +447,5 @@ fun SettingSurface(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun ScaleGrid(
-    onTap: () -> Unit = {},
-    content: @Composable () -> Unit = {},
-) {
-    val scope = rememberCoroutineScope()
-    val itemScale = remember { Animatable(1F) }
-    Box(
-        modifier = Modifier
-            .fillMaxSize(itemScale.value)
-            .pointerInput(Unit) {
-                forEachGesture {
-                    awaitPointerEventScope {
-                        awaitFirstDown()
-                        // 这里开始
-                        scope.launch {
-                            itemScale.animateTo(0.84F)
-                        }
-                        var move = false
-                        do {
-                            val event = awaitPointerEvent()
-                            if (!move) {
-                                move = event.type == PointerEventType.Move
-                                break
-                            }
-                        } while (event.changes.any { it.pressed })
-                        // 这里结束
-                        scope.launch {
-                            itemScale.animateTo(1F)
-                        }
-                        if (move) {
-                            return@awaitPointerEventScope
-                        }
-                        onTap()
-                    }
-                }
-            }
-    ) {
-        content()
     }
 }

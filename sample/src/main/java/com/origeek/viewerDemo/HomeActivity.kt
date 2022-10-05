@@ -32,6 +32,8 @@ class HomeActivity : BaseActivity() {
                     goActivity(PreviewerActivity::class.java)
                 }, goTransform = {
                     goActivity(TransformActivity::class.java)
+                }, goWeak = {
+                    goActivity(NetActivity::class.java)
                 })
             }
         }
@@ -51,6 +53,7 @@ fun HomeBody(
     goGallery: () -> Unit,
     goPreviewer: () -> Unit,
     goTransform: () -> Unit,
+    goWeak: () -> Unit,
 ) {
     val state = rememberScrollState()
     Column(
@@ -70,6 +73,8 @@ fun HomeBody(
         HomeLargeButton(title = "ImagePreviewer", onClick = goPreviewer)
         Spacer(modifier = Modifier.height(24.dp))
         HomeLargeButton(title = "TransformPreviewer", onClick = goTransform)
+        // Spacer(modifier = Modifier.height(24.dp))
+        // HomeLargeButton(title = "Weak Network", onClick = goWeak)
     }
 }
 

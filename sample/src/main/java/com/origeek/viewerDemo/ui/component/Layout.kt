@@ -1,5 +1,8 @@
 package com.origeek.viewerDemo.ui.component
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -7,13 +10,18 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
+import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
 @Composable
@@ -116,4 +124,46 @@ fun LazyGridLayout(
             }
         }, contentPadding = contentPadding
     )
+}
+
+@Composable
+fun ScaleGrid(
+    onTap: () -> Unit = {},
+    content: @Composable () -> Unit = {},
+) {
+    val scope = rememberCoroutineScope()
+    val itemScale = remember { Animatable(1F) }
+    Box(
+        modifier = Modifier
+            .fillMaxSize(itemScale.value)
+            .pointerInput(Unit) {
+                forEachGesture {
+                    awaitPointerEventScope {
+                        awaitFirstDown()
+                        // 这里开始
+                        scope.launch {
+                            itemScale.animateTo(0.84F)
+                        }
+                        var move = false
+                        do {
+                            val event = awaitPointerEvent()
+                            if (!move) {
+                                move = event.type == PointerEventType.Move
+                                break
+                            }
+                        } while (event.changes.any { it.pressed })
+                        // 这里结束
+                        scope.launch {
+                            itemScale.animateTo(1F)
+                        }
+                        if (move) {
+                            return@awaitPointerEventScope
+                        }
+                        onTap()
+                    }
+                }
+            }
+    ) {
+        content()
+    }
 }

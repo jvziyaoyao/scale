@@ -372,6 +372,7 @@ class ImagePreviewerState internal constructor() {
             ticket.awaitNextTicket()
             animateContainerState = MutableTransitionState(false)
         } else {
+            transformState.setExitState()
             animateContainerState.targetState = false
         }
 
