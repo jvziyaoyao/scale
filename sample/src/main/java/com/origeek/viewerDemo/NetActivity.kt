@@ -18,8 +18,8 @@ import com.origeek.imageViewer.ImagePreviewer
 import com.origeek.imageViewer.TransformImageView
 import com.origeek.imageViewer.rememberPreviewerState
 import com.origeek.imageViewer.rememberTransformItemState
+import com.origeek.ui.common.ScaleGrid
 import com.origeek.viewerDemo.base.BaseActivity
-import com.origeek.viewerDemo.ui.component.ScaleGrid
 import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
 import kotlinx.coroutines.launch
 

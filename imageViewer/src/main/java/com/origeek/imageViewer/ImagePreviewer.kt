@@ -22,8 +22,7 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
+import com.origeek.ui.common.Ticket
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -36,6 +35,7 @@ import kotlin.math.absoluteValue
 
 val DEEP_DARK_FANTASY = Color(0xFF000000)
 val DEFAULT_ITEM_SPACE = 12.dp
+val DEFAULT_SOFT_ANIMATION_SPEC = tween<Float>(320)
 
 @Composable
 fun DefaultPreviewerBackground() {
@@ -60,7 +60,7 @@ class ImagePreviewerState internal constructor() {
 
     internal var getKey: ((Int) -> Any)? = null
 
-    internal var defaultAnimationSpec: AnimationSpec<Float> = SpringSpec()
+    internal var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
 
     internal var imageViewerState by mutableStateOf<ImageViewerState?>(null)
 
@@ -419,15 +419,11 @@ fun rememberPreviewerState(
 
 @OptIn(ExperimentalAnimationApi::class)
 val DEFAULT_PREVIEWER_ENTER_TRANSITION =
-    scaleIn(animationSpec = spring(stiffness = Spring.StiffnessMedium)) + fadeIn(
-        animationSpec = spring(
-            stiffness = 4000f
-        )
-    )
+    scaleIn(tween(180)) + fadeIn(tween(240))
 
 @OptIn(ExperimentalAnimationApi::class)
 val DEFAULT_PREVIEWER_EXIT_TRANSITION =
-    fadeOut(animationSpec = spring(stiffness = 2000f)) + scaleOut(animationSpec = spring(stiffness = Spring.StiffnessMedium))
+     scaleOut(tween(320)) + fadeOut(tween(240))
 
 @Composable
 fun ImagePreviewer(

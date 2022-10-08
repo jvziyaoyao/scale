@@ -23,7 +23,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -34,9 +33,9 @@ import com.origeek.imageViewer.ImagePreviewer
 import com.origeek.imageViewer.TransformImageView
 import com.origeek.imageViewer.rememberPreviewerState
 import com.origeek.imageViewer.rememberTransformItemState
+import com.origeek.ui.common.LazyGridLayout
+import com.origeek.ui.common.ScaleGrid
 import com.origeek.viewerDemo.base.BaseActivity
-import com.origeek.viewerDemo.ui.component.LazyGridLayout
-import com.origeek.viewerDemo.ui.component.ScaleGrid
 import com.origeek.viewerDemo.ui.component.rememberCoilImagePainter
 import com.origeek.viewerDemo.ui.theme.*
 import kotlinx.coroutines.launch
@@ -380,24 +379,19 @@ fun SettingSurface(
     ) {
         val (btn) = createRefs()
         val guideFromBottom = createGuidelineFromBottom(0.28F)
-        Box(modifier = Modifier
-            .constrainAs(btn) {
+        FloatingActionButton(
+            onClick = {
+                visible = true
+            },
+            backgroundColor = MaterialTheme.colors.surface,
+            modifier = Modifier.constrainAs(btn) {
                 end.linkTo(parent.end, pm)
                 bottom.linkTo(guideFromBottom)
             }
-            .size(54.dp)
-            .shadow(12.dp, shape = CircleShape)
-            .clip(CircleShape)
-            .background(MaterialTheme.colors.surface)
-            .clickable {
-                visible = true
-            },
-            contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = Icons.Filled.Settings,
+                Icons.Filled.Settings,
                 contentDescription = null,
-                modifier = Modifier.size(32.dp),
                 tint = MaterialTheme.colors.onSurface.copy(0.32F)
             )
         }
