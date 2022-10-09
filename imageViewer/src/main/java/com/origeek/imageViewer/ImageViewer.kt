@@ -604,7 +604,7 @@ suspend fun PointerInputScope.detectTransformGestures(
             val dlt = t1 - lastReleaseTime
 
             if (moveCount == 0) releasedEvent?.let { e ->
-                if (e.changes.isNullOrEmpty()) return@let
+                if (e.changes.isEmpty()) return@let
                 val offset = e.changes.first().position
                 if (dlt < 272) {
                     t1 = 0L

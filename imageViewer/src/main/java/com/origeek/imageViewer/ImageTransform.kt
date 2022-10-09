@@ -31,7 +31,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -174,9 +173,14 @@ fun TransformItemView(
             content()
         }
     }
-    SideEffect {
+    DisposableEffect(Unit) {
+        // 这个composable加载时添加到map
         scope.launch {
             itemState.addItem()
+        }
+        onDispose {
+            // composable退出时从map移除
+            itemState.removeItem()
         }
     }
     Box(
@@ -194,12 +198,6 @@ fun TransformItemView(
         ) {
             itemState.blockCompose()
         }
-    }
-    DisposableEffect(key1 = key) {
-        scope.launch {
-            itemState.removeItem()
-        }
-        onDispose {}
     }
 }
 
@@ -470,7 +468,7 @@ class TransformItemState(
 
     var key: Any? = null
 
-    private suspend fun checkItemInMap() {
+    private fun checkItemInMap() {
         if (checkInBound == null) return
         if (checkInBound!!.invoke(this)) {
             addItem()
@@ -496,7 +494,7 @@ class TransformItemState(
      * 判断item是否在所需范围内，返回true，则添加该item到map，返回false则移除
      * @param checkInBound Function0<Boolean>
      */
-    suspend fun checkIfInBound(checkInBound: () -> Boolean) {
+    fun checkIfInBound(checkInBound: () -> Boolean) {
         if (checkInBound()) {
             addItem()
         } else {
@@ -508,10 +506,10 @@ class TransformItemState(
      * 添加item到map上
      * @param key Any?
      */
-    suspend fun addItem(key: Any? = null) {
+    fun addItem(key: Any? = null) {
         val currentKey = key ?: this.key ?: return
         if (checkInBound != null) return
-        imageTransformMutex.withLock {
+        synchronized(imageTransformMutex) {
             transformItemStateMap[currentKey] = this
         }
     }
@@ -520,10 +518,10 @@ class TransformItemState(
      * 从map上移除item
      * @param key Any?
      */
-    suspend fun removeItem(key: Any? = null) {
-        val currentKey = key ?: this.key ?: return
-        if (checkInBound != null) return
-        imageTransformMutex.withLock {
+    fun removeItem(key: Any? = null) {
+        synchronized(imageTransformMutex) {
+            val currentKey = key ?: this.key ?: return
+            if (checkInBound != null) return
             transformItemStateMap.remove(currentKey)
         }
     }
