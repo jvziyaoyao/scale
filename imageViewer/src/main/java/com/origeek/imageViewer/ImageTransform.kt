@@ -160,11 +160,6 @@ fun TransformImageView(
 }
 
 @Composable
-fun rememberTransformItemState(): TransformItemState {
-    return remember { TransformItemState() }
-}
-
-@Composable
 fun TransformItemView(
     modifier: Modifier = Modifier,
     key: Any,
@@ -173,6 +168,7 @@ fun TransformItemView(
     content: @Composable () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    itemState.key = key
     itemState.blockCompose = remember {
         movableContentOf {
             content()
@@ -180,16 +176,16 @@ fun TransformItemView(
     }
     SideEffect {
         scope.launch {
-            imageTransformMutex.withLock {
-                transformItemStateMap[key] = itemState
-            }
+            itemState.addItem()
         }
     }
     Box(
         modifier = modifier
             .onGloballyPositioned {
-                itemState.blockPosition = it.positionInRoot()
-                itemState.blockSize = it.size
+                itemState.onPositionChange(
+                    position = it.positionInRoot(),
+                    size = it.size,
+                )
             }
             .fillMaxSize()
     ) {
@@ -201,9 +197,7 @@ fun TransformItemView(
     }
     DisposableEffect(key1 = key) {
         scope.launch {
-            imageTransformMutex.withLock {
-                transformItemStateMap.remove(key)
-            }
+            itemState.removeItem()
         }
         onDispose {}
     }
@@ -346,6 +340,10 @@ class TransformContentState internal constructor() {
             return Size(width = srcSize.width.toFloat(), height = srcSize.width.div(intrinsicRatio))
         }
 
+    fun findTransformItem(key: Any) = transformItemStateMap[key]
+
+    fun clearTransformItems() = transformItemStateMap.clear()
+
     fun setEnterState() {
         onAction = true
         onActionTarget = null
@@ -462,8 +460,79 @@ fun rememberTransformContentState(
 }
 
 class TransformItemState(
+    var scope: CoroutineScope,
     var blockPosition: Offset = Offset.Zero,
     var blockSize: IntSize = IntSize.Zero,
     var blockCompose: (@Composable () -> Unit) = {},
     var intrinsicSize: Size? = null,
-)
+    var checkInBound: (TransformItemState.() -> Boolean)? = null,
+) {
+
+    var key: Any? = null
+
+    private suspend fun checkItemInMap() {
+        if (checkInBound == null) return
+        if (checkInBound!!.invoke(this)) {
+            addItem()
+        } else {
+            removeItem()
+        }
+    }
+
+    /**
+     * 位置和大小发生变化时
+     * @param position Offset
+     * @param size IntSize
+     */
+    internal fun onPositionChange(position: Offset, size: IntSize) {
+        blockPosition = position
+        blockSize = size
+        scope.launch {
+            checkItemInMap()
+        }
+    }
+
+    /**
+     * 判断item是否在所需范围内，返回true，则添加该item到map，返回false则移除
+     * @param checkInBound Function0<Boolean>
+     */
+    suspend fun checkIfInBound(checkInBound: () -> Boolean) {
+        if (checkInBound()) {
+            addItem()
+        } else {
+            removeItem()
+        }
+    }
+
+    /**
+     * 添加item到map上
+     * @param key Any?
+     */
+    suspend fun addItem(key: Any? = null) {
+        val currentKey = key ?: this.key ?: return
+        if (checkInBound != null) return
+        imageTransformMutex.withLock {
+            transformItemStateMap[currentKey] = this
+        }
+    }
+
+    /**
+     * 从map上移除item
+     * @param key Any?
+     */
+    suspend fun removeItem(key: Any? = null) {
+        val currentKey = key ?: this.key ?: return
+        if (checkInBound != null) return
+        imageTransformMutex.withLock {
+            transformItemStateMap.remove(currentKey)
+        }
+    }
+}
+
+@Composable
+fun rememberTransformItemState(
+    scope: CoroutineScope = rememberCoroutineScope(),
+    checkInBound: (TransformItemState.() -> Boolean)? = null,
+): TransformItemState {
+    return remember { TransformItemState(scope = scope, checkInBound = checkInBound) }
+}

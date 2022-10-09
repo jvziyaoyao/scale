@@ -120,8 +120,6 @@ class ImagePreviewerState internal constructor() {
     private suspend fun stateCloseEnd() =
         updateState(animating = false, visible = false, visibleTarget = null)
 
-    private fun findTransformItem(key: Any) = transformItemStateMap[key]
-
     private suspend fun shrinkDown() {
         stateCloseStart()
         listOf(
@@ -223,6 +221,10 @@ class ImagePreviewerState internal constructor() {
             closeCallback?.invoke()
         }
     }
+
+    fun findTransformItem(key: Any) = transformState.findTransformItem(key)
+
+    fun clearTransformItems() = transformState.clearTransformItems()
 
     suspend fun scrollToPage(
         @IntRange(from = 0) page: Int,
@@ -423,7 +425,7 @@ val DEFAULT_PREVIEWER_ENTER_TRANSITION =
 
 @OptIn(ExperimentalAnimationApi::class)
 val DEFAULT_PREVIEWER_EXIT_TRANSITION =
-     scaleOut(tween(320)) + fadeOut(tween(240))
+    scaleOut(tween(320)) + fadeOut(tween(240))
 
 @Composable
 fun ImagePreviewer(
