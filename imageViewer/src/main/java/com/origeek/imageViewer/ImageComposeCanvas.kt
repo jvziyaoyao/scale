@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.BitmapRegionDecoder
 import android.graphics.Rect
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.fillMaxSize
@@ -582,11 +583,14 @@ fun ImageComposeCanvas(
             rotate(degrees = rotation, pivot = rotationCenter)
         }) {
             bitmap?.let {
-                drawImage(
-                    image = it.asImageBitmap(),
-                    dstSize = IntSize(rSize.width, rSize.height),
-                    dstOffset = IntOffset(deltaX.toInt(), deltaY.toInt())
-                )
+                // bitmap大小在1的时候会有闪屏的现象
+                if (it.width > 1 && it.height > 1) {
+                    drawImage(
+                        image = it.asImageBitmap(),
+                        dstSize = IntSize(rSize.width, rSize.height),
+                        dstOffset = IntOffset(deltaX.toInt(), deltaY.toInt())
+                    )
+                }
             }
             // 更新渲染队列
             if (renderUpdateTimeStamp >= 0) updateRenderList()
