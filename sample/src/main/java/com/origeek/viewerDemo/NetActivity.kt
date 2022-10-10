@@ -111,7 +111,6 @@ fun rememberHugeImagePainter(inputStream: InputStream): Any? {
     var painter by remember { mutableStateOf<Any?>(defaultPainter) }
     LaunchedEffect(inputStream) {
         launch(Dispatchers.IO) {
-            delay(1200)
             val imageDecoder = try {
                 val decoder = BitmapRegionDecoder.newInstance(inputStream, false)
                 if (decoder== null) {

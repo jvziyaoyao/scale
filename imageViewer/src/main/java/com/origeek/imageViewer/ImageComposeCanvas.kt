@@ -5,11 +5,15 @@ import android.graphics.BitmapFactory
 import android.graphics.BitmapRegionDecoder
 import android.graphics.Rect
 import android.util.Log
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -556,8 +560,25 @@ fun ImageComposeCanvas(
             Offset(cx, cy)
         }
     }
+
+    /**
+     * TODO: 这个动画是否要加入配置项
+     * canvas加载成功后避免闪一下
+     */
+    val canvasAlpha = remember { Animatable(0F) }
+    LaunchedEffect(key1 = bitmap) {
+        if (bitmap != null && bitmap!!.width > 1 && bitmap!!.height > 1) {
+            if (canvasAlpha.value == 0F) {
+                scope.launch {
+                    canvasAlpha.animateTo(targetValue = 1F, animationSpec = tween(80))
+                }
+            }
+        }
+    }
+
     Canvas(
         modifier = modifier
+            .alpha(canvasAlpha.value)
             .fillMaxSize()
             .graphicsLayer {
                 // 图片位移时会超出容器大小，需要在这个地方指定是否裁切
@@ -582,15 +603,13 @@ fun ImageComposeCanvas(
         withTransform({
             rotate(degrees = rotation, pivot = rotationCenter)
         }) {
-            bitmap?.let {
-                // bitmap大小在1的时候会有闪屏的现象
-                if (it.width > 1 && it.height > 1) {
-                    drawImage(
-                        image = it.asImageBitmap(),
-                        dstSize = IntSize(rSize.width, rSize.height),
-                        dstOffset = IntOffset(deltaX.toInt(), deltaY.toInt())
-                    )
-                }
+            // bitmap大小在1的时候会有闪屏的现象
+            if (bitmap != null) {
+                drawImage(
+                    image = bitmap!!.asImageBitmap(),
+                    dstSize = IntSize(rSize.width, rSize.height),
+                    dstOffset = IntOffset(deltaX.toInt(), deltaY.toInt())
+                )
             }
             // 更新渲染队列
             if (renderUpdateTimeStamp >= 0) updateRenderList()
@@ -605,7 +624,6 @@ fun ImageComposeCanvas(
                     }
                 }
             }
-
             // 这里会把可视区域的矩形画出来
             if (debugMode) {
                 drawRect(
@@ -616,7 +634,6 @@ fun ImageComposeCanvas(
             }
         }
     }
-
     // 结束回调
     DisposableEffect(key1 = Unit) {
         onDispose {
