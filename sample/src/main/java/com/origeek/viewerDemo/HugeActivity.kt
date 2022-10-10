@@ -43,11 +43,13 @@ fun HugeBody() {
         model = imageDecoder,
         state = state,
         boundClip = false,
-        onDoubleTap = {
-            scope.launch {
-                state.toggleScale(it)
-            }
-        }
+        detectGesture = {
+          onDoubleTap = {
+              scope.launch {
+                  state.toggleScale(it)
+              }
+          }
+        },
     )
 
 }

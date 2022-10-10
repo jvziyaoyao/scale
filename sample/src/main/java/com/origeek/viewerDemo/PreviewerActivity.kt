@@ -119,9 +119,11 @@ fun PreviewerBody(
             count = images.size,
             state = imageViewerState,
             imageLoader = { index -> painterResource(id = images[index]) },
-            onTap = {
-                scope.launch {
-                    imageViewerState.close()
+            detectGesture = {
+                onTap = {
+                    scope.launch {
+                        imageViewerState.close()
+                    }
                 }
             },
         )

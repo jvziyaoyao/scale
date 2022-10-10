@@ -211,6 +211,12 @@ fun rememberViewerState(
     ImageViewerState(offsetX, offsetY, scale, rotation, animationSpec)
 }
 
+class ViewerGestureScope(
+    var onTap: (Offset) -> Unit = {},
+    var onDoubleTap: (Offset) -> Unit = {},
+    var onLongPress: (Offset) -> Unit = {},
+)
+
 /**
  * model支持Painter、ImageBitmap、ImageVector、BitmapRegionDecoder
  */
@@ -219,12 +225,12 @@ fun ImageViewer(
     modifier: Modifier = Modifier,
     model: Any,
     state: ImageViewerState = rememberViewerState(),
-    onTap: (Offset) -> Unit = {},
-    onDoubleTap: (Offset) -> Unit = {},
-    onLongPress: (Offset) -> Unit = {},
+    detectGesture: ViewerGestureScope.() -> Unit = {},
     boundClip: Boolean = true,
     debugMode: Boolean = false,
 ) {
+    val viewerGestureScope = remember { ViewerGestureScope() }
+    detectGesture.invoke(viewerGestureScope)
     val scope = rememberCoroutineScope()
     // 触摸时中心位置
     var centroid by remember { mutableStateOf(Offset.Zero) }
@@ -275,9 +281,9 @@ fun ImageViewer(
     }
     val gesture = remember {
         RawGesture(
-            onTap = onTap,
-            onDoubleTap = onDoubleTap,
-            onLongPress = onLongPress,
+            onTap = viewerGestureScope.onTap,
+            onDoubleTap = viewerGestureScope.onDoubleTap,
+            onLongPress = viewerGestureScope.onLongPress,
             gestureStart = {
                 if (state.allowGestureInput) {
                     eventChangeCount = 0

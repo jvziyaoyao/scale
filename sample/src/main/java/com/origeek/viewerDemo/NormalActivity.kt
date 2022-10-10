@@ -39,11 +39,13 @@ fun NormalBody() {
             state = state,
             model = painterResource(id = R.drawable.light_02),
             modifier = Modifier.fillMaxSize(),
-            onDoubleTap = {
-                scope.launch {
-                    state.toggleScale(it)
+            detectGesture = {
+                onDoubleTap = {
+                    scope.launch {
+                        state.toggleScale(it)
+                    }
                 }
-            }
+            },
         )
     }
 }

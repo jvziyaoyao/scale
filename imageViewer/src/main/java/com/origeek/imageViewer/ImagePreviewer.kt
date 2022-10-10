@@ -3,7 +3,10 @@ package com.origeek.imageViewer
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -427,6 +430,12 @@ val DEFAULT_PREVIEWER_ENTER_TRANSITION =
 val DEFAULT_PREVIEWER_EXIT_TRANSITION =
     scaleOut(tween(320)) + fadeOut(tween(240))
 
+class PreviewerLayerScope(
+    var viewerContainer: @Composable (viewer: @Composable () -> Unit) -> Unit = { it() },
+    var background: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> DefaultPreviewerBackground() },
+    var foreground: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> },
+)
+
 @Composable
 fun ImagePreviewer(
     modifier: Modifier = Modifier,
@@ -437,13 +446,12 @@ fun ImagePreviewer(
     enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
     exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,
     currentViewerState: (ImageViewerState) -> Unit = {},
-    onTap: () -> Unit = {},
-    onDoubleTap: () -> Boolean = { false },
-    onLongPress: () -> Unit = {},
-    viewerContainer: @Composable (viewer: @Composable () -> Unit) -> Unit = { it() },
-    background: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> DefaultPreviewerBackground() },
-    foreground: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> },
+    detectGesture: GalleryGestureScope.() -> Unit = {},
+    previewerLayer: PreviewerLayerScope.() -> Unit = {},
 ) {
+    // 图层相关
+    val layerScope = remember { PreviewerLayerScope() }
+    previewerLayer.invoke(layerScope)
     LaunchedEffect(
         key1 = state.animateContainerState,
         key2 = state.animateContainerState.currentState
@@ -483,37 +491,37 @@ fun ImagePreviewer(
                     currentViewerState(it)
                 },
                 itemSpacing = itemSpacing,
-                onTap = onTap,
-                onDoubleTap = onDoubleTap,
-                onLongPress = onLongPress,
-                viewerContainer = {
-                    viewerContainer {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .alpha(state.transformContentAlpha.value)
-                            ) {
-                                TransformContentView(state.transformState)
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .alpha(state.viewerContainerAlpha.value)
-                            ) {
-                                it()
+                detectGesture = detectGesture,
+                galleryLayer = {
+                    this.viewerContainer = {
+                        layerScope.viewerContainer {
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .alpha(state.transformContentAlpha.value)
+                                ) {
+                                    TransformContentView(state.transformState)
+                                }
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .alpha(state.viewerContainerAlpha.value)
+                                ) {
+                                    it()
+                                }
                             }
                         }
                     }
-                },
-                background = {
-                    UIContainer {
-                        background(count, it)
+                    this.background = {
+                        UIContainer {
+                            layerScope.background(count, it)
+                        }
                     }
-                },
-                foreground = {
-                    UIContainer {
-                        foreground(count, it)
+                    this.foreground = {
+                        UIContainer {
+                            layerScope.foreground(count, it)
+                        }
                     }
                 },
             )
@@ -524,75 +532,4 @@ fun ImagePreviewer(
         }
     }
     state.ticket.Next()
-}
-
-@Composable
-fun ImageGallery(
-    modifier: Modifier = Modifier,
-    count: Int,
-    state: ImagePagerState = rememberImagePagerState(),
-    imageLoader: @Composable (Int) -> Any,
-    itemSpacing: Dp = DEFAULT_ITEM_SPACE,
-    currentViewerState: (ImageViewerState) -> Unit = {},
-    onTap: () -> Unit = {},
-    onDoubleTap: () -> Boolean = { false },
-    onLongPress: () -> Unit = {},
-    viewerContainer: @Composable (viewer: @Composable () -> Unit) -> Unit = { it() },
-    background: @Composable ((Int) -> Unit) = {},
-    foreground: @Composable ((Int) -> Unit) = {},
-) {
-    require(count >= 0) { "imageCount must be >= 0" }
-    val scope = rememberCoroutineScope()
-    // 确保不会越界
-    val currentPage by remember {
-        derivedStateOf {
-            if (state.currentPage >= count) {
-                if (count > 0) count - 1 else 0
-            } else state.currentPage
-        }
-    }
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-    ) {
-        background(currentPage)
-        ImageHorizonPager(
-            count = count,
-            state = state,
-            modifier = Modifier
-                .fillMaxSize(),
-            itemSpacing = itemSpacing,
-        ) { page ->
-            val imageState = rememberViewerState()
-            LaunchedEffect(key1 = currentPage) {
-                if (currentPage != page) imageState.reset()
-                if (currentPage == page) currentViewerState(imageState)
-            }
-            viewerContainer {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                ) {
-                    key(count, page) {
-                        ImageViewer(
-                            model = imageLoader(page),
-                            state = imageState,
-                            boundClip = false,
-                            onTap = {
-                                onTap()
-                            },
-                            onDoubleTap = {
-                                val consumed = onDoubleTap()
-                                if (!consumed) scope.launch {
-                                    imageState.toggleScale(it)
-                                }
-                            },
-                            onLongPress = { onLongPress() },
-                        )
-                    }
-                }
-            }
-        }
-        foreground(currentPage)
-    }
 }
