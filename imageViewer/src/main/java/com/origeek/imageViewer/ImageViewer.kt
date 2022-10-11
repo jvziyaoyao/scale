@@ -50,6 +50,7 @@ class ImageViewerState(
     animationSpec: AnimationSpec<Float>? = null,
 ) : CoroutineScope by MainScope() {
 
+    // 默认动画窗格
     var defaultAnimateSpec: AnimationSpec<Float> = animationSpec ?: SpringSpec()
 
     // x偏移
@@ -69,6 +70,9 @@ class ImageViewerState(
 
     // 默认显示大小
     var defaultSize by mutableStateOf(IntSize(0, 0))
+
+    // model类型
+    var modelType by mutableStateOf<Class<*>?>(null)
 
     // 容器大小
     internal var containerSize by mutableStateOf(IntSize(0, 0))
@@ -217,8 +221,22 @@ class ViewerGestureScope(
     var onLongPress: (Offset) -> Unit = {},
 )
 
+class ComposeModel(
+    val content: @Composable ComposeModelScope.() -> Unit = {}
+) {
+    class ComposeModelScope(
+        var scale: Float = DEFAULT_SCALE,
+        var offsetX: Float = DEFAULT_OFFSET_X,
+        var offsetY: Float = DEFAULT_OFFSET_Y,
+        var rotation: Float = DEFAULT_ROTATION,
+        var gesture: RawGesture = RawGesture(),
+        var onSizeChange: suspend (SizeChangeContent) -> Unit = {},
+        var boundClip: Boolean = true,
+    )
+}
+
 /**
- * model支持Painter、ImageBitmap、ImageVector、BitmapRegionDecoder
+ * model支持Painter、ImageBitmap、ImageVector、BitmapRegionDecoder, ComposeModel
  */
 @Composable
 fun ImageViewer(
@@ -261,7 +279,6 @@ fun ImageViewer(
     var boundScale by remember { mutableStateOf(1F) }
     // 目标旋转角度
     var desRotation by remember { mutableStateOf(0F) }
-
     // 要增加的旋转角度
     var rotate by remember { mutableStateOf(0F) }
     // 要增加的放大倍率
@@ -476,6 +493,7 @@ fun ImageViewer(
         }
     }
     Box(modifier = modifier) {
+        state.modelType = model.javaClass
         when (model) {
             is Painter,
             is ImageVector,
@@ -503,6 +521,18 @@ fun ImageViewer(
                     onSizeChange = sizeChange,
                     boundClip = boundClip,
                 )
+            }
+            is ComposeModel -> {
+                val composeModelScope = remember { ComposeModel.ComposeModelScope() }
+                model.content(composeModelScope.apply {
+                    this.scale = state.scale.value
+                    this.offsetX = state.offsetX.value
+                    this.offsetY = state.offsetY.value
+                    this.rotation = state.rotation.value
+                    this.gesture = gesture
+                    this.onSizeChange = sizeChange
+                    this.boundClip = boundClip
+                })
             }
             else -> {
                 throw Exception("不支持这种model类型！ ${model::class.java.name}")

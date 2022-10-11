@@ -143,7 +143,9 @@ class ImagePreviewerState internal constructor() {
             var vStartOffset by mutableStateOf<Offset?>(null)
             var vOrientationDown by mutableStateOf<Boolean?>(null)
             if (getKey != null) detectVerticalDragGestures(
-                onDragStart = {
+                onDragStart = OnDragStart@ {
+                    if (imageViewerState == null) return@OnDragStart
+                    if (imageViewerState?.modelType?.name == ComposeModel::class.java.name) return@OnDragStart
                     var transformItemState: TransformItemState? = null
                     getKey?.apply {
                         findTransformItem(invoke(currentPage))?.apply {
@@ -151,12 +153,13 @@ class ImagePreviewerState internal constructor() {
                         }
                     }
                     transformState.itemState = transformItemState
-                    if (imageViewerState?.scale?.value == 1F) {
+                    if (imageViewerState!!.scale.value == 1F) {
                         vStartOffset = it
-                        imageViewerState?.allowGestureInput = false
+                        imageViewerState!!.allowGestureInput = false
                     }
                 },
-                onDragEnd = {
+                onDragEnd = OnDragEnd@ {
+                    if (vStartOffset == null) return@OnDragEnd
                     vStartOffset = null
                     vOrientationDown = null
                     imageViewerState?.apply {
@@ -182,15 +185,14 @@ class ImagePreviewerState internal constructor() {
                         }
                     }
                 },
-                onVerticalDrag = { change, dragAmount ->
+                onVerticalDrag = OnVerticalDrag@ { change, dragAmount ->
+                    if (imageViewerState == null) return@OnVerticalDrag
                     if (vStartOffset != null) {
                         if (vOrientationDown == null) vOrientationDown = dragAmount > 0
                         if (vOrientationDown == true) {
                             val offsetY = change.position.y - vStartOffset!!.y
                             val offsetX = change.position.x - vStartOffset!!.x
-                            val containerHeight =
-                                imageViewerState?.containerSize?.height
-                                    ?: transformState.containerSize.height
+                            val containerHeight = imageViewerState!!.containerSize.height
                             val scale = (containerHeight - offsetY.absoluteValue).div(
                                 containerHeight
                             )

@@ -80,6 +80,7 @@ fun ImageGallery(
                 ) {
                     key(count, page) {
                         ImageViewer(
+                            modifier = Modifier.fillMaxSize(),
                             model = imageLoader(page),
                             state = imageState,
                             boundClip = false,

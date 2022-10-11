@@ -1,25 +1,20 @@
 package com.origeek.viewerDemo
 
 import android.graphics.BitmapRegionDecoder
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import coil.EventListener
-import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.origeek.imageViewer.*
 import com.origeek.ui.common.ScaleGrid
 import com.origeek.viewerDemo.base.BaseActivity
@@ -70,6 +65,7 @@ fun NetBody() {
         val previewerState = rememberPreviewerState()
         val key = "2887"
         val itemState = rememberTransformItemState()
+
         if (previewerState.canClose || previewerState.animating) BackHandler {
             if (previewerState.canClose) scope.launch {
 //                previewerState.closeTransform(key)
@@ -107,13 +103,22 @@ fun NetBody() {
 
 @Composable
 fun rememberHugeImagePainter(inputStream: InputStream): Any? {
-    val defaultPainter = painterResource(id = R.drawable.ic_dark_bg)
+    val defaultPainter = ComposeModel {
+        Box(
+            Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator(color = MaterialTheme.colors.surface.copy(0.2F))
+        }
+    }
     var painter by remember { mutableStateOf<Any?>(defaultPainter) }
     LaunchedEffect(inputStream) {
         launch(Dispatchers.IO) {
+            delay(1200)
             val imageDecoder = try {
                 val decoder = BitmapRegionDecoder.newInstance(inputStream, false)
-                if (decoder== null) {
+                if (decoder == null) {
                     null
                 } else {
                     ImageDecoder(decoder = decoder)
