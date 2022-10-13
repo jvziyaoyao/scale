@@ -91,7 +91,7 @@ class ImageViewerState(
     internal var resetTimeStamp by mutableStateOf(0L)
 
     // 挂载状态
-    internal val mountedFlow = MutableSharedFlow<Unit>()
+    internal val mountedFlow = MutableSharedFlow<Unit>(replay = 1)
 
     /**
      * 判断是否有动画正在运行

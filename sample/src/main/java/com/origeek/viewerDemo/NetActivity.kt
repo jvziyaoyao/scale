@@ -2,7 +2,6 @@ package com.origeek.viewerDemo
 
 import android.graphics.BitmapRegionDecoder
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
@@ -16,22 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.widget.Placeholder
-import androidx.lifecycle.MutableLiveData
 import coil.compose.rememberAsyncImagePainter
 import com.origeek.imageViewer.*
 import com.origeek.ui.common.ScaleGrid
 import com.origeek.viewerDemo.base.BaseActivity
-import com.origeek.viewerDemo.ui.component.rememberCoilImagePainter
 import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.io.InputStream
-import java.util.*
 
 /**
  * @program: ImageViewer
@@ -72,7 +64,7 @@ fun NetBody() {
         val itemState = rememberTransformItemState()
         val inputStream = remember { context.assets.open("a350.jpg") }
         val painter = rememberAsyncImagePainter(model = R.drawable.a350_temp)
-        var transformEnable by remember { mutableStateOf(true) }
+        var transformEnable by remember { mutableStateOf(false) }
 //        val painter = painterResource(R.drawable.a350_temp)
 
         if (previewerState.canClose || previewerState.animating) BackHandler {
@@ -129,6 +121,7 @@ fun NetBody() {
             count = 1,
             imageLoader = {
                 rememberDecoderImagePainter(inputStream = inputStream)
+//                painterResource(R.drawable.a350_temp)
 //                rememberAsyncImagePainter(
 //                    model = IMAGE_FULL,
 //                    placeholder = painterResource(

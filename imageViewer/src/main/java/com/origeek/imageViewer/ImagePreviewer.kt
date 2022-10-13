@@ -13,10 +13,12 @@ import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
@@ -26,15 +28,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.origeek.ui.common.Ticket
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-import kotlin.math.absoluteValue
 
 val DEEP_DARK_FANTASY = Color(0xFF000000)
 val DEFAULT_ITEM_SPACE = 12.dp
@@ -75,12 +73,18 @@ class ImagePreviewerState internal constructor() {
 
     internal var viewerContainerAlpha = Animatable(1F)
 
+    private val viewerContainerVisible: Boolean
+        get() = viewerContainerAlpha.value == 1F
+
     var animating by mutableStateOf(false)
 
     var visible by mutableStateOf(false)
         internal set
 
     var visibleTarget by mutableStateOf<Boolean?>(null)
+
+    var viewerLoading by mutableStateOf(false)
+        internal set
 
     val canOpen: Boolean
         get() = !visible && visibleTarget == null && !animating
@@ -138,81 +142,98 @@ class ImagePreviewerState internal constructor() {
         stateCloseEnd()
     }
 
+    private suspend fun awaitViewerLoading() {
+        viewerLoading = true
+        imageViewerState?.mountedFlow?.collectOne(scope)
+        viewerLoading = false
+    }
+
+    private suspend fun transformSnapToViewer(isViewer: Boolean) {
+        if (isViewer) {
+            if (visibleTarget == false) return
+            transformContentAlpha.snapTo(0F)
+            viewerContainerAlpha.snapTo(1F)
+        } else {
+            transformContentAlpha.snapTo(1F)
+            viewerContainerAlpha.snapTo(0F)
+        }
+    }
+
     internal suspend fun verticalDrag(pointerInputScope: PointerInputScope) {
         pointerInputScope.apply {
             var vStartOffset by mutableStateOf<Offset?>(null)
             var vOrientationDown by mutableStateOf<Boolean?>(null)
             if (getKey != null) detectVerticalDragGestures(
-                onDragStart = OnDragStart@ {
-                    if (imageViewerState == null) return@OnDragStart
-                    if (imageViewerState?.modelType?.name == ComposeModel::class.java.name) return@OnDragStart
-                    var transformItemState: TransformItemState? = null
-                    getKey?.apply {
-                        findTransformItem(invoke(currentPage))?.apply {
-                            transformItemState = this
-                        }
-                    }
-                    transformState.itemState = transformItemState
-                    if (imageViewerState!!.scale.value == 1F) {
-                        vStartOffset = it
-                        imageViewerState!!.allowGestureInput = false
-                    }
+                onDragStart = OnDragStart@{
+//                    if (imageViewerState == null) return@OnDragStart
+//                    if (imageViewerState?.modelType?.name == ComposeModel::class.java.name) return@OnDragStart
+//                    var transformItemState: TransformItemState? = null
+//                    getKey?.apply {
+//                        findTransformItem(invoke(currentPage))?.apply {
+//                            transformItemState = this
+//                        }
+//                    }
+//                    transformState.itemState = transformItemState
+//                    if (imageViewerState!!.scale.value == 1F) {
+//                        vStartOffset = it
+//                        imageViewerState!!.allowGestureInput = false
+//                    }
                 },
-                onDragEnd = OnDragEnd@ {
-                    if (vStartOffset == null) return@OnDragEnd
-                    vStartOffset = null
-                    vOrientationDown = null
-                    imageViewerState?.apply {
-                        allowGestureInput = true
-                        if (scale.value < 0.8F && getKey != null) {
-                            scope.launch {
-                                val key = getKey!!(currentPage)
-                                val transformItem = findTransformItem(key)
-                                if (transformItem != null) {
-                                    closeTransform(key)
-                                } else {
-                                    shrinkDown()
-                                }
-                                uiAlpha.snapTo(1F)
-                            }
-                        } else {
-                            scope.launch {
-                                uiAlpha.animateTo(1F, defaultAnimationSpec)
-                            }
-                            scope.launch {
-                                reset(defaultAnimationSpec)
-                            }
-                        }
-                    }
+                onDragEnd = OnDragEnd@{
+//                    if (vStartOffset == null) return@OnDragEnd
+//                    vStartOffset = null
+//                    vOrientationDown = null
+//                    imageViewerState?.apply {
+//                        allowGestureInput = true
+//                        if (scale.value < 0.8F && getKey != null) {
+//                            scope.launch {
+//                                val key = getKey!!(currentPage)
+//                                val transformItem = findTransformItem(key)
+//                                if (transformItem != null) {
+//                                    closeTransform(key)
+//                                } else {
+//                                    shrinkDown()
+//                                }
+//                                uiAlpha.snapTo(1F)
+//                            }
+//                        } else {
+//                            scope.launch {
+//                                uiAlpha.animateTo(1F, defaultAnimationSpec)
+//                            }
+//                            scope.launch {
+//                                reset(defaultAnimationSpec)
+//                            }
+//                        }
+//                    }
                 },
-                onVerticalDrag = OnVerticalDrag@ { change, dragAmount ->
-                    if (imageViewerState == null) return@OnVerticalDrag
-                    if (vStartOffset != null) {
-                        if (vOrientationDown == null) vOrientationDown = dragAmount > 0
-                        if (vOrientationDown == true) {
-                            val offsetY = change.position.y - vStartOffset!!.y
-                            val offsetX = change.position.x - vStartOffset!!.x
-                            val containerHeight = imageViewerState!!.containerSize.height
-                            val scale = (containerHeight - offsetY.absoluteValue).div(
-                                containerHeight
-                            )
-                            scope.launch {
-                                uiAlpha.snapTo(scale)
-                                imageViewerState?.offsetY?.apply {
-                                    snapTo(offsetY)
-                                }
-                                imageViewerState?.offsetX?.apply {
-                                    snapTo(offsetX)
-                                }
-                                imageViewerState?.scale?.apply {
-                                    snapTo(scale)
-                                }
-                            }
-                        } else {
-                            // 如果不是向上，就返还输入权，以免页面卡顿
-                            imageViewerState?.allowGestureInput = true
-                        }
-                    }
+                onVerticalDrag = OnVerticalDrag@{ change, dragAmount ->
+//                    if (imageViewerState == null) return@OnVerticalDrag
+//                    if (vStartOffset != null) {
+//                        if (vOrientationDown == null) vOrientationDown = dragAmount > 0
+//                        if (vOrientationDown == true) {
+//                            val offsetY = change.position.y - vStartOffset!!.y
+//                            val offsetX = change.position.x - vStartOffset!!.x
+//                            val containerHeight = imageViewerState!!.containerSize.height
+//                            val scale = (containerHeight - offsetY.absoluteValue).div(
+//                                containerHeight
+//                            )
+//                            scope.launch {
+//                                uiAlpha.snapTo(scale)
+//                                imageViewerState?.offsetY?.apply {
+//                                    snapTo(offsetY)
+//                                }
+//                                imageViewerState?.offsetX?.apply {
+//                                    snapTo(offsetX)
+//                                }
+//                                imageViewerState?.scale?.apply {
+//                                    snapTo(scale)
+//                                }
+//                            }
+//                        } else {
+//                            // 如果不是向上，就返还输入权，以免页面卡顿
+//                            imageViewerState?.allowGestureInput = true
+//                        }
+//                    }
                 }
             )
         }
@@ -267,6 +288,9 @@ class ImagePreviewerState internal constructor() {
                 ticket.awaitNextTicket()
                 ticket.awaitNextTicket()
                 pagerState.scrollToPage(index)
+                launch {
+                    awaitViewerLoading()
+                }
             }
         }
 
@@ -286,6 +310,7 @@ class ImagePreviewerState internal constructor() {
         }
         scope.launch {
             stateCloseStart()
+            cancelOpenTransform()
             // 这里创建一个全新的state是为了让exitTransition的设置得到响应
             animateContainerState = MutableTransitionState(true)
             animateContainerState.targetState = false
@@ -294,32 +319,68 @@ class ImagePreviewerState internal constructor() {
         }
     }
 
+    private var openTransformJob: Deferred<Unit>? = null
+
     suspend fun openTransform(
         index: Int,
         itemState: TransformItemState,
         animationSpec: AnimationSpec<Float>? = null
     ) {
-        stateOpenStart()
-        val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
-        animateContainerState = MutableTransitionState(true)
-        viewerContainerAlpha.snapTo(0F)
-        transformContentAlpha.snapTo(1F)
-        uiAlpha.snapTo(0F)
-        ticket.awaitNextTicket()
-        pagerState.scrollToPage(index)
-        listOf(
-            scope.async {
-                transformState.enterTransform(itemState, animationSpec = currentAnimationSpec)
-                transformContentAlpha.snapTo(0F)
-                viewerContainerAlpha.snapTo(1F)
-            },
-            scope.async {
-                uiAlpha.animateTo(1F, animationSpec = currentAnimationSpec)
-            }
-        ).awaitAll()
+        openTransformJob = scope.async {
+            stateOpenStart()
+            val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
+            animateContainerState = MutableTransitionState(true)
+            transformSnapToViewer(false)
+            uiAlpha.snapTo(0F)
+            ticket.awaitNextTicket()
+            pagerState.scrollToPage(index)
+            listOf(
+                scope.async {
+                    transformState.enterTransform(itemState, animationSpec = currentAnimationSpec)
+                },
+                scope.async {
+                    uiAlpha.animateTo(1F, animationSpec = currentAnimationSpec)
+                }
+            ).awaitAll()
 
-        // 执行完成后的回调
-        stateOpenEnd()
+            // 执行完成后的回调
+            stateOpenEnd()
+
+            // 等待viewer加载
+            awaitViewerLoading()
+            transformSnapToViewer(true)
+        }
+        openTransformJob?.await()
+    }
+
+    private fun cancelOpenTransform() {
+        openTransformJob?.cancel()
+        viewerLoading = false
+    }
+
+    private suspend fun copyViewerPosToContent(itemState: TransformItemState) {
+        transformState.itemState = itemState
+        transformState.containerSize = imageViewerState!!.containerSize
+        val scale = imageViewerState!!.scale
+        val offsetX = imageViewerState!!.offsetX
+        val offsetY = imageViewerState!!.offsetY
+        val rw = transformState.fitSize.width * scale.value
+        val rh = transformState.fitSize.height * scale.value
+        val goOffsetX =
+            (transformState.containerSize.width - rw).div(2) + offsetX.value
+        val goOffsetY =
+            (transformState.containerSize.height - rh).div(2) + offsetY.value
+        val fixScale = transformState.fitScale * scale.value
+        transformState.graphicScaleX.snapTo(fixScale)
+        transformState.graphicScaleY.snapTo(fixScale)
+        transformState.displayWidth.snapTo(transformState.displayRatioSize.width)
+        transformState.displayHeight.snapTo(transformState.displayRatioSize.height)
+        transformState.offsetX.snapTo(goOffsetX)
+        transformState.offsetY.snapTo(goOffsetY)
+
+        animateContainerState = MutableTransitionState(true)
+        transformSnapToViewer(false)
+        if (uiAlpha.value == 0F) uiAlpha.snapTo(1F)
     }
 
     suspend fun closeTransform(
@@ -328,33 +389,11 @@ class ImagePreviewerState internal constructor() {
     ) {
         val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
         stateCloseStart()
+        cancelOpenTransform()
         val itemState = findTransformItem(key)
         if (itemState != null) {
-            transformState.itemState = itemState
-            transformState.containerSize = imageViewerState!!.containerSize
-            val scale = imageViewerState!!.scale
-            val offsetX = imageViewerState!!.offsetX
-            val offsetY = imageViewerState!!.offsetY
-            val rw = transformState.fitSize.width * scale.value
-            val rh = transformState.fitSize.height * scale.value
-            val goOffsetX =
-                (transformState.containerSize.width - rw).div(2) + offsetX.value
-            val goOffsetY =
-                (transformState.containerSize.height - rh).div(2) + offsetY.value
-            val fixScale = transformState.fitScale * scale.value
-            transformState.graphicScaleX.snapTo(fixScale)
-            transformState.graphicScaleY.snapTo(fixScale)
-            transformState.displayWidth.snapTo(transformState.displayRatioSize.width)
-            transformState.displayHeight.snapTo(transformState.displayRatioSize.height)
-            transformState.offsetX.snapTo(goOffsetX)
-            transformState.offsetY.snapTo(goOffsetY)
-
-            animateContainerState = MutableTransitionState(true)
-            viewerContainerAlpha.snapTo(0F)
-            transformContentAlpha.snapTo(1F)
-            if (uiAlpha.value == 0F) uiAlpha.snapTo(1F)
+            if (viewerContainerVisible) copyViewerPosToContent(itemState)
             ticket.awaitNextTicket()
-
             listOf(
                 scope.async {
                     transformState.exitTransform(animationSpec = currentAnimationSpec)
@@ -504,6 +543,21 @@ fun ImagePreviewer(
                                         .alpha(state.transformContentAlpha.value)
                                 ) {
                                     TransformContentView(state.transformState)
+                                }
+                                /**
+                                 * TODO: 后续再考虑如何设计loading
+                                 */
+                                AnimatedVisibility(
+                                    visible = state.viewerLoading,
+                                    enter = fadeIn(tween(200)),
+                                    exit = fadeOut(tween(200))
+                                ) {
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(color = Color.White.copy(0.2F))
+                                    }
                                 }
                                 Box(
                                     modifier = Modifier
