@@ -34,7 +34,7 @@ fun ImageGallery(
     modifier: Modifier = Modifier,
     count: Int,
     state: ImagePagerState = rememberImagePagerState(),
-    imageLoader: @Composable (Int) -> Any,
+    imageLoader: @Composable (Int) -> Any?,
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     currentViewerState: (ImageViewerState) -> Unit = {},
     detectGesture: GalleryGestureScope.() -> Unit = {},

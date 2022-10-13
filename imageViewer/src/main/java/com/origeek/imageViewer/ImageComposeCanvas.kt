@@ -198,6 +198,7 @@ fun ImageComposeCanvas(
     rotation: Float = DEFAULT_ROTATION,
     gesture: RawGesture = RawGesture(),
     onSizeChange: suspend (SizeChangeContent) -> Unit = {},
+    onMounted: () -> Unit = {},
     boundClip: Boolean = true,
     debugMode: Boolean = false,
 ) {
@@ -571,6 +572,7 @@ fun ImageComposeCanvas(
             if (canvasAlpha.value == 0F) {
                 scope.launch {
                     canvasAlpha.animateTo(targetValue = 1F, animationSpec = tween(80))
+                    onMounted()
                 }
             }
         }
@@ -603,7 +605,6 @@ fun ImageComposeCanvas(
         withTransform({
             rotate(degrees = rotation, pivot = rotationCenter)
         }) {
-            // bitmap大小在1的时候会有闪屏的现象
             if (bitmap != null) {
                 drawImage(
                     image = bitmap!!.asImageBitmap(),
@@ -634,14 +635,6 @@ fun ImageComposeCanvas(
             }
         }
     }
-    // 结束回调
-    DisposableEffect(key1 = Unit) {
-        onDispose {
-            // 释放资源
-            imageDecoder.release()
-        }
-    }
-
 }
 
 fun checkRectInBound(

@@ -46,6 +46,7 @@ fun ImageComposeOrigin(
     rotation: Float = DEFAULT_ROTATION,
     gesture: RawGesture = RawGesture(),
     onSizeChange: suspend (SizeChangeContent) -> Unit = {},
+    onMounted: () -> Unit = {},
     boundClip: Boolean = true,
 ) {
     // 容器大小
@@ -118,6 +119,7 @@ fun ImageComposeOrigin(
 
     when (model) {
         is Painter -> {
+            var isMounted by remember { mutableStateOf(false) }
             imageSpecified = model.intrinsicSize.isSpecified
             LaunchedEffect(key1 = model.intrinsicSize, block = {
                 if (imageSpecified) {
@@ -125,6 +127,10 @@ fun ImageComposeOrigin(
                         model.intrinsicSize.width.toInt(),
                         model.intrinsicSize.height.toInt()
                     )
+                    if (!isMounted) {
+                        isMounted = true
+                        onMounted()
+                    }
                 }
             })
         }
@@ -135,6 +141,7 @@ fun ImageComposeOrigin(
                     model.defaultWidth.toPx().toInt(),
                     model.defaultHeight.toPx().toInt(),
                 )
+                onMounted()
             }
         }
         is ImageBitmap -> {
@@ -143,6 +150,7 @@ fun ImageComposeOrigin(
                 model.width,
                 model.height
             )
+            onMounted()
         }
         else -> throw Exception("不支持这种类型的数据！")
     }

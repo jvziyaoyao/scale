@@ -443,7 +443,7 @@ fun ImagePreviewer(
     modifier: Modifier = Modifier,
     count: Int,
     state: ImagePreviewerState = rememberPreviewerState(),
-    imageLoader: @Composable (Int) -> Any,
+    imageLoader: @Composable (Int) -> Any?,
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
     exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,

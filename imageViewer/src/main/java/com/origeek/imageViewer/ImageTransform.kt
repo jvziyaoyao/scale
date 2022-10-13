@@ -314,28 +314,30 @@ class TransformContentState internal constructor() {
 
     val fitOffsetX: Float
         get() {
-            return if (widthFixed) {
-                0F
-            } else {
-                (containerSize.width - fitSize.width).div(2).toFloat()
-            }
+            return (containerSize.width - fitSize.width).div(2)
         }
 
     val fitOffsetY: Float
         get() {
-            return if (!widthFixed) {
-                0F
-            } else {
-                (containerSize.height - fitSize.height).div(2).toFloat()
-            }
+            return (containerSize.height - fitSize.height).div(2)
         }
 
     val fitScale: Float
-        get() = fitSize.width.div(displayRatioSize.width)
+        get() {
+            return fitSize.width.div(displayRatioSize.width)
+        }
 
     val displayRatioSize: Size
         get() {
             return Size(width = srcSize.width.toFloat(), height = srcSize.width.div(intrinsicRatio))
+        }
+
+    val realSize: Size
+        get() {
+            return Size(
+                width = displayWidth.value * graphicScaleX.value,
+                height = displayHeight.value * graphicScaleY.value,
+            )
         }
 
     fun findTransformItem(key: Any) = transformItemStateMap[key]
@@ -350,6 +352,31 @@ class TransformContentState internal constructor() {
     fun setExitState() {
         onAction = false
         onActionTarget = null
+    }
+
+    suspend fun notifyEnterChanged() {
+        scope.launch {
+            listOf(
+                scope.async {
+                    displayWidth.snapTo(displayRatioSize.width)
+                },
+                scope.async {
+                    displayHeight.snapTo(displayRatioSize.height)
+                },
+                scope.async {
+                    graphicScaleX.snapTo(fitScale)
+                },
+                scope.async {
+                    graphicScaleY.snapTo(fitScale)
+                },
+                scope.async {
+                    offsetX.snapTo(fitOffsetX)
+                },
+                scope.async {
+                    offsetY.snapTo(fitOffsetY)
+                },
+            ).awaitAll()
+        }
     }
 
     suspend fun exitTransform(
@@ -402,29 +429,34 @@ class TransformContentState internal constructor() {
         onAction = true
 
         scope.launch {
-            listOf(
-                scope.async {
-                    displayWidth.animateTo(displayRatioSize.width, currentAnimationSpec)
-                },
-                scope.async {
-                    displayHeight.animateTo(displayRatioSize.height, currentAnimationSpec)
-                },
-                scope.async {
-                    graphicScaleX.animateTo(fitScale, currentAnimationSpec)
-                },
-                scope.async {
-                    graphicScaleY.animateTo(fitScale, currentAnimationSpec)
-                },
-                scope.async {
-                    offsetX.animateTo(fitOffsetX, currentAnimationSpec)
-                },
-                scope.async {
-                    offsetY.animateTo(fitOffsetY, currentAnimationSpec)
-                },
-            ).awaitAll()
+            reset(currentAnimationSpec)
             c.resume(Unit)
             onActionTarget = null
         }
+    }
+
+    suspend fun reset(animationSpec: AnimationSpec<Float>? = null) {
+        val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
+        listOf(
+            scope.async {
+                displayWidth.animateTo(displayRatioSize.width, currentAnimationSpec)
+            },
+            scope.async {
+                displayHeight.animateTo(displayRatioSize.height, currentAnimationSpec)
+            },
+            scope.async {
+                graphicScaleX.animateTo(fitScale, currentAnimationSpec)
+            },
+            scope.async {
+                graphicScaleY.animateTo(fitScale, currentAnimationSpec)
+            },
+            scope.async {
+                offsetX.animateTo(fitOffsetX, currentAnimationSpec)
+            },
+            scope.async {
+                offsetY.animateTo(fitOffsetY, currentAnimationSpec)
+            },
+        ).awaitAll()
     }
 
     companion object {
