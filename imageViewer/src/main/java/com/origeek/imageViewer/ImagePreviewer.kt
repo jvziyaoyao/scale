@@ -23,9 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.origeek.ui.common.Ticket
 import kotlinx.coroutines.*
@@ -36,6 +39,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlin.math.absoluteValue
 
 val DEEP_DARK_FANTASY = Color(0xFF000000)
 val DEFAULT_ITEM_SPACE = 12.dp
@@ -113,6 +117,44 @@ class ImagePreviewerState internal constructor() {
     var allowLoading by mutableStateOf(true)
         private set
 
+    /**
+     * TODO
+     */
+
+    var ppContainerSize: IntSize by mutableStateOf(IntSize.Zero)
+
+    var ppOffsetX = Animatable(0F)
+
+    var ppOffsetY = Animatable(0F)
+
+    var ppScale = Animatable(1F)
+
+    suspend fun ppReset() {
+        scope.apply {
+            listOf(
+                async {
+                    ppOffsetX.animateTo(0F, defaultAnimationSpec)
+                },
+                async {
+                    ppOffsetY.animateTo(0F, defaultAnimationSpec)
+                },
+                async {
+                    ppScale.animateTo(1F, defaultAnimationSpec)
+                },
+            ).awaitAll()
+        }
+    }
+
+    suspend fun ppResetImmediately() {
+        ppOffsetX.snapTo(0F)
+        ppOffsetY.snapTo(0F)
+        ppScale.snapTo(1F)
+    }
+
+    /**
+     * TODO
+     */
+
     private suspend fun updateState(animating: Boolean, visible: Boolean, visibleTarget: Boolean?) {
         mutex.withLock {
             this.animating = animating
@@ -173,24 +215,40 @@ class ImagePreviewerState internal constructor() {
             var vOrientationDown by mutableStateOf<Boolean?>(null)
             if (getKey != null) detectVerticalDragGestures(
                 onDragStart = OnDragStart@{
-//                    if (imageViewerState == null) return@OnDragStart
-//                    if (imageViewerState?.modelType?.name == ComposeModel::class.java.name) return@OnDragStart
-//                    var transformItemState: TransformItemState? = null
-//                    getKey?.apply {
-//                        findTransformItem(invoke(currentPage))?.apply {
-//                            transformItemState = this
-//                        }
-//                    }
-//                    transformState.itemState = transformItemState
-//                    if (imageViewerState!!.scale.value == 1F) {
-//                        vStartOffset = it
-//                        imageViewerState!!.allowGestureInput = false
-//                    }
+                    // 如果imageViewerState不存在，无法进行下拉手势
+                    if (imageViewerState == null) return@OnDragStart
+                    var transformItemState: TransformItemState? = null
+                    // 查询当前transformItem
+                    getKey?.apply {
+                        findTransformItem(invoke(currentPage))?.apply {
+                            transformItemState = this
+                        }
+                    }
+                    // 更新当前transformItem
+                    transformState.itemState = transformItemState
+                    // 只有viewer的缩放率为1时才允许下拉手势
+                    if (imageViewerState?.scale?.value == 1F) {
+                        vStartOffset = it
+                        // 进入下拉手势时禁用viewer的手势
+                        imageViewerState?.allowGestureInput = false
+                    }
                 },
                 onDragEnd = OnDragEnd@{
-//                    if (vStartOffset == null) return@OnDragEnd
-//                    vStartOffset = null
-//                    vOrientationDown = null
+                    if (vStartOffset == null) return@OnDragEnd
+                    vStartOffset = null
+                    vOrientationDown = null
+                    imageViewerState?.allowGestureInput = true
+                    // TODO: 0.8这个值要配置
+                    if (ppScale.value < 0.8F && getKey != null) {
+
+                    } else {
+                        scope.launch {
+                            uiAlpha.animateTo(1F, defaultAnimationSpec)
+                        }
+                        scope.launch {
+                            ppReset()
+                        }
+                    }
 //                    imageViewerState?.apply {
 //                        allowGestureInput = true
 //                        if (scale.value < 0.8F && getKey != null) {
@@ -215,33 +273,26 @@ class ImagePreviewerState internal constructor() {
 //                    }
                 },
                 onVerticalDrag = OnVerticalDrag@{ change, dragAmount ->
-//                    if (imageViewerState == null) return@OnVerticalDrag
-//                    if (vStartOffset != null) {
-//                        if (vOrientationDown == null) vOrientationDown = dragAmount > 0
-//                        if (vOrientationDown == true) {
-//                            val offsetY = change.position.y - vStartOffset!!.y
-//                            val offsetX = change.position.x - vStartOffset!!.x
-//                            val containerHeight = imageViewerState!!.containerSize.height
-//                            val scale = (containerHeight - offsetY.absoluteValue).div(
-//                                containerHeight
-//                            )
-//                            scope.launch {
-//                                uiAlpha.snapTo(scale)
-//                                imageViewerState?.offsetY?.apply {
-//                                    snapTo(offsetY)
-//                                }
-//                                imageViewerState?.offsetX?.apply {
-//                                    snapTo(offsetX)
-//                                }
-//                                imageViewerState?.scale?.apply {
-//                                    snapTo(scale)
-//                                }
-//                            }
-//                        } else {
-//                            // 如果不是向上，就返还输入权，以免页面卡顿
-//                            imageViewerState?.allowGestureInput = true
-//                        }
-//                    }
+                    if (imageViewerState == null) return@OnVerticalDrag
+                    if (vStartOffset == null) return@OnVerticalDrag
+                    if (vOrientationDown == null) vOrientationDown = dragAmount > 0
+                    if (vOrientationDown == true) {
+                        val offsetY = change.position.y - vStartOffset!!.y
+                        val offsetX = change.position.x - vStartOffset!!.x
+                        val containerHeight = ppContainerSize.height
+                        val scale = (containerHeight - offsetY.absoluteValue).div(
+                            containerHeight
+                        )
+                        scope.launch {
+                            uiAlpha.snapTo(scale)
+                            ppOffsetX.snapTo(offsetX)
+                            ppOffsetY.snapTo(offsetY)
+                            ppScale.snapTo(scale)
+                        }
+                    } else {
+                        // 如果不是向上，就返还输入权，以免页面卡顿
+                        imageViewerState?.allowGestureInput = true
+                    }
                 }
             )
         }
@@ -322,6 +373,10 @@ class ImagePreviewerState internal constructor() {
                 ticket.awaitNextTicket()
                 // 跳转到index
                 pagerState.scrollToPage(index)
+                // 等待viewer加载
+                awaitViewerLoading()
+                // viewer加载成功后显示viewer
+                transformSnapToViewer(true)
             }
         }
 
@@ -609,7 +664,19 @@ fun ImagePreviewer(
                 galleryLayer = {
                     this.viewerContainer = {
                         layerScope.viewerContainer {
-                            Box(modifier = Modifier.fillMaxSize()) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .onGloballyPositioned {
+                                        state.ppContainerSize = it.size
+                                    }
+                                    .graphicsLayer {
+                                        scaleX = state.ppScale.value
+                                        scaleY = state.ppScale.value
+                                        translationX = state.ppOffsetX.value
+                                        translationY = state.ppOffsetY.value
+                                    }
+                            ) {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxSize()

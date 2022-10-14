@@ -76,9 +76,6 @@ class ImageViewerState(
     // 默认显示大小
     var defaultSize by mutableStateOf(IntSize(0, 0))
 
-    // model类型
-    var modelType by mutableStateOf<Class<*>?>(null)
-
     // 容器大小
     internal var containerSize by mutableStateOf(IntSize(0, 0))
 
