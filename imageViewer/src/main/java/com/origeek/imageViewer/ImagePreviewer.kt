@@ -1,5 +1,6 @@
 package com.origeek.imageViewer
 
+import android.util.Log
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.compose.animation.*
@@ -151,6 +152,36 @@ class ImagePreviewerState internal constructor() {
         ppScale.snapTo(1F)
     }
 
+    suspend fun copyPPStateToTransform() {
+        transformState.apply {
+            val targetScale = ppScale.value * fitScale
+            graphicScaleX.snapTo(targetScale)
+            graphicScaleY.snapTo(targetScale)
+            val centerOffsetY = (containerSize.height - realSize.height).div(2)
+            val centerOffsetX = (containerSize.width - realSize.width).div(2)
+            offsetY.snapTo(centerOffsetY + ppOffsetY.value)
+            offsetX.snapTo(centerOffsetX + ppOffsetX.value)
+        }
+    }
+
+    suspend fun ppShrinkDown() {
+        stateCloseStart()
+        listOf(
+            scope.async {
+                ppScale.animateTo(0F, animationSpec = defaultAnimationSpec)
+            },
+            scope.async {
+                uiAlpha.animateTo(0F, animationSpec = defaultAnimationSpec)
+            }
+        ).awaitAll()
+        ticket.awaitNextTicket()
+        animateContainerState = MutableTransitionState(false)
+        ticket.awaitNextTicket()
+        ppReset()
+        transformState.setExitState()
+        stateCloseEnd()
+    }
+
     /**
      * TODO
      */
@@ -174,21 +205,6 @@ class ImagePreviewerState internal constructor() {
 
     private suspend fun stateCloseEnd() =
         updateState(animating = false, visible = false, visibleTarget = null)
-
-    private suspend fun shrinkDown() {
-        stateCloseStart()
-        listOf(
-            scope.async {
-                imageViewerState?.scale?.animateTo(0F, animationSpec = defaultAnimationSpec)
-            },
-            scope.async {
-                uiAlpha.animateTo(0F, animationSpec = defaultAnimationSpec)
-            }
-        ).awaitAll()
-        ticket.awaitNextTicket()
-        animateContainerState = MutableTransitionState(false)
-        stateCloseEnd()
-    }
 
     private suspend fun awaitViewerLoading() {
         imageViewerState?.mountedFlow?.apply {
@@ -239,8 +255,29 @@ class ImagePreviewerState internal constructor() {
                     vOrientationDown = null
                     imageViewerState?.allowGestureInput = true
                     // TODO: 0.8这个值要配置
-                    if (ppScale.value < 0.8F && getKey != null) {
-
+                    if (ppScale.value < 0.8F) {
+                        scope.launch {
+                            if (getKey != null) {
+                                val key = getKey!!.invoke(currentPage)
+                                val transformItem = findTransformItem(key)
+                                if (transformItem != null) {
+                                    // TODO: 提取方法
+                                    transformState.notifyEnterChanged()
+                                    ticket.awaitNextTicket()
+                                    copyPPStateToTransform()
+                                    ppResetImmediately()
+                                    transformSnapToViewer(false)
+                                    ticket.awaitNextTicket()
+                                    closeTransform(key, defaultAnimationSpec)
+                                } else {
+                                    ppShrinkDown()
+                                }
+                            } else {
+                                ppShrinkDown()
+                            }
+                            // 结束动画后需要把关闭的UI打开
+                            uiAlpha.snapTo(1F)
+                        }
                     } else {
                         scope.launch {
                             uiAlpha.animateTo(1F, defaultAnimationSpec)

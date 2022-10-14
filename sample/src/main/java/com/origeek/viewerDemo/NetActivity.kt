@@ -139,23 +139,6 @@ fun NetBody() {
             state = previewerState,
         )
     }
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        Column {
-            Text(text = "maxWidth ${this@BoxWithConstraints.maxWidth}")
-            Text(text = "maxHeight ${this@BoxWithConstraints.maxHeight}")
-
-            var innerWidth by remember { mutableStateOf(0.dp) }
-            var innerHeight by remember { mutableStateOf(0.dp) }
-            Box(modifier = Modifier.size(100.dp)) {
-                BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                    innerWidth = this.maxWidth
-                    innerHeight = this.maxHeight
-                }
-            }
-            Text(text = "innerWidth $innerWidth")
-            Text(text = "innerHeight $innerHeight")
-        }
-    }
 }
 
 val defaultPlaceholder = ComposeModel {

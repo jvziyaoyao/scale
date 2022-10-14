@@ -1,5 +1,6 @@
 package com.origeek.imageViewer
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
@@ -433,6 +434,7 @@ class TransformContentState internal constructor() {
         animationSpec: AnimationSpec<Float>? = null
     ) = suspendCoroutine<Unit> { c ->
         val currentAnimateSpec = animationSpec ?: defaultAnimationSpec
+        Log.i("TAG", "exitTransform: (${srcSize.width},${srcSize.height}) (${srcPosition.x},${srcPosition.y})")
         scope.launch {
             listOf(
                 scope.async {

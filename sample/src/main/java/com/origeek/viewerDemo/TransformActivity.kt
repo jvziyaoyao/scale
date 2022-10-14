@@ -77,7 +77,7 @@ class TransformActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val images = getItemList()
+        val images = getItemList(100)
         setBasicContent {
             ViewerDemoTheme {
                 TransformBody(images)
