@@ -2,6 +2,7 @@ package com.origeek.viewerDemo
 
 import android.graphics.BitmapRegionDecoder
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
@@ -20,9 +21,11 @@ import com.origeek.imageViewer.*
 import com.origeek.ui.common.ScaleGrid
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.takeWhile
 import java.io.InputStream
 
 /**
@@ -63,9 +66,9 @@ fun NetBody() {
         val previewerState = rememberPreviewerState(animationSpec = tween(400))
         val itemState = rememberTransformItemState()
         val inputStream = remember { context.assets.open("a350.jpg") }
-        val painter = rememberAsyncImagePainter(model = R.drawable.a350_temp)
+//        val painter = rememberAsyncImagePainter(model = R.drawable.a350_temp)
         var transformEnable by remember { mutableStateOf(false) }
-//        val painter = painterResource(R.drawable.a350_temp)
+        val painter = painterResource(R.drawable.a350_temp)
 
         if (previewerState.canClose || previewerState.animating) BackHandler {
             if (previewerState.canClose) scope.launch {
@@ -90,7 +93,7 @@ fun NetBody() {
                         if (transformEnable) {
                             previewerState.openTransform(0, itemState)
                         } else {
-                            previewerState.open(0)
+                            previewerState.open(0, itemState)
                         }
                     }
                 }) {

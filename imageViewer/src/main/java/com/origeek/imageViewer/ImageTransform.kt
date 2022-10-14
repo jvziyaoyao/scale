@@ -4,18 +4,19 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
@@ -29,6 +30,9 @@ import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlin.coroutines.resume
@@ -235,6 +239,35 @@ fun TransformContentView(
             ) {
                 transformContentState.srcCompose!!()
             }
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomStart) {
+                Column {
+                    Text(text = "TransformContent", modifier = Modifier.background(Color.White))
+                    Text(
+                        text = "offsetX -> ${transformContentState.offsetX.value}",
+                        modifier = Modifier.background(Color.White)
+                    )
+                    Text(
+                        text = "offsetY -> ${transformContentState.offsetY.value}",
+                        modifier = Modifier.background(Color.White)
+                    )
+                    Text(
+                        text = "displayWidth -> ${transformContentState.displayWidth.value}",
+                        modifier = Modifier.background(Color.White)
+                    )
+                    Text(
+                        text = "displayHeight -> ${transformContentState.displayHeight.value}",
+                        modifier = Modifier.background(Color.White)
+                    )
+                    Text(
+                        text = "graphicScaleX -> ${transformContentState.graphicScaleX.value}",
+                        modifier = Modifier.background(Color.White)
+                    )
+                    Text(
+                        text = "graphicScaleY -> ${transformContentState.graphicScaleY.value}",
+                        modifier = Modifier.background(Color.White)
+                    )
+                }
+            }
         }
     }
 }
@@ -286,7 +319,20 @@ class TransformContentState internal constructor() {
 
     var containerOffset by mutableStateOf(Offset.Zero)
 
-    var containerSize by mutableStateOf(IntSize.Zero)
+    private var containerSizeState = mutableStateOf(IntSize.Zero)
+
+    var containerSize: IntSize
+        get() = containerSizeState.value
+        set(value) {
+            containerSizeState.value = value
+            if (value.width != 0 && value.height != 0) {
+                scope.launch {
+                    specifierSizeFlow.emit(true)
+                }
+            }
+        }
+
+    var specifierSizeFlow = MutableStateFlow(false)
 
     val containerRatio: Float
         get() {
@@ -339,6 +385,10 @@ class TransformContentState internal constructor() {
                 height = displayHeight.value * graphicScaleY.value,
             )
         }
+
+    suspend fun awaitContainerSizeSpecifier() {
+        specifierSizeFlow.takeWhile { !it }.collect {}
+    }
 
     fun findTransformItem(key: Any) = transformItemStateMap[key]
 

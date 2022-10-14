@@ -29,6 +29,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.origeek.ui.common.Ticket
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.resume
@@ -83,8 +86,8 @@ class ImagePreviewerState internal constructor() {
 
     var visibleTarget by mutableStateOf<Boolean?>(null)
 
-    var viewerLoading by mutableStateOf(false)
-        internal set
+    val viewerMounted: MutableStateFlow<Boolean>
+        get() = imageViewerState?.mountedFlow ?: MutableStateFlow(false)
 
     val canOpen: Boolean
         get() = !visible && visibleTarget == null && !animating
@@ -106,6 +109,9 @@ class ImagePreviewerState internal constructor() {
 
     val interactionSource: InteractionSource
         get() = pagerState.interactionSource
+
+    var allowLoading by mutableStateOf(true)
+        private set
 
     private suspend fun updateState(animating: Boolean, visible: Boolean, visibleTarget: Boolean?) {
         mutex.withLock {
@@ -143,9 +149,11 @@ class ImagePreviewerState internal constructor() {
     }
 
     private suspend fun awaitViewerLoading() {
-        viewerLoading = true
-        imageViewerState?.mountedFlow?.collectOne(scope)
-        viewerLoading = false
+        imageViewerState?.mountedFlow?.apply {
+            withContext(Dispatchers.Default) {
+                takeWhile { !it }.collect()
+            }
+        }
     }
 
     private suspend fun transformSnapToViewer(isViewer: Boolean) {
@@ -266,31 +274,54 @@ class ImagePreviewerState internal constructor() {
 
     internal var enterTransition: EnterTransition? = null
 
-    suspend fun open(index: Int = 0, enterTransition: EnterTransition? = null) =
+    suspend fun open(
+        index: Int = 0,
+        itemState: TransformItemState? = null,
+        enterTransition: EnterTransition? = null
+    ) =
         suspendCoroutine<Unit> { c ->
+            // 设置当前转换动画
             this.enterTransition = enterTransition
+            // 设置转换回调
             openCallback = {
                 c.resume(Unit)
+                // 清除转换回调
                 openCallback = null
+                // 清除转换动画
                 this.enterTransition = null
+                // 标记结束
                 scope.launch {
                     stateOpenEnd()
                 }
             }
             scope.launch {
+                // 标记开始
                 stateOpenStart()
+                // container动画立即设置为关闭
                 animateContainerState = MutableTransitionState(false)
+                // 允许显示loading
+                allowLoading = true
+                // 开启UI
                 uiAlpha.snapTo(1F)
+                // 开启viewer
                 viewerContainerAlpha.snapTo(1F)
+                // 如果输入itemState，则用itemState做为背景
+                if (itemState != null) {
+                    scope.launch {
+                        transformContentAlpha.snapTo(1F)
+                        transformState.awaitContainerSizeSpecifier()
+                        transformState.enterTransform(itemState, animationSpec = tween(0))
+                    }
+                }
+                // 等待下一帧
                 ticket.awaitNextTicket()
+                // 开启container
                 animateContainerState.targetState = true
                 // 可能要跳两次才行，否则会闪退
                 ticket.awaitNextTicket()
                 ticket.awaitNextTicket()
+                // 跳转到index
                 pagerState.scrollToPage(index)
-                launch {
-                    awaitViewerLoading()
-                }
             }
         }
 
@@ -299,22 +330,32 @@ class ImagePreviewerState internal constructor() {
     internal var exitTransition: ExitTransition? = null
 
     suspend fun close(exitTransition: ExitTransition? = null) = suspendCoroutine<Unit> { c ->
+        // 设置当前退出动画
         this.exitTransition = exitTransition
+        // 设置退出结束的回调方法
         closeCallback = {
             c.resume(Unit)
+            // 将回调设置为空
             closeCallback = null
+            // 将退出动画设置为空
             this.exitTransition = null
+            // 标记结束
             scope.launch {
                 stateCloseEnd()
             }
         }
         scope.launch {
+            // 标记开始
             stateCloseStart()
+            // 关闭正在进行的开启操作
             cancelOpenTransform()
             // 这里创建一个全新的state是为了让exitTransition的设置得到响应
             animateContainerState = MutableTransitionState(true)
+            // 开启container关闭动画
             animateContainerState.targetState = false
+            // 等待下一帧
             ticket.awaitNextTicket()
+            // transformState标记退出
             transformState.setExitState()
         }
     }
@@ -326,28 +367,44 @@ class ImagePreviewerState internal constructor() {
         itemState: TransformItemState,
         animationSpec: AnimationSpec<Float>? = null
     ) {
+        // 动画开始
+        stateOpenStart()
+        // 设置当前动画窗格
+        val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
+        // 关闭loading
+        allowLoading = false
+        // 设置新的container状态立刻设置为true
+        animateContainerState = MutableTransitionState(true)
+        // 关闭viewer。打开transform
+        transformSnapToViewer(false)
+        // 关闭UI
+        uiAlpha.snapTo(0F)
+        // 等待下一帧
+        ticket.awaitNextTicket()
+        // pager跳转到index页
+        pagerState.scrollToPage(index)
+        // 这两个一起执行
+        listOf(
+            scope.async {
+                // 开启动画
+                transformState.enterTransform(itemState, animationSpec = currentAnimationSpec)
+                // 开启loading
+                allowLoading = true
+            },
+            scope.async {
+                // UI慢慢显示
+                uiAlpha.animateTo(1F, animationSpec = currentAnimationSpec)
+            }
+        ).awaitAll()
+
+        // 执行完成后的回调
+        stateOpenEnd()
+
+        // 这里需要等待viewer挂载，显示loading界面
         openTransformJob = scope.async {
-            stateOpenStart()
-            val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
-            animateContainerState = MutableTransitionState(true)
-            transformSnapToViewer(false)
-            uiAlpha.snapTo(0F)
-            ticket.awaitNextTicket()
-            pagerState.scrollToPage(index)
-            listOf(
-                scope.async {
-                    transformState.enterTransform(itemState, animationSpec = currentAnimationSpec)
-                },
-                scope.async {
-                    uiAlpha.animateTo(1F, animationSpec = currentAnimationSpec)
-                }
-            ).awaitAll()
-
-            // 执行完成后的回调
-            stateOpenEnd()
-
             // 等待viewer加载
             awaitViewerLoading()
+            // viewer加载成功后显示viewer
             transformSnapToViewer(true)
         }
         openTransformJob?.await()
@@ -355,7 +412,6 @@ class ImagePreviewerState internal constructor() {
 
     private fun cancelOpenTransform() {
         openTransformJob?.cancel()
-        viewerLoading = false
     }
 
     private suspend fun copyViewerPosToContent(itemState: TransformItemState) {
@@ -387,30 +443,47 @@ class ImagePreviewerState internal constructor() {
         key: Any,
         animationSpec: AnimationSpec<Float>? = null,
     ) {
+        // 设置当前动画窗格
         val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
+        // 标记开始
         stateCloseStart()
+        // 关闭可能正在进行的open操作
         cancelOpenTransform()
+        // 关闭loading的显示
+        allowLoading = false
+        // 查询item是否存在
         val itemState = findTransformItem(key)
+        // 如果存在，就transform退出，否则就普通退出
         if (itemState != null) {
+            // 如果viewer在显示的状态，退出时将viewer的pose复制给content
             if (viewerContainerVisible) copyViewerPosToContent(itemState)
+            // 等待下一帧
             ticket.awaitNextTicket()
             listOf(
                 scope.async {
+                    // transform动画退出
                     transformState.exitTransform(animationSpec = currentAnimationSpec)
+                    // 退出结束后隐藏content
                     transformContentAlpha.snapTo(0F)
                 },
                 scope.async {
+                    // 动画隐藏UI
                     uiAlpha.animateTo(0F, animationSpec = currentAnimationSpec)
                 }
             ).awaitAll()
+            // 等待下一帧
             ticket.awaitNextTicket()
+            // 彻底关闭container
             animateContainerState = MutableTransitionState(false)
         } else {
+            // transform标记退出
             transformState.setExitState()
+            // container动画退出
             animateContainerState.targetState = false
         }
-
-        // 执行完成后的回调
+        // 允许使用loading
+        allowLoading = true
+        // 标记结束
         stateCloseEnd()
     }
 
@@ -544,11 +617,19 @@ fun ImagePreviewer(
                                 ) {
                                     TransformContentView(state.transformState)
                                 }
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .alpha(state.viewerContainerAlpha.value)
+                                ) {
+                                    it()
+                                }
                                 /**
                                  * TODO: 后续再考虑如何设计loading
                                  */
+                                val viewerMounted by state.viewerMounted.collectAsState(initial = false)
                                 AnimatedVisibility(
-                                    visible = state.viewerLoading,
+                                    visible = !viewerMounted && state.allowLoading,
                                     enter = fadeIn(tween(200)),
                                     exit = fadeOut(tween(200))
                                 ) {
@@ -558,13 +639,6 @@ fun ImagePreviewer(
                                     ) {
                                         CircularProgressIndicator(color = Color.White.copy(0.2F))
                                     }
-                                }
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .alpha(state.viewerContainerAlpha.value)
-                                ) {
-                                    it()
                                 }
                             }
                         }

@@ -31,6 +31,7 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.absoluteValue
@@ -91,7 +92,7 @@ class ImageViewerState(
     internal var resetTimeStamp by mutableStateOf(0L)
 
     // 挂载状态
-    internal val mountedFlow = MutableSharedFlow<Unit>(replay = 1)
+    internal val mountedFlow = MutableStateFlow(false)
 
     /**
      * 判断是否有动画正在运行
@@ -513,114 +514,60 @@ fun ImageViewer(
         }
     }
     Box(modifier = modifier) {
-
-        /**
-         * 整体渲染逻辑
-         * @param model Any
-         * @param onMounted Function0<Unit>
-         */
-        @Composable
-        fun PoseModel(
-            model: Any,
-            onMounted: () -> Unit = {},
-        ) {
-            when (model) {
-                is Painter,
-                is ImageVector,
-                is ImageBitmap,
-                -> {
-                    ImageComposeOrigin(
-                        model = model,
-                        scale = state.scale.value,
-                        offsetX = state.offsetX.value,
-                        offsetY = state.offsetY.value,
-                        rotation = state.rotation.value,
-                        gesture = gesture,
-                        onSizeChange = sizeChange,
-                        onMounted = onMounted,
-                        boundClip = boundClip,
-                    )
-                }
-                is ImageDecoder -> {
-                    ImageComposeCanvas(
-                        imageDecoder = model,
-                        scale = state.scale.value,
-                        offsetX = state.offsetX.value,
-                        offsetY = state.offsetY.value,
-                        rotation = state.rotation.value,
-                        gesture = gesture,
-                        onSizeChange = sizeChange,
-                        onMounted = onMounted,
-                        boundClip = boundClip,
-                    )
-                }
-                is ComposeModel -> {
-                    val composeModelScope = remember { ComposeModel.ComposeModelScope() }
-                    model.ModelCompose(
-                        composeModelScope = composeModelScope.apply {
-                            this.scale = state.scale.value
-                            this.offsetX = state.offsetX.value
-                            this.offsetY = state.offsetY.value
-                            this.rotation = state.rotation.value
-                            this.gesture = gesture
-                            this.onSizeChange = sizeChange
-                            this.boundClip = boundClip
-                        },
-                        onMounted = onMounted,
-                    )
-                }
-//                else -> {
-//                    throw Exception("不支持这种model类型！ ${model::class.java.name}")
-//                }
-            }
-        }
-
         /**
          * 将挂载信息通知到state
          */
-        fun notifyMountedFlow() {
+        val onMounted: () -> Unit = {
             scope.launch {
-                state.mountedFlow.emit(Unit)
+                state.mountedFlow.emit(true)
             }
         }
-
-        // 左右交替渲染，主要是为了解决切换model时导致的闪屏问题
-        var modelLeft by remember { mutableStateOf<Any?>(null) }
-        var modelRight by remember { mutableStateOf<Any?>(null) }
-        LaunchedEffect(key1 = model) {
-            state.modelType = model?.javaClass
-            if (modelLeft != null && modelRight == null) {
-                modelRight = model
-            } else if (modelLeft == null && modelRight != null) {
-                modelLeft = model
-            } else {
-                modelLeft = model
-            }
-        }
-        if (modelLeft != null) {
-            PoseModel(modelLeft!!) {
-                modelRight = null
-                notifyMountedFlow()
-            }
-            if (debugMode) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = "left",
-                    color = Color.White
+        /**
+         * 根据不同类型的model进行不同的渲染
+         */
+        when (model) {
+            is Painter,
+            is ImageVector,
+            is ImageBitmap,
+            -> {
+                ImageComposeOrigin(
+                    model = model,
+                    scale = state.scale.value,
+                    offsetX = state.offsetX.value,
+                    offsetY = state.offsetY.value,
+                    rotation = state.rotation.value,
+                    gesture = gesture,
+                    onSizeChange = sizeChange,
+                    onMounted = onMounted,
+                    boundClip = boundClip,
                 )
             }
-        }
-        if (modelRight != null) {
-            PoseModel(modelRight!!) {
-                modelLeft = null
-                notifyMountedFlow()
+            is ImageDecoder -> {
+                ImageComposeCanvas(
+                    imageDecoder = model,
+                    scale = state.scale.value,
+                    offsetX = state.offsetX.value,
+                    offsetY = state.offsetY.value,
+                    rotation = state.rotation.value,
+                    gesture = gesture,
+                    onSizeChange = sizeChange,
+                    onMounted = onMounted,
+                    boundClip = boundClip,
+                )
             }
-            if (debugMode) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = "right",
-                    color = Color.White,
-                    textAlign = TextAlign.End,
+            is ComposeModel -> {
+                val composeModelScope = remember { ComposeModel.ComposeModelScope() }
+                model.ModelCompose(
+                    composeModelScope = composeModelScope.apply {
+                        this.scale = state.scale.value
+                        this.offsetX = state.offsetX.value
+                        this.offsetY = state.offsetY.value
+                        this.rotation = state.rotation.value
+                        this.gesture = gesture
+                        this.onSizeChange = sizeChange
+                        this.boundClip = boundClip
+                    },
+                    onMounted = onMounted,
                 )
             }
         }
@@ -634,6 +581,9 @@ fun ImageViewer(
                     .fillMaxSize()
                     .zIndex(10F)
             ) {
+                if (model != null) {
+                    Text(text = "Model -> ON", Modifier.background(Color.White))
+                }
                 Box(
                     modifier = Modifier
                         .graphicsLayer {
