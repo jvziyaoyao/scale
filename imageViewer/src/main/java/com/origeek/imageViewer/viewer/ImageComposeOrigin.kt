@@ -1,4 +1,4 @@
-package com.origeek.imageViewer
+package com.origeek.imageViewer.viewer
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures

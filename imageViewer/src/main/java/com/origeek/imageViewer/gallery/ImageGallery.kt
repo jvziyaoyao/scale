@@ -1,10 +1,14 @@
-package com.origeek.imageViewer
+package com.origeek.imageViewer.gallery
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
+import com.origeek.imageViewer.previewer.DEFAULT_ITEM_SPACE
+import com.origeek.imageViewer.viewer.ImageViewer
+import com.origeek.imageViewer.viewer.ImageViewerState
+import com.origeek.imageViewer.viewer.rememberViewerState
 import kotlinx.coroutines.launch
 
 /**

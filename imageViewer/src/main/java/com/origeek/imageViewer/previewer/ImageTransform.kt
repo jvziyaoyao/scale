@@ -1,4 +1,4 @@
-package com.origeek.imageViewer
+package com.origeek.imageViewer.previewer
 
 import android.util.Log
 import androidx.compose.animation.core.Animatable

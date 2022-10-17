@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.accompanist.insets.systemBarsPadding
-import com.origeek.imageViewer.ImagePreviewer
-import com.origeek.imageViewer.rememberPreviewerState
+import com.origeek.imageViewer.previewer.ImagePreviewer
+import com.origeek.imageViewer.previewer.rememberPreviewerState
 import com.origeek.ui.common.GridLayout
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme

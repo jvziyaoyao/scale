@@ -29,10 +29,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.origeek.imageViewer.ImagePreviewer
-import com.origeek.imageViewer.TransformImageView
-import com.origeek.imageViewer.rememberPreviewerState
-import com.origeek.imageViewer.rememberTransformItemState
+import com.origeek.imageViewer.previewer.ImagePreviewer
+import com.origeek.imageViewer.previewer.TransformImageView
+import com.origeek.imageViewer.previewer.rememberPreviewerState
+import com.origeek.imageViewer.previewer.rememberTransformItemState
 import com.origeek.ui.common.LazyGridLayout
 import com.origeek.ui.common.ScaleGrid
 import com.origeek.viewerDemo.base.BaseActivity

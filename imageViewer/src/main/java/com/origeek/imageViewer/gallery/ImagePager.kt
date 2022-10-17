@@ -1,4 +1,4 @@
-package com.origeek.imageViewer
+package com.origeek.imageViewer.gallery
 
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange

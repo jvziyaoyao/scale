@@ -6,9 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import com.origeek.imageViewer.ImageDecoder
-import com.origeek.imageViewer.ImageViewer
-import com.origeek.imageViewer.rememberViewerState
+import com.origeek.imageViewer.viewer.ImageDecoder
+import com.origeek.imageViewer.viewer.ImageViewer
+import com.origeek.imageViewer.viewer.rememberViewerState
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
 import kotlinx.coroutines.launch
