@@ -40,17 +40,18 @@ class ViewerContainerState {
 
     var scale = Animatable(1F)
 
-    suspend fun reset() {
+    suspend fun reset(animationSpec: AnimationSpec<Float>? = null) {
+        val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
         scope.apply {
             listOf(
                 async {
-                    offsetX.animateTo(0F, defaultAnimationSpec)
+                    offsetX.animateTo(0F, currentAnimationSpec)
                 },
                 async {
-                    offsetY.animateTo(0F, defaultAnimationSpec)
+                    offsetY.animateTo(0F, currentAnimationSpec)
                 },
                 async {
-                    scale.animateTo(1F, defaultAnimationSpec)
+                    scale.animateTo(1F, currentAnimationSpec)
                 },
             ).awaitAll()
         }

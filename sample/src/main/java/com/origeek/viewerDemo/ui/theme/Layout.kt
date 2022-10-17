@@ -20,6 +20,7 @@ val pm = 12.dp
 val pl = 16.dp
 val pxl = 20.dp
 val pxxl = 24.dp
+val pgl = 30.dp
 
 val fxxs = 10.sp
 val fxs = 12.sp

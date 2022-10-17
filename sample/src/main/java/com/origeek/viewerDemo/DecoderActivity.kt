@@ -21,8 +21,9 @@ import com.origeek.imageViewer.previewer.TransformImageView
 import com.origeek.imageViewer.previewer.rememberPreviewerState
 import com.origeek.imageViewer.previewer.rememberTransformItemState
 import com.origeek.imageViewer.viewer.ImageDecoder
-import com.origeek.ui.common.ScaleGrid
+import com.origeek.ui.common.compose.ScaleGrid
 import com.origeek.viewerDemo.base.BaseActivity
+import com.origeek.viewerDemo.ui.component.rememberDecoderImagePainter
 import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -49,36 +50,6 @@ class DecoderActivity : BaseActivity() {
         }
     }
 
-}
-
-@Composable
-fun rememberDecoderImagePainter(
-    inputStream: InputStream,
-    delay: Long? = null,
-): Any? {
-    var imageDecoder by remember { mutableStateOf<ImageDecoder?>(null) }
-    LaunchedEffect(inputStream) {
-        launch(Dispatchers.IO) {
-            if (delay != null) delay(delay)
-            imageDecoder = try {
-                val decoder = BitmapRegionDecoder.newInstance(inputStream, false)
-                if (decoder == null) {
-                    null
-                } else {
-                    ImageDecoder(decoder = decoder)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-    }
-    DisposableEffect(Unit) {
-        onDispose {
-            imageDecoder?.release()
-        }
-    }
-    return imageDecoder
 }
 
 @Composable

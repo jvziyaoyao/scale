@@ -33,14 +33,14 @@ import com.origeek.imageViewer.previewer.ImagePreviewer
 import com.origeek.imageViewer.previewer.TransformImageView
 import com.origeek.imageViewer.previewer.rememberPreviewerState
 import com.origeek.imageViewer.previewer.rememberTransformItemState
-import com.origeek.ui.common.LazyGridLayout
-import com.origeek.ui.common.ScaleGrid
+import com.origeek.ui.common.compose.LazyGridLayout
+import com.origeek.ui.common.compose.ScaleGrid
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.rememberCoilImagePainter
 import com.origeek.viewerDemo.ui.theme.*
 import kotlinx.coroutines.launch
 import java.util.*
-import java.util.stream.Collectors
+import kotlin.math.absoluteValue
 
 /**
  * @program: ImageViewer
@@ -53,34 +53,20 @@ import java.util.stream.Collectors
  **/
 class TransformActivity : BaseActivity() {
 
-    private fun getItemList(time: Int = 1): List<DrawableItem> {
-        val srcList = listOf(
-            R.drawable.img_01,
-            R.drawable.img_02,
-            R.drawable.img_03,
-            R.drawable.img_04,
-            R.drawable.img_05,
-            R.drawable.img_06,
-        )
-        val resList = mutableListOf<Int>()
-        for (i in 0 until time) {
-            resList.addAll(srcList)
-        }
-        return resList.stream().map {
-            DrawableItem(
-                id = UUID.randomUUID().toString(),
-                res = it
-            )
-        }.collect(Collectors.toList())
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val images = getItemList()
         setBasicContent {
             ViewerDemoTheme {
-                TransformBody(images)
+                TransformBody(
+                    listOf(
+                        R.drawable.img_01,
+                        R.drawable.img_02,
+                        R.drawable.img_03,
+                        R.drawable.img_04,
+                        R.drawable.img_05,
+                        R.drawable.img_06,
+                    )
+                )
             }
         }
     }
@@ -92,13 +78,43 @@ data class DrawableItem(
     val res: Int,
 )
 
+val drawableItemTempIdMap = mutableMapOf<Int, String>()
+
 @Composable
-fun TransformBody(images: List<DrawableItem>) {
+fun TransformBody(
+    imageIds: List<Int>
+) {
+
     val settingState = rememberSettingState()
     val scope = rememberCoroutineScope()
     val previewerState = rememberPreviewerState(
         animationSpec = tween(settingState.animationDuration)
     )
+    val images = remember { mutableStateListOf<DrawableItem>() }
+    LaunchedEffect(
+        key1 = imageIds,
+        key2 = settingState,
+        key3 = settingState.dataRepeat
+    ) {
+        images.clear()
+        for (i in 0 until settingState.dataRepeat) {
+            for ((index, res) in imageIds.withIndex()) {
+                val currentIndex = i * imageIds.size + index
+                var id = drawableItemTempIdMap[currentIndex]
+                if (id == null) {
+                    id = UUID.randomUUID().toString()
+                    drawableItemTempIdMap[currentIndex] = id
+                }
+                images.add(
+                    DrawableItem(
+                        id = id,
+                        res = res
+                    )
+                )
+            }
+        }
+    }
+
     if (settingState.verticalDrag) {
         previewerState.enableVerticalDrag { images[it].id }
     } else {
@@ -224,6 +240,7 @@ const val DEFAULT_VERTICAL_DRAG = true
 const val DEFAULT_TRANSFORM_ENTER = true
 const val DEFAULT_TRANSFORM_EXIT = true
 const val DEFAULT_ANIMATION_DURATION = 400
+const val DEFAULT_DATA_REPEAT = 1
 
 class TransformSettingState {
 
@@ -235,11 +252,14 @@ class TransformSettingState {
 
     var animationDuration by mutableStateOf(DEFAULT_ANIMATION_DURATION)
 
+    var dataRepeat by mutableStateOf(DEFAULT_DATA_REPEAT)
+
     fun reset() {
         verticalDrag = DEFAULT_VERTICAL_DRAG
         transformEnter = DEFAULT_TRANSFORM_ENTER
         transformExit = DEFAULT_TRANSFORM_EXIT
         animationDuration = DEFAULT_ANIMATION_DURATION
+        dataRepeat = DEFAULT_DATA_REPEAT
     }
 
     companion object {
@@ -250,6 +270,7 @@ class TransformSettingState {
                     it.transformEnter,
                     it.transformExit,
                     it.animationDuration,
+                    it.dataRepeat,
                 )
             },
             restore = {
@@ -258,6 +279,7 @@ class TransformSettingState {
                 state.transformEnter = it[1] as Boolean
                 state.transformExit = it[2] as Boolean
                 state.animationDuration = it[3] as Int
+                state.dataRepeat = it[4] as Int
                 state
             }
         )
@@ -287,36 +309,45 @@ fun SettingPanel(state: TransformSettingState, onClose: () -> Unit) {
                     state.verticalDrag = it
                 })
             }
-            Spacer(modifier = Modifier.height(pm))
+            Spacer(modifier = Modifier.height(pxs))
             SettingItem(label = "Transform Enter") {
                 SettingItemSwitch(checked = state.transformEnter, onCheckedChanged = {
                     state.transformEnter = it
                 })
             }
-            Spacer(modifier = Modifier.height(pm))
+            Spacer(modifier = Modifier.height(pxs))
             SettingItem(label = "Transform Exit") {
                 SettingItemSwitch(checked = state.transformExit, onCheckedChanged = {
                     state.transformExit = it
                 })
             }
             Spacer(modifier = Modifier.height(pm))
-            SettingItem(label = "Animation Duration") {
+            SettingItem(label = "Duration ${state.animationDuration.toLong()}") {
                 Slider(
                     modifier = Modifier
                         .height(48.dp)
                         .width(120.dp),
                     value = state.animationDuration.toFloat(),
                     valueRange = 0F..2000F,
-                    onValueChangeFinished = {
-                        Toast.makeText(context, "${state.animationDuration}", Toast.LENGTH_SHORT)
-                            .show()
-                    },
                     onValueChange = {
                         state.animationDuration = it.toInt()
                     },
                 )
             }
-            Spacer(modifier = Modifier.height(pxxl))
+            Spacer(modifier = Modifier.height(pl))
+            SettingItem(label = "Data Repeat ${state.dataRepeat}") {
+                Slider(
+                    modifier = Modifier
+                        .height(48.dp)
+                        .width(120.dp),
+                    value = state.dataRepeat.toFloat(),
+                    valueRange = 1F..100F,
+                    onValueChange = {
+                        state.dataRepeat = it.toInt()
+                    },
+                )
+            }
+            Spacer(modifier = Modifier.height(pgl))
             Button(modifier = Modifier.fillMaxWidth(), onClick = {
                 state.reset()
                 Toast.makeText(context, "👌 Reset", Toast.LENGTH_SHORT)

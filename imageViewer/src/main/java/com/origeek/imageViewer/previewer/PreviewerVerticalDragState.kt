@@ -25,6 +25,9 @@ import kotlin.math.absoluteValue
 // 默认下拉关闭缩放阈值
 const val DEFAULT_SCALE_TO_CLOSE_MIN_VALUE = 0.8F
 
+/**
+ * 增加垂直方向拖拽的能力
+ */
 open class PreviewerVerticalDragState : PreviewerTransformState() {
 
     // 从外部传入viewer容器
@@ -64,7 +67,7 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
         ticket.awaitNextTicket()
         animateContainerVisableState = MutableTransitionState(false)
         ticket.awaitNextTicket()
-        viewerContainerState.reset()
+        viewerContainerState.reset(defaultAnimationSpec)
         transformState.setExitState()
         stateCloseEnd()
     }
@@ -143,7 +146,7 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
                             uiAlpha.animateTo(1F, defaultAnimationSpec)
                         }
                         scope.launch {
-                            viewerContainerState.reset()
+                            viewerContainerState.reset(defaultAnimationSpec)
                         }
                     }
                 },
