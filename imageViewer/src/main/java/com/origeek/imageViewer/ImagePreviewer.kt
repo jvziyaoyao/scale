@@ -54,52 +54,9 @@ fun DefaultPreviewerBackground() {
     )
 }
 
-class ImagePreviewerState internal constructor() {
-
-    lateinit var scope: CoroutineScope
+open class PagerPreviewerState {
 
     lateinit var pagerState: ImagePagerState
-
-    lateinit var transformState: TransformContentState
-
-    lateinit var viewerContainerState: ViewerContainerState
-
-    private var mutex = Mutex()
-
-    internal val ticket = Ticket()
-
-    internal var getKey: ((Int) -> Any)? = null
-
-    internal var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
-
-    internal var imageViewerState by mutableStateOf<ImageViewerState?>(null)
-
-    internal var animateContainerState by mutableStateOf(MutableTransitionState(false))
-
-    internal var uiAlpha = Animatable(1F)
-
-    internal var transformContentAlpha = Animatable(1F)
-
-    internal var viewerContainerAlpha = Animatable(1F)
-
-    private val viewerContainerVisible: Boolean
-        get() = viewerContainerAlpha.value == 1F
-
-    var animating by mutableStateOf(false)
-
-    var visible by mutableStateOf(false)
-        internal set
-
-    var visibleTarget by mutableStateOf<Boolean?>(null)
-
-    val viewerMounted: MutableStateFlow<Boolean>
-        get() = imageViewerState?.mountedFlow ?: MutableStateFlow(false)
-
-    val canOpen: Boolean
-        get() = !visible && visibleTarget == null && !animating
-
-    val canClose: Boolean
-        get() = visible && visibleTarget == null && !animating
 
     val currentPage: Int
         get() = pagerState.currentPage
@@ -113,41 +70,69 @@ class ImagePreviewerState internal constructor() {
     val currentPageOffset: Float
         get() = pagerState.currentPageOffset
 
-    val interactionSource: InteractionSource
-        get() = pagerState.interactionSource
+    suspend fun scrollToPage(
+        @IntRange(from = 0) page: Int,
+        @FloatRange(from = 0.0, to = 1.0) pageOffset: Float = 0f,
+    ) = pagerState.scrollToPage(page, pageOffset)
+
+    suspend fun animateScrollToPage(
+        @IntRange(from = 0) page: Int,
+        @FloatRange(from = 0.0, to = 1.0) pageOffset: Float = 0f,
+    ) = pagerState.animateScrollToPage(page, pageOffset)
+
+}
+
+open class TransformPreviewerState: PagerPreviewerState() {
+
+    lateinit var scope: CoroutineScope
+
+    lateinit var transformState: TransformContentState
+
+    private var mutex = Mutex()
+
+    internal val ticket = Ticket()
+
+    internal var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
+
+    internal var animateContainerState by mutableStateOf(MutableTransitionState(false))
+
+    internal var imageViewerState by mutableStateOf<ImageViewerState?>(null)
+
+    internal var uiAlpha = Animatable(1F)
+
+    internal var transformContentAlpha = Animatable(1F)
+
+    internal var viewerContainerAlpha = Animatable(1F)
+
+    internal val viewerContainerVisible: Boolean
+        get() = viewerContainerAlpha.value == 1F
+
+    val viewerMounted: MutableStateFlow<Boolean>
+        get() = imageViewerState?.mountedFlow ?: MutableStateFlow(false)
 
     var allowLoading by mutableStateOf(true)
-        private set
 
-    suspend fun copyViewerContainterStateToTransformState() {
-        transformState.apply {
-            val targetScale = viewerContainerState.scale.value * fitScale
-            graphicScaleX.snapTo(targetScale)
-            graphicScaleY.snapTo(targetScale)
-            val centerOffsetY = (containerSize.height - realSize.height).div(2)
-            val centerOffsetX = (containerSize.width - realSize.width).div(2)
-            offsetY.snapTo(centerOffsetY + viewerContainerState.offsetY.value)
-            offsetX.snapTo(centerOffsetX + viewerContainerState.offsetX.value)
-        }
-    }
+    var animating by mutableStateOf(false)
 
-    suspend fun viewerContainerShrinkDown() {
-        stateCloseStart()
-        listOf(
-            scope.async {
-                viewerContainerState.scale.animateTo(0F, animationSpec = defaultAnimationSpec)
-            },
-            scope.async {
-                uiAlpha.animateTo(0F, animationSpec = defaultAnimationSpec)
-            }
-        ).awaitAll()
-        ticket.awaitNextTicket()
-        animateContainerState = MutableTransitionState(false)
-        ticket.awaitNextTicket()
-        viewerContainerState.reset()
-        transformState.setExitState()
-        stateCloseEnd()
-    }
+    var visible by mutableStateOf(false)
+        internal set
+
+    var visibleTarget by mutableStateOf<Boolean?>(null)
+        internal set
+
+    val canOpen: Boolean
+        get() = !visible && visibleTarget == null && !animating
+
+    val canClose: Boolean
+        get() = visible && visibleTarget == null && !animating
+
+    private var openCallback: (() -> Unit)? = null
+
+    private var closeCallback: (() -> Unit)? = null
+
+    internal var enterTransition: EnterTransition? = null
+
+    internal var exitTransition: ExitTransition? = null
 
     private suspend fun updateState(animating: Boolean, visible: Boolean, visibleTarget: Boolean?) {
         mutex.withLock {
@@ -163,10 +148,10 @@ class ImagePreviewerState internal constructor() {
     private suspend fun stateOpenEnd() =
         updateState(animating = false, visible = true, visibleTarget = null)
 
-    private suspend fun stateCloseStart() =
+    protected suspend fun stateCloseStart() =
         updateState(animating = true, visible = true, visibleTarget = false)
 
-    private suspend fun stateCloseEnd() =
+    protected suspend fun stateCloseEnd() =
         updateState(animating = false, visible = false, visibleTarget = null)
 
     private suspend fun awaitViewerLoading() {
@@ -177,7 +162,7 @@ class ImagePreviewerState internal constructor() {
         }
     }
 
-    private suspend fun transformSnapToViewer(isViewer: Boolean) {
+    protected suspend fun transformSnapToViewer(isViewer: Boolean) {
         if (isViewer) {
             if (visibleTarget == false) return
             transformContentAlpha.snapTo(0F)
@@ -188,92 +173,37 @@ class ImagePreviewerState internal constructor() {
         }
     }
 
-    internal suspend fun verticalDrag(pointerInputScope: PointerInputScope) {
-        pointerInputScope.apply {
-            var vStartOffset by mutableStateOf<Offset?>(null)
-            var vOrientationDown by mutableStateOf<Boolean?>(null)
-            if (getKey != null) detectVerticalDragGestures(
-                onDragStart = OnDragStart@{
-                    // 如果imageViewerState不存在，无法进行下拉手势
-                    if (imageViewerState == null) return@OnDragStart
-                    var transformItemState: TransformItemState? = null
-                    // 查询当前transformItem
-                    getKey?.apply {
-                        findTransformItem(invoke(currentPage))?.apply {
-                            transformItemState = this
-                        }
-                    }
-                    // 更新当前transformItem
-                    transformState.itemState = transformItemState
-                    // 只有viewer的缩放率为1时才允许下拉手势
-                    if (imageViewerState?.scale?.value == 1F) {
-                        vStartOffset = it
-                        // 进入下拉手势时禁用viewer的手势
-                        imageViewerState?.allowGestureInput = false
-                    }
-                },
-                onDragEnd = OnDragEnd@{
-                    if (vStartOffset == null) return@OnDragEnd
-                    vStartOffset = null
-                    vOrientationDown = null
-                    imageViewerState?.allowGestureInput = true
-                    // TODO: 0.8这个值要配置
-                    if (viewerContainerState.scale.value < 0.8F) {
-                        scope.launch {
-                            if (getKey != null) {
-                                val key = getKey!!.invoke(currentPage)
-                                val transformItem = findTransformItem(key)
-                                if (transformItem != null) {
-                                    // TODO: 提取方法
-                                    transformState.notifyEnterChanged()
-                                    ticket.awaitNextTicket()
-                                    copyViewerContainterStateToTransformState()
-                                    viewerContainerState.resetImmediately()
-                                    transformSnapToViewer(false)
-                                    ticket.awaitNextTicket()
-                                    closeTransform(key, defaultAnimationSpec)
-                                } else {
-                                    viewerContainerShrinkDown()
-                                }
-                            } else {
-                                viewerContainerShrinkDown()
-                            }
-                            // 结束动画后需要把关闭的UI打开
-                            uiAlpha.snapTo(1F)
-                        }
-                    } else {
-                        scope.launch {
-                            uiAlpha.animateTo(1F, defaultAnimationSpec)
-                        }
-                        scope.launch {
-                            viewerContainerState.reset()
-                        }
-                    }
-                },
-                onVerticalDrag = OnVerticalDrag@{ change, dragAmount ->
-                    if (imageViewerState == null) return@OnVerticalDrag
-                    if (vStartOffset == null) return@OnVerticalDrag
-                    if (vOrientationDown == null) vOrientationDown = dragAmount > 0
-                    if (vOrientationDown == true) {
-                        val offsetY = change.position.y - vStartOffset!!.y
-                        val offsetX = change.position.x - vStartOffset!!.x
-                        val containerHeight = viewerContainerState.containerSize.height
-                        val scale = (containerHeight - offsetY.absoluteValue).div(
-                            containerHeight
-                        )
-                        scope.launch {
-                            uiAlpha.snapTo(scale)
-                            viewerContainerState.offsetX.snapTo(offsetX)
-                            viewerContainerState.offsetY.snapTo(offsetY)
-                            viewerContainerState.scale.snapTo(scale)
-                        }
-                    } else {
-                        // 如果不是向上，就返还输入权，以免页面卡顿
-                        imageViewerState?.allowGestureInput = true
-                    }
-                }
-            )
-        }
+    private var openTransformJob: Deferred<Unit>? = null
+
+    private fun cancelOpenTransform() {
+        openTransformJob?.cancel()
+    }
+
+    private suspend fun copyViewerPosToContent(itemState: TransformItemState) {
+        // 更新itemState，确保itemState一致
+        transformState.itemState = itemState
+        // 确保viewer的容器大小与transform的容器大小一致
+        transformState.containerSize = imageViewerState!!.containerSize
+        val scale = imageViewerState!!.scale
+        val offsetX = imageViewerState!!.offsetX
+        val offsetY = imageViewerState!!.offsetY
+        // 计算transform的实际大小
+        val rw = transformState.fitSize.width * scale.value
+        val rh = transformState.fitSize.height * scale.value
+        // 计算目标平移量
+        val goOffsetX =
+            (transformState.containerSize.width - rw).div(2) + offsetX.value
+        val goOffsetY =
+            (transformState.containerSize.height - rh).div(2) + offsetY.value
+        // 计算缩放率
+        val fixScale = transformState.fitScale * scale.value
+        // 更新值
+        transformState.graphicScaleX.snapTo(fixScale)
+        transformState.graphicScaleY.snapTo(fixScale)
+        transformState.displayWidth.snapTo(transformState.displayRatioSize.width)
+        transformState.displayHeight.snapTo(transformState.displayRatioSize.height)
+        transformState.offsetX.snapTo(goOffsetX)
+        transformState.offsetY.snapTo(goOffsetY)
     }
 
     internal fun onAnimateContainerStateChanged() {
@@ -288,20 +218,6 @@ class ImagePreviewerState internal constructor() {
     fun findTransformItem(key: Any) = transformState.findTransformItem(key)
 
     fun clearTransformItems() = transformState.clearTransformItems()
-
-    suspend fun scrollToPage(
-        @IntRange(from = 0) page: Int,
-        @FloatRange(from = 0.0, to = 1.0) pageOffset: Float = 0f,
-    ) = pagerState.scrollToPage(page, pageOffset)
-
-    suspend fun animateScrollToPage(
-        @IntRange(from = 0) page: Int,
-        @FloatRange(from = 0.0, to = 1.0) pageOffset: Float = 0f,
-    ) = pagerState.animateScrollToPage(page, pageOffset)
-
-    private var openCallback: (() -> Unit)? = null
-
-    internal var enterTransition: EnterTransition? = null
 
     suspend fun open(
         index: Int = 0,
@@ -358,10 +274,6 @@ class ImagePreviewerState internal constructor() {
             }
         }
 
-    private var closeCallback: (() -> Unit)? = null
-
-    internal var exitTransition: ExitTransition? = null
-
     suspend fun close(exitTransition: ExitTransition? = null) = suspendCoroutine<Unit> { c ->
         // 设置当前退出动画
         this.exitTransition = exitTransition
@@ -392,8 +304,6 @@ class ImagePreviewerState internal constructor() {
             transformState.setExitState()
         }
     }
-
-    private var openTransformJob: Deferred<Unit>? = null
 
     suspend fun openTransform(
         index: Int,
@@ -443,37 +353,6 @@ class ImagePreviewerState internal constructor() {
         openTransformJob?.await()
     }
 
-    private fun cancelOpenTransform() {
-        openTransformJob?.cancel()
-    }
-
-    private suspend fun copyViewerPosToContent(itemState: TransformItemState) {
-        // 更新itemState，确保itemState一致
-        transformState.itemState = itemState
-        // 确保viewer的容器大小与transform的容器大小一致
-        transformState.containerSize = imageViewerState!!.containerSize
-        val scale = imageViewerState!!.scale
-        val offsetX = imageViewerState!!.offsetX
-        val offsetY = imageViewerState!!.offsetY
-        // 计算transform的实际大小
-        val rw = transformState.fitSize.width * scale.value
-        val rh = transformState.fitSize.height * scale.value
-        // 计算目标平移量
-        val goOffsetX =
-            (transformState.containerSize.width - rw).div(2) + offsetX.value
-        val goOffsetY =
-            (transformState.containerSize.height - rh).div(2) + offsetY.value
-        // 计算缩放率
-        val fixScale = transformState.fitScale * scale.value
-        // 更新值
-        transformState.graphicScaleX.snapTo(fixScale)
-        transformState.graphicScaleY.snapTo(fixScale)
-        transformState.displayWidth.snapTo(transformState.displayRatioSize.width)
-        transformState.displayHeight.snapTo(transformState.displayRatioSize.height)
-        transformState.offsetX.snapTo(goOffsetX)
-        transformState.offsetY.snapTo(goOffsetY)
-    }
-
     suspend fun closeTransform(
         key: Any,
         animationSpec: AnimationSpec<Float>? = null,
@@ -499,7 +378,7 @@ class ImagePreviewerState internal constructor() {
             }
             // 等待下一帧
             ticket.awaitNextTicket()
-            listOf(  
+            listOf(
                 scope.async {
                     // transform动画退出
                     transformState.exitTransform(animationSpec = currentAnimationSpec)
@@ -527,6 +406,132 @@ class ImagePreviewerState internal constructor() {
         stateCloseEnd()
     }
 
+}
+
+open class VerticalDragPreviewerState: TransformPreviewerState() {
+
+    lateinit var viewerContainerState: ViewerContainerState
+
+    private suspend fun copyViewerContainerStateToTransformState() {
+        transformState.apply {
+            val targetScale = viewerContainerState.scale.value * fitScale
+            graphicScaleX.snapTo(targetScale)
+            graphicScaleY.snapTo(targetScale)
+            val centerOffsetY = (containerSize.height - realSize.height).div(2)
+            val centerOffsetX = (containerSize.width - realSize.width).div(2)
+            offsetY.snapTo(centerOffsetY + viewerContainerState.offsetY.value)
+            offsetX.snapTo(centerOffsetX + viewerContainerState.offsetX.value)
+        }
+    }
+
+    private suspend fun viewerContainerShrinkDown() {
+        stateCloseStart()
+        listOf(
+            scope.async {
+                viewerContainerState.scale.animateTo(0F, animationSpec = defaultAnimationSpec)
+            },
+            scope.async {
+                uiAlpha.animateTo(0F, animationSpec = defaultAnimationSpec)
+            }
+        ).awaitAll()
+        ticket.awaitNextTicket()
+        animateContainerState = MutableTransitionState(false)
+        ticket.awaitNextTicket()
+        viewerContainerState.reset()
+        transformState.setExitState()
+        stateCloseEnd()
+    }
+
+    internal var getKey: ((Int) -> Any)? = null
+
+    internal suspend fun verticalDrag(pointerInputScope: PointerInputScope) {
+        pointerInputScope.apply {
+            var vStartOffset by mutableStateOf<Offset?>(null)
+            var vOrientationDown by mutableStateOf<Boolean?>(null)
+            if (getKey != null) detectVerticalDragGestures(
+                onDragStart = OnDragStart@{
+                    // 如果imageViewerState不存在，无法进行下拉手势
+                    if (imageViewerState == null) return@OnDragStart
+                    var transformItemState: TransformItemState? = null
+                    // 查询当前transformItem
+                    getKey?.apply {
+                        findTransformItem(invoke(currentPage))?.apply {
+                            transformItemState = this
+                        }
+                    }
+                    // 更新当前transformItem
+                    transformState.itemState = transformItemState
+                    // 只有viewer的缩放率为1时才允许下拉手势
+                    if (imageViewerState?.scale?.value == 1F) {
+                        vStartOffset = it
+                        // 进入下拉手势时禁用viewer的手势
+                        imageViewerState?.allowGestureInput = false
+                    }
+                },
+                onDragEnd = OnDragEnd@{
+                    if (vStartOffset == null) return@OnDragEnd
+                    vStartOffset = null
+                    vOrientationDown = null
+                    imageViewerState?.allowGestureInput = true
+                    // TODO: 0.8这个值要配置
+                    if (viewerContainerState.scale.value < 0.8F) {
+                        scope.launch {
+                            if (getKey != null) {
+                                val key = getKey!!.invoke(currentPage)
+                                val transformItem = findTransformItem(key)
+                                if (transformItem != null) {
+                                    // TODO: 提取方法
+                                    transformState.notifyEnterChanged()
+                                    ticket.awaitNextTicket()
+                                    copyViewerContainerStateToTransformState()
+                                    viewerContainerState.resetImmediately()
+                                    transformSnapToViewer(false)
+                                    ticket.awaitNextTicket()
+                                    closeTransform(key, defaultAnimationSpec)
+                                } else {
+                                    viewerContainerShrinkDown()
+                                }
+                            } else {
+                                viewerContainerShrinkDown()
+                            }
+                            // 结束动画后需要把关闭的UI打开
+                            uiAlpha.snapTo(1F)
+                        }
+                    } else {
+                        scope.launch {
+                            uiAlpha.animateTo(1F, defaultAnimationSpec)
+                        }
+                        scope.launch {
+                            viewerContainerState.reset()
+                        }
+                    }
+                },
+                onVerticalDrag = OnVerticalDrag@{ change, dragAmount ->
+                    if (imageViewerState == null) return@OnVerticalDrag
+                    if (vStartOffset == null) return@OnVerticalDrag
+                    if (vOrientationDown == null) vOrientationDown = dragAmount > 0
+                    if (vOrientationDown == true) {
+                        val offsetY = change.position.y - vStartOffset!!.y
+                        val offsetX = change.position.x - vStartOffset!!.x
+                        val containerHeight = viewerContainerState.containerSize.height
+                        val scale = (containerHeight - offsetY.absoluteValue).div(
+                            containerHeight
+                        )
+                        scope.launch {
+                            uiAlpha.snapTo(scale)
+                            viewerContainerState.offsetX.snapTo(offsetX)
+                            viewerContainerState.offsetY.snapTo(offsetY)
+                            viewerContainerState.scale.snapTo(scale)
+                        }
+                    } else {
+                        // 如果不是向上，就返还输入权，以免页面卡顿
+                        imageViewerState?.allowGestureInput = true
+                    }
+                }
+            )
+        }
+    }
+
     fun enableVerticalDrag(getKey: ((Int) -> Any)? = null) {
         this.getKey = getKey
     }
@@ -534,7 +539,9 @@ class ImagePreviewerState internal constructor() {
     fun disableVerticalDrag() {
         this.getKey = null
     }
+}
 
+class ImagePreviewerState internal constructor(): VerticalDragPreviewerState() {
     companion object {
         val Saver: Saver<ImagePreviewerState, *> = listSaver(
             save = {
@@ -558,6 +565,7 @@ class ImagePreviewerState internal constructor() {
         )
     }
 }
+
 
 @Composable
 fun rememberPreviewerState(
