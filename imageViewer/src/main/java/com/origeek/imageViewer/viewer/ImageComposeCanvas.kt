@@ -5,7 +5,7 @@ import android.graphics.BitmapFactory
 import android.graphics.BitmapRegionDecoder
 import android.graphics.Rect
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +22,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import com.origeek.imageViewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -195,8 +196,9 @@ fun ImageComposeCanvas(
     offsetY: Float = DEFAULT_OFFSET_Y,
     rotation: Float = DEFAULT_ROTATION,
     gesture: RawGesture = RawGesture(),
-    onSizeChange: suspend (SizeChangeContent) -> Unit = {},
     onMounted: () -> Unit = {},
+    onSizeChange: suspend (SizeChangeContent) -> Unit = {},
+    crossfadeAnimationSpec: AnimationSpec<Float> = DEFAULT_CROSS_FADE_ANIMATE_SPEC,
     boundClip: Boolean = true,
     debugMode: Boolean = false,
 ) {
@@ -561,7 +563,6 @@ fun ImageComposeCanvas(
     }
 
     /**
-     * TODO: 这个动画是否要加入配置项
      * canvas加载成功后避免闪一下
      */
     val canvasAlpha = remember { Animatable(0F) }
@@ -569,7 +570,10 @@ fun ImageComposeCanvas(
         if (bitmap != null && bitmap!!.width > 1 && bitmap!!.height > 1) {
             if (canvasAlpha.value == 0F) {
                 scope.launch {
-                    canvasAlpha.animateTo(targetValue = 1F, animationSpec = tween(80))
+                    canvasAlpha.animateTo(
+                        targetValue = 1F,
+                        animationSpec = crossfadeAnimationSpec
+                    )
                     onMounted()
                 }
             }

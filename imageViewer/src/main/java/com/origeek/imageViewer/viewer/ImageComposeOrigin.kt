@@ -1,5 +1,7 @@
 package com.origeek.imageViewer.viewer
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -20,6 +22,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
+import com.origeek.imageViewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
+import kotlinx.coroutines.launch
 
 class RawGesture(
     val onTap: (Offset) -> Unit = {},
@@ -27,7 +31,7 @@ class RawGesture(
     val onLongPress: (Offset) -> Unit = {},
     val gestureStart: () -> Unit = {},
     val gestureEnd: (transformOnly: Boolean) -> Unit = {},
-    val onGesture: (centroid: Offset, pan: Offset, zoom: Float, rotation: Float, event: PointerEvent) -> Boolean = { _, _, _, _, _ -> true},
+    val onGesture: (centroid: Offset, pan: Offset, zoom: Float, rotation: Float, event: PointerEvent) -> Boolean = { _, _, _, _, _ -> true },
 )
 
 data class SizeChangeContent(
@@ -45,10 +49,12 @@ fun ImageComposeOrigin(
     offsetY: Float = DEFAULT_OFFSET_Y,
     rotation: Float = DEFAULT_ROTATION,
     gesture: RawGesture = RawGesture(),
-    onSizeChange: suspend (SizeChangeContent) -> Unit = {},
     onMounted: () -> Unit = {},
+    onSizeChange: suspend (SizeChangeContent) -> Unit = {},
+    crossfadeAnimationSpec: AnimationSpec<Float> = DEFAULT_CROSS_FADE_ANIMATE_SPEC,
     boundClip: Boolean = true,
 ) {
+    val scope = rememberCoroutineScope()
     // 容器大小
     var bSize by remember { mutableStateOf(IntSize(0, 0)) }
     // 容器比例
@@ -117,6 +123,19 @@ fun ImageComposeOrigin(
     // 图片是否加载成功
     var imageSpecified by remember { mutableStateOf(false) }
 
+    // 承载容器的透明度，主要用来控制图片加载成功后的渐变效果
+    val viewerAlpha = remember { Animatable(0F) }
+
+    /**
+     * mounted回调
+     */
+    fun goMounted() {
+        scope.launch {
+            viewerAlpha.animateTo(1F, crossfadeAnimationSpec)
+            onMounted()
+        }
+    }
+
     when (model) {
         is Painter -> {
             var isMounted by remember { mutableStateOf(false) }
@@ -129,7 +148,7 @@ fun ImageComposeOrigin(
                     )
                     if (!isMounted) {
                         isMounted = true
-                        onMounted()
+                        goMounted()
                     }
                 }
             })
@@ -141,7 +160,7 @@ fun ImageComposeOrigin(
                     model.defaultWidth.toPx().toInt(),
                     model.defaultHeight.toPx().toInt(),
                 )
-                onMounted()
+                goMounted()
             }
         }
         is ImageBitmap -> {
@@ -150,7 +169,7 @@ fun ImageComposeOrigin(
                 model.width,
                 model.height
             )
-            onMounted()
+            goMounted()
         }
         else -> throw Exception("不支持这种类型的数据！")
     }
@@ -161,6 +180,7 @@ fun ImageComposeOrigin(
             .graphicsLayer {
                 // 图片位移时会超出容器大小，需要在这个地方指定是否裁切
                 clip = boundClip
+                alpha = viewerAlpha.value
             }
             .onSizeChanged {
                 bSize = it

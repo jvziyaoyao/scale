@@ -77,7 +77,7 @@ class TransformActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val images = getItemList(100)
+        val images = getItemList()
         setBasicContent {
             ViewerDemoTheme {
                 TransformBody(images)
@@ -376,6 +376,7 @@ fun SettingSurface(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
+            .systemBarsPadding(),
     ) {
         val (btn) = createRefs()
         val guideFromBottom = createGuidelineFromBottom(0.28F)

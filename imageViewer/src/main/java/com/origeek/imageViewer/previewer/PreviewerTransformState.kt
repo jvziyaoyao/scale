@@ -32,12 +32,27 @@ import kotlin.coroutines.suspendCoroutine
 
 open class PreviewerTransformState: PreviewerPagerState() {
 
+    /**
+     *   +-------------------+
+     *          PRIVATE
+     *   +-------------------+
+     */
+
+    // 锁对象
     private var mutex = Mutex()
 
+    // 打开回调，最外层animateVisible修改时调用
     private var openCallback: (() -> Unit)? = null
 
+    // 关闭回调，最外层animateVisible修改时调用
     private var closeCallback: (() -> Unit)? = null
 
+    /**
+     * 更新当前的标记状态
+     * @param animating Boolean
+     * @param visible Boolean
+     * @param visibleTarget Boolean?
+     */
     private suspend fun updateState(animating: Boolean, visible: Boolean, visibleTarget: Boolean?) {
         mutex.withLock {
             this.animating = animating
@@ -46,12 +61,22 @@ open class PreviewerTransformState: PreviewerPagerState() {
         }
     }
 
+    /**
+     * 打开图片后到加载成功过程的协程任务
+     */
     private var openTransformJob: Deferred<Unit>? = null
 
+    /**
+     * 取消打开动作
+     */
     private fun cancelOpenTransform() {
         openTransformJob?.cancel()
     }
 
+    /**
+     * 将viewer的位置大小等信息复制给transformContent
+     * @param itemState TransformItemState
+     */
     private suspend fun copyViewerPosToContent(itemState: TransformItemState) {
         // 更新itemState，确保itemState一致
         transformState.itemState = itemState
@@ -79,6 +104,9 @@ open class PreviewerTransformState: PreviewerPagerState() {
         transformState.offsetY.snapTo(goOffsetY)
     }
 
+    /**
+     * 等待viewer挂载成功
+     */
     private suspend fun awaitViewerLoading() {
         imageViewerState?.mountedFlow?.apply {
             withContext(Dispatchers.Default) {
@@ -88,66 +116,82 @@ open class PreviewerTransformState: PreviewerPagerState() {
     }
 
     /**
-     * override
+     *   +-------------------+
+     *         LATE INIT
+     *   +-------------------+
      */
 
+    // 从外部提供作用域
     lateinit var scope: CoroutineScope
 
+    // 从外部提供transformContentState
     lateinit var transformState: TransformContentState
 
+    /**
+     *   +-------------------+
+     *         INTERNAL
+     *   +-------------------+
+     */
+
+    // 等待界面刷新的ticket
     internal val ticket = Ticket()
 
+    // 默认动画窗格
     internal var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
 
-    internal var animateContainerState by mutableStateOf(MutableTransitionState(false))
+    // 最外侧animateVisableState
+    internal var animateContainerVisableState by mutableStateOf(MutableTransitionState(false))
 
+    // imageViewer状态对象
     internal var imageViewerState by mutableStateOf<ImageViewerState?>(null)
 
+    // UI透明度
     internal var uiAlpha = Animatable(1F)
 
+    // 转换图层transformContent透明度
     internal var transformContentAlpha = Animatable(1F)
 
+    // viewer容器的透明度
     internal var viewerContainerAlpha = Animatable(1F)
 
+    // 是否显示viewer容器的标识
     internal val viewerContainerVisible: Boolean
         get() = viewerContainerAlpha.value == 1F
 
-    val viewerMounted: MutableStateFlow<Boolean>
-        get() = imageViewerState?.mountedFlow ?: MutableStateFlow(false)
-
-    var allowLoading by mutableStateOf(true)
-
-    var animating by mutableStateOf(false)
-
-    var visible by mutableStateOf(false)
-        internal set
-
-    var visibleTarget by mutableStateOf<Boolean?>(null)
-        internal set
-
-    val canOpen: Boolean
-        get() = !visible && visibleTarget == null && !animating
-
-    val canClose: Boolean
-        get() = visible && visibleTarget == null && !animating
-
+    // 进入转换动画
     internal var enterTransition: EnterTransition? = null
 
+    // 离开的转换动画
     internal var exitTransition: ExitTransition? = null
 
-    protected suspend fun stateOpenStart() =
+    // viewer是否已成功的挂载
+    internal val viewerMounted: MutableStateFlow<Boolean>
+        get() = imageViewerState?.mountedFlow ?: MutableStateFlow(false)
+
+    // 是否允许界面显示loading
+    internal var allowLoading by mutableStateOf(true)
+
+    // 标记打开动作，执行开始
+    internal suspend fun stateOpenStart() =
         updateState(animating = true, visible = false, visibleTarget = true)
 
-    protected suspend fun stateOpenEnd() =
+    // 标记打开动作，执行结束
+    internal suspend fun stateOpenEnd() =
         updateState(animating = false, visible = true, visibleTarget = null)
 
-    protected suspend fun stateCloseStart() =
+    // 标记关闭动作，执行开始
+    internal suspend fun stateCloseStart() =
         updateState(animating = true, visible = true, visibleTarget = false)
 
-    protected suspend fun stateCloseEnd() =
+    // 标记关闭动作，执行结束
+    internal suspend fun stateCloseEnd() =
         updateState(animating = false, visible = false, visibleTarget = null)
 
-    protected suspend fun transformSnapToViewer(isViewer: Boolean) {
+    /**
+     * 转换图层转viewer图层，true显示viewer，false显示转换图层
+     * @param isViewer Boolean
+     */
+    internal suspend fun transformSnapToViewer(isViewer: Boolean) {
         if (isViewer) {
             if (visibleTarget == false) return
             transformContentAlpha.snapTo(0F)
@@ -158,8 +202,11 @@ open class PreviewerTransformState: PreviewerPagerState() {
         }
     }
 
+    /**
+     * animateVisable执行完成后调用回调方法
+     */
     internal fun onAnimateContainerStateChanged() {
-        if (animateContainerState.currentState) {
+        if (animateContainerVisableState.currentState) {
             openCallback?.invoke()
             transformState.setEnterState()
         } else {
@@ -167,10 +214,43 @@ open class PreviewerTransformState: PreviewerPagerState() {
         }
     }
 
+    /**
+     *   +-------------------+
+     *          PUBLIC
+     *   +-------------------+
+     */
+
+    // 是否正在进行动画
+    var animating by mutableStateOf(false)
+
+    // 是否可见
+    var visible by mutableStateOf(false)
+        internal set
+
+    // 是否可见的目标值
+    var visibleTarget by mutableStateOf<Boolean?>(null)
+        internal set
+
+    // 是否允许执行open操作
+    val canOpen: Boolean
+        get() = !visible && visibleTarget == null && !animating
+
+    // 是否允许执行close操作
+    val canClose: Boolean
+        get() = visible && visibleTarget == null && !animating
+
+    // 查找key关联的transformItem
     fun findTransformItem(key: Any) = transformState.findTransformItem(key)
 
+    // 清除全部transformItems
     fun clearTransformItems() = transformState.clearTransformItems()
 
+    /**
+     * 打开previewer
+     * @param index Int
+     * @param itemState TransformItemState?
+     * @param enterTransition EnterTransition?
+     */
     suspend fun open(
         index: Int = 0,
         itemState: TransformItemState? = null,
@@ -195,7 +275,7 @@ open class PreviewerTransformState: PreviewerPagerState() {
                 // 标记开始
                 stateOpenStart()
                 // container动画立即设置为关闭
-                animateContainerState = MutableTransitionState(false)
+                animateContainerVisableState = MutableTransitionState(false)
                 // 允许显示loading
                 allowLoading = true
                 // 开启UI
@@ -213,7 +293,7 @@ open class PreviewerTransformState: PreviewerPagerState() {
                 // 等待下一帧
                 ticket.awaitNextTicket()
                 // 开启container
-                animateContainerState.targetState = true
+                animateContainerVisableState.targetState = true
                 // 可能要跳两次才行，否则会闪退
                 ticket.awaitNextTicket()
                 ticket.awaitNextTicket()
@@ -226,6 +306,10 @@ open class PreviewerTransformState: PreviewerPagerState() {
             }
         }
 
+    /**
+     * 关闭previewer
+     * @param exitTransition ExitTransition?
+     */
     suspend fun close(exitTransition: ExitTransition? = null) = suspendCoroutine<Unit> { c ->
         // 设置当前退出动画
         this.exitTransition = exitTransition
@@ -247,9 +331,9 @@ open class PreviewerTransformState: PreviewerPagerState() {
             // 关闭正在进行的开启操作
             cancelOpenTransform()
             // 这里创建一个全新的state是为了让exitTransition的设置得到响应
-            animateContainerState = MutableTransitionState(true)
+            animateContainerVisableState = MutableTransitionState(true)
             // 开启container关闭动画
-            animateContainerState.targetState = false
+            animateContainerVisableState.targetState = false
             // 等待下一帧
             ticket.awaitNextTicket()
             // transformState标记退出
@@ -257,6 +341,12 @@ open class PreviewerTransformState: PreviewerPagerState() {
         }
     }
 
+    /**
+     * 打开previewer，带转换效果
+     * @param index Int
+     * @param itemState TransformItemState
+     * @param animationSpec AnimationSpec<Float>?
+     */
     suspend fun openTransform(
         index: Int,
         itemState: TransformItemState,
@@ -269,7 +359,7 @@ open class PreviewerTransformState: PreviewerPagerState() {
         // 关闭loading
         allowLoading = false
         // 设置新的container状态立刻设置为true
-        animateContainerState = MutableTransitionState(true)
+        animateContainerVisableState = MutableTransitionState(true)
         // 关闭viewer。打开transform
         transformSnapToViewer(false)
         // 关闭UI
@@ -305,6 +395,11 @@ open class PreviewerTransformState: PreviewerPagerState() {
         openTransformJob?.await()
     }
 
+    /**
+     * 关闭previewer，带转换效果
+     * @param key Any
+     * @param animationSpec AnimationSpec<Float>?
+     */
     suspend fun closeTransform(
         key: Any,
         animationSpec: AnimationSpec<Float>? = null,
@@ -345,12 +440,12 @@ open class PreviewerTransformState: PreviewerPagerState() {
             // 等待下一帧
             ticket.awaitNextTicket()
             // 彻底关闭container
-            animateContainerState = MutableTransitionState(false)
+            animateContainerVisableState = MutableTransitionState(false)
         } else {
             // transform标记退出
             transformState.setExitState()
             // container动画退出
-            animateContainerState.targetState = false
+            animateContainerVisableState.targetState = false
         }
         // 允许使用loading
         allowLoading = true

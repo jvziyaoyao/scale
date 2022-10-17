@@ -22,10 +22,20 @@ import kotlin.math.absoluteValue
  * @create: 2022-10-17 14:42
  **/
 
+// 默认下拉关闭缩放阈值
+const val DEFAULT_SCALE_TO_CLOSE_MIN_VALUE = 0.8F
+
 open class PreviewerVerticalDragState : PreviewerTransformState() {
 
+    // 从外部传入viewer容器
     lateinit var viewerContainerState: ViewerContainerState
 
+    // 下拉关闭的缩放的阈值，当scale小于这个值，就关闭，否则还原
+    private var scaleToCloseMinValue = DEFAULT_SCALE_TO_CLOSE_MIN_VALUE
+
+    /**
+     * 将viewer容器的位置大小复制给transformContent
+     */
     private suspend fun copyViewerContainerStateToTransformState() {
         transformState.apply {
             val targetScale = viewerContainerState.scale.value * fitScale
@@ -38,6 +48,9 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
         }
     }
 
+    /**
+     * viewer容器缩小关闭
+     */
     private suspend fun viewerContainerShrinkDown() {
         stateCloseStart()
         listOf(
@@ -49,15 +62,37 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
             }
         ).awaitAll()
         ticket.awaitNextTicket()
-        animateContainerState = MutableTransitionState(false)
+        animateContainerVisableState = MutableTransitionState(false)
         ticket.awaitNextTicket()
         viewerContainerState.reset()
         transformState.setExitState()
         stateCloseEnd()
     }
 
+    /**
+     * 响应下拉关闭
+     */
+    private suspend fun dragDownClose(key: Any) {
+        transformState.notifyEnterChanged()
+        allowLoading = false
+        ticket.awaitNextTicket()
+        copyViewerContainerStateToTransformState()
+        viewerContainerState.resetImmediately()
+        transformSnapToViewer(false)
+        ticket.awaitNextTicket()
+        closeTransform(key, defaultAnimationSpec)
+        allowLoading = true
+    }
+
+    /**
+     * 根据页面获取当前页码所属的key
+     */
     internal var getKey: ((Int) -> Any)? = null
 
+    /**
+     * 设置下拉手势的方法
+     * @param pointerInputScope PointerInputScope
+     */
     internal suspend fun verticalDrag(pointerInputScope: PointerInputScope) {
         pointerInputScope.apply {
             var vStartOffset by mutableStateOf<Offset?>(null)
@@ -87,21 +122,13 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
                     vStartOffset = null
                     vOrientationDown = null
                     imageViewerState?.allowGestureInput = true
-                    // TODO: 0.8这个值要配置
-                    if (viewerContainerState.scale.value < 0.8F) {
+                    if (viewerContainerState.scale.value < scaleToCloseMinValue) {
                         scope.launch {
                             if (getKey != null) {
                                 val key = getKey!!.invoke(currentPage)
                                 val transformItem = findTransformItem(key)
                                 if (transformItem != null) {
-                                    // TODO: 提取方法
-                                    transformState.notifyEnterChanged()
-                                    ticket.awaitNextTicket()
-                                    copyViewerContainerStateToTransformState()
-                                    viewerContainerState.resetImmediately()
-                                    transformSnapToViewer(false)
-                                    ticket.awaitNextTicket()
-                                    closeTransform(key, defaultAnimationSpec)
+                                    dragDownClose(key)
                                 } else {
                                     viewerContainerShrinkDown()
                                 }
@@ -146,10 +173,19 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
         }
     }
 
-    fun enableVerticalDrag(getKey: ((Int) -> Any)? = null) {
+    /**
+     * 开启下拉手势
+     * @param getKey Function1<Int, Any>?
+     * @param minScale Float?
+     */
+    fun enableVerticalDrag(minScale: Float? = null, getKey: ((Int) -> Any)? = null) {
+        minScale?.let { scaleToCloseMinValue = it }
         this.getKey = getKey
     }
 
+    /**
+     * 关闭下拉手势
+     */
     fun disableVerticalDrag() {
         this.getKey = null
     }

@@ -240,35 +240,6 @@ fun TransformContentView(
             ) {
                 transformContentState.srcCompose!!()
             }
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomStart) {
-                Column {
-                    Text(text = "TransformContent", modifier = Modifier.background(Color.White))
-                    Text(
-                        text = "offsetX -> ${transformContentState.offsetX.value}",
-                        modifier = Modifier.background(Color.White)
-                    )
-                    Text(
-                        text = "offsetY -> ${transformContentState.offsetY.value}",
-                        modifier = Modifier.background(Color.White)
-                    )
-                    Text(
-                        text = "displayWidth -> ${transformContentState.displayWidth.value}",
-                        modifier = Modifier.background(Color.White)
-                    )
-                    Text(
-                        text = "displayHeight -> ${transformContentState.displayHeight.value}",
-                        modifier = Modifier.background(Color.White)
-                    )
-                    Text(
-                        text = "graphicScaleX -> ${transformContentState.graphicScaleX.value}",
-                        modifier = Modifier.background(Color.White)
-                    )
-                    Text(
-                        text = "graphicScaleY -> ${transformContentState.graphicScaleY.value}",
-                        modifier = Modifier.background(Color.White)
-                    )
-                }
-            }
         }
     }
 }
@@ -434,7 +405,6 @@ class TransformContentState internal constructor() {
         animationSpec: AnimationSpec<Float>? = null
     ) = suspendCoroutine<Unit> { c ->
         val currentAnimateSpec = animationSpec ?: defaultAnimationSpec
-        Log.i("TAG", "exitTransform: (${srcSize.width},${srcSize.height}) (${srcPosition.x},${srcPosition.y})")
         scope.launch {
             listOf(
                 scope.async {

@@ -21,21 +21,19 @@ class HomeActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBasicContent {
-            ViewerDemoTheme {
-                HomeBody(goSample = {
-                    goActivity(NormalActivity::class.java)
-                }, goHuge = {
-                    goActivity(HugeActivity::class.java)
-                }, goGallery = {
-                    goActivity(GalleryActivity::class.java)
-                }, goPreviewer = {
-                    goActivity(PreviewerActivity::class.java)
-                }, goTransform = {
-                    goActivity(TransformActivity::class.java)
-                }, goWeak = {
-                    goActivity(NetActivity::class.java)
-                })
-            }
+            HomeBody(goSample = {
+                goActivity(NormalActivity::class.java)
+            }, goHuge = {
+                goActivity(HugeActivity::class.java)
+            }, goGallery = {
+                goActivity(GalleryActivity::class.java)
+            }, goPreviewer = {
+                goActivity(PreviewerActivity::class.java)
+            }, goTransform = {
+                goActivity(TransformActivity::class.java)
+            }, goDecoder = {
+                goActivity(DecoderActivity::class.java)
+            })
         }
     }
 
@@ -53,7 +51,7 @@ fun HomeBody(
     goGallery: () -> Unit,
     goPreviewer: () -> Unit,
     goTransform: () -> Unit,
-    goWeak: () -> Unit,
+    goDecoder: () -> Unit,
 ) {
     val state = rememberScrollState()
     Column(
@@ -73,8 +71,9 @@ fun HomeBody(
         HomeLargeButton(title = "ImagePreviewer", onClick = goPreviewer)
         Spacer(modifier = Modifier.height(24.dp))
         HomeLargeButton(title = "TransformPreviewer", onClick = goTransform)
-        // Spacer(modifier = Modifier.height(24.dp))
-        // HomeLargeButton(title = "Weak Network", onClick = goWeak)
+        Spacer(modifier = Modifier.height(24.dp))
+        HomeLargeButton(title = "ImageDecoder", onClick = goDecoder)
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
+import com.origeek.imageViewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.math.PI
@@ -50,10 +51,14 @@ class ImageViewerState(
     scale: Float = DEFAULT_SCALE,
     rotation: Float = DEFAULT_ROTATION,
     animationSpec: AnimationSpec<Float>? = null,
+    crossfadeAnimationSpec: AnimationSpec<Float>? = null,
 ) : CoroutineScope by MainScope() {
 
     // 默认动画窗格
     var defaultAnimateSpec: AnimationSpec<Float> = animationSpec ?: SpringSpec()
+
+    // viewer挂载成功后显示时的动画窗格
+    var crossfadeAnimationSpec: AnimationSpec<Float> = crossfadeAnimationSpec ?: DEFAULT_CROSS_FADE_ANIMATE_SPEC
 
     // x偏移
     val offsetX = Animatable(offsetX)
@@ -213,8 +218,9 @@ fun rememberViewerState(
     scale: Float = DEFAULT_SCALE,
     rotation: Float = DEFAULT_ROTATION,
     animationSpec: AnimationSpec<Float>? = null,
+    crossfadeAnimationSpec: AnimationSpec<Float>? = null,
 ): ImageViewerState = rememberSaveable(saver = ImageViewerState.SAVER) {
-    ImageViewerState(offsetX, offsetY, scale, rotation, animationSpec)
+    ImageViewerState(offsetX, offsetY, scale, rotation, animationSpec, crossfadeAnimationSpec)
 }
 
 class ViewerGestureScope(
@@ -260,7 +266,7 @@ fun ImageViewer(
     state: ImageViewerState = rememberViewerState(),
     detectGesture: ViewerGestureScope.() -> Unit = {},
     boundClip: Boolean = true,
-    debugMode: Boolean = true,
+    debugMode: Boolean = false,
 ) {
     val viewerGestureScope = remember { ViewerGestureScope() }
     detectGesture.invoke(viewerGestureScope)
@@ -534,6 +540,7 @@ fun ImageViewer(
                     onSizeChange = sizeChange,
                     onMounted = onMounted,
                     boundClip = boundClip,
+                    crossfadeAnimationSpec = state.crossfadeAnimationSpec,
                 )
             }
             is ImageDecoder -> {
@@ -547,6 +554,7 @@ fun ImageViewer(
                     onSizeChange = sizeChange,
                     onMounted = onMounted,
                     boundClip = boundClip,
+                    crossfadeAnimationSpec = state.crossfadeAnimationSpec,
                 )
             }
             is ComposeModel -> {

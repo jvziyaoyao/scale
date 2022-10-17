@@ -46,7 +46,7 @@ class ImagePreviewerState internal constructor() : PreviewerVerticalDragState() 
         val Saver: Saver<ImagePreviewerState, *> = listSaver(
             save = {
                 listOf<Any>(
-                    it.animateContainerState.currentState,
+                    it.animateContainerVisableState.currentState,
                     it.uiAlpha.value,
                     it.transformContentAlpha.value,
                     it.viewerContainerAlpha.value,
@@ -55,7 +55,7 @@ class ImagePreviewerState internal constructor() : PreviewerVerticalDragState() 
             },
             restore = {
                 val previewerState = ImagePreviewerState()
-                previewerState.animateContainerState = MutableTransitionState(it[0] as Boolean)
+                previewerState.animateContainerVisableState = MutableTransitionState(it[0] as Boolean)
                 previewerState.uiAlpha = Animatable(it[1] as Float)
                 previewerState.transformContentAlpha = Animatable(it[2] as Float)
                 previewerState.viewerContainerAlpha = Animatable(it[3] as Float)
@@ -93,6 +93,26 @@ val DEFAULT_PREVIEWER_ENTER_TRANSITION =
 val DEFAULT_PREVIEWER_EXIT_TRANSITION =
     scaleOut(tween(320)) + fadeOut(tween(240))
 
+val DEFAULT_CROSS_FADE_ANIMATE_SPEC: AnimationSpec<Float> = tween(80)
+
+val DEFAULT_PLACEHOLDER_ENTER_TRANSITION = fadeIn(tween(200))
+val DEFAULT_PLACEHOLDER_EXIT_TRANSITION = fadeOut(tween(200))
+
+val DEFAULT_PREVIEWER_PLACEHOLDER_CONTENT = @Composable {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(color = Color.White.copy(0.2F))
+    }
+}
+
+class PreviewerPlaceholder(
+    var enterTransition: EnterTransition = DEFAULT_PLACEHOLDER_ENTER_TRANSITION,
+    var exitTransition: ExitTransition = DEFAULT_PLACEHOLDER_EXIT_TRANSITION,
+    var content: @Composable () -> Unit = DEFAULT_PREVIEWER_PLACEHOLDER_CONTENT,
+)
+
 class PreviewerLayerScope(
     var viewerContainer: @Composable (viewer: @Composable () -> Unit) -> Unit = { it() },
     var background: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> DefaultPreviewerBackground() },
@@ -108,6 +128,7 @@ fun ImagePreviewer(
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
     exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,
+    placeholder: PreviewerPlaceholder = PreviewerPlaceholder(),
     currentViewerState: (ImageViewerState) -> Unit = {},
     detectGesture: GalleryGestureScope.() -> Unit = {},
     previewerLayer: PreviewerLayerScope.() -> Unit = {},
@@ -116,14 +137,14 @@ fun ImagePreviewer(
     val layerScope = remember { PreviewerLayerScope() }
     previewerLayer.invoke(layerScope)
     LaunchedEffect(
-        key1 = state.animateContainerState,
-        key2 = state.animateContainerState.currentState
+        key1 = state.animateContainerVisableState,
+        key2 = state.animateContainerVisableState.currentState
     ) {
         state.onAnimateContainerStateChanged()
     }
     AnimatedVisibility(
         modifier = Modifier.fillMaxSize(),
-        visibleState = state.animateContainerState,
+        visibleState = state.animateContainerVisableState,
         enter = state.enterTransition ?: enter,
         exit = state.exitTransition ?: exit,
     ) {
@@ -175,19 +196,13 @@ fun ImagePreviewer(
                                 ) {
                                     it()
                                 }
-                                // TODO: 提取配置项, 以及, enter/exit
                                 val viewerMounted by state.viewerMounted.collectAsState(initial = false)
-                                AnimatedVisibility(
-                                    visible = !viewerMounted && state.allowLoading,
-                                    enter = fadeIn(tween(200)),
-                                    exit = fadeOut(tween(200))
+                                if (state.allowLoading) AnimatedVisibility(
+                                    visible = !viewerMounted,
+                                    enter = placeholder.enterTransition,
+                                    exit = placeholder.exitTransition,
                                 ) {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        CircularProgressIndicator(color = Color.White.copy(0.2F))
-                                    }
+                                    placeholder.content()
                                 }
                             }
                         }
