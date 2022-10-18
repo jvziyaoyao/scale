@@ -9,7 +9,6 @@ import com.origeek.imageViewer.viewer.ImageViewer
 import com.origeek.imageViewer.viewer.rememberViewerState
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.rememberDecoderImagePainter
-import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
 import kotlinx.coroutines.launch
 
 class HugeActivity : BaseActivity() {
@@ -17,9 +16,7 @@ class HugeActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBasicContent {
-            ViewerDemoTheme {
-                HugeBody()
-            }
+            HugeBody()
         }
     }
 
@@ -37,11 +34,11 @@ fun HugeBody() {
         state = state,
         boundClip = false,
         detectGesture = {
-          onDoubleTap = {
-              scope.launch {
-                  state.toggleScale(it)
-              }
-          }
+            onDoubleTap = {
+                scope.launch {
+                    state.toggleScale(it)
+                }
+            }
         },
     )
 }

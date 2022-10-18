@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.insets.systemBarsPadding
 import com.origeek.viewerDemo.base.BaseActivity
-import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
 
 class HomeActivity : BaseActivity() {
 

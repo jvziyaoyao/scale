@@ -1,34 +1,23 @@
 package com.origeek.viewerDemo
 
-import android.graphics.BitmapRegionDecoder
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.origeek.imageViewer.previewer.ImagePreviewer
 import com.origeek.imageViewer.previewer.TransformImageView
 import com.origeek.imageViewer.previewer.rememberPreviewerState
 import com.origeek.imageViewer.previewer.rememberTransformItemState
-import com.origeek.imageViewer.viewer.ImageDecoder
 import com.origeek.ui.common.compose.ScaleGrid
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.rememberDecoderImagePainter
-import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.io.InputStream
 
 /**
  * @program: ImageViewer
@@ -44,9 +33,7 @@ class DecoderActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBasicContent {
-            ViewerDemoTheme {
-                NetBody()
-            }
+            NetBody()
         }
     }
 

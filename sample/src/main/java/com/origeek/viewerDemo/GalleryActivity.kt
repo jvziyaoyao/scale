@@ -9,16 +9,13 @@ import androidx.compose.ui.Modifier
 import com.origeek.imageViewer.gallery.ImageGallery
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.rememberCoilImagePainter
-import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
 
 class GalleryActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBasicContent {
-            ViewerDemoTheme {
-                GalleryBody()
-            }
+            GalleryBody()
         }
     }
 

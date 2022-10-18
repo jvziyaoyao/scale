@@ -10,7 +10,6 @@ import androidx.compose.ui.res.painterResource
 import com.origeek.imageViewer.viewer.ImageViewer
 import com.origeek.imageViewer.viewer.rememberViewerState
 import com.origeek.viewerDemo.base.BaseActivity
-import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
 import kotlinx.coroutines.launch
 
 class NormalActivity : BaseActivity() {
@@ -18,9 +17,7 @@ class NormalActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBasicContent {
-            ViewerDemoTheme {
-                NormalBody()
-            }
+            NormalBody()
         }
     }
 

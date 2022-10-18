@@ -40,7 +40,6 @@ import com.origeek.viewerDemo.ui.component.rememberCoilImagePainter
 import com.origeek.viewerDemo.ui.theme.*
 import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.math.absoluteValue
 
 /**
  * @program: ImageViewer
@@ -56,18 +55,16 @@ class TransformActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBasicContent {
-            ViewerDemoTheme {
-                TransformBody(
-                    listOf(
-                        R.drawable.img_01,
-                        R.drawable.img_02,
-                        R.drawable.img_03,
-                        R.drawable.img_04,
-                        R.drawable.img_05,
-                        R.drawable.img_06,
-                    )
+            TransformBody(
+                listOf(
+                    R.drawable.img_01,
+                    R.drawable.img_02,
+                    R.drawable.img_03,
+                    R.drawable.img_04,
+                    R.drawable.img_05,
+                    R.drawable.img_06,
                 )
-            }
+            )
         }
     }
 

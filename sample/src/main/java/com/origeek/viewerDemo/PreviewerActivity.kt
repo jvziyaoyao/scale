@@ -16,10 +16,9 @@ import com.google.accompanist.insets.systemBarsPadding
 import com.origeek.imageViewer.previewer.ImagePreviewer
 import com.origeek.imageViewer.previewer.rememberPreviewerState
 import com.origeek.ui.common.compose.GridLayout
+import com.origeek.ui.common.util.hideSystemUI
+import com.origeek.ui.common.util.showSystemUI
 import com.origeek.viewerDemo.base.BaseActivity
-import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
-import com.origeek.viewerDemo.util.hideSystemUI
-import com.origeek.viewerDemo.util.showSystemUI
 import kotlinx.coroutines.launch
 
 const val SYSTEM_UI_VISIBILITY = "SYSTEM_UI_VISIBILITY"
@@ -32,11 +31,9 @@ class PreviewerActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         handlerSystemUI(savedInstanceState?.getBoolean(SYSTEM_UI_VISIBILITY) ?: true)
         setBasicContent {
-            ViewerDemoTheme {
-                PreviewerBody {
-                    if (systemUIVisible != !it) {
-                        handlerSystemUI(!it)
-                    }
+            PreviewerBody {
+                if (systemUIVisible != !it) {
+                    handlerSystemUI(!it)
                 }
             }
         }
