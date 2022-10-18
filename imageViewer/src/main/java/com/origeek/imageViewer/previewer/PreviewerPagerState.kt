@@ -52,7 +52,7 @@ open class PreviewerPagerState {
      */
     suspend fun scrollToPage(
         @IntRange(from = 0) page: Int,
-        @FloatRange(from = 0.0, to = 1.0) pageOffset: Float,
+        @FloatRange(from = 0.0, to = 1.0) pageOffset: Float = 0F,
     ) = pagerState.scrollToPage(page, pageOffset)
 
     /**
@@ -62,7 +62,7 @@ open class PreviewerPagerState {
      */
     suspend fun animateScrollToPage(
         @IntRange(from = 0) page: Int,
-        @FloatRange(from = 0.0, to = 1.0) pageOffset: Float,
+        @FloatRange(from = 0.0, to = 1.0) pageOffset: Float = 0F,
     ) = pagerState.animateScrollToPage(page, pageOffset)
 
 }
