@@ -2,6 +2,7 @@ package com.origeek.viewerDemo
 
 import android.os.Bundle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import com.origeek.imageViewer.viewer.ImageViewer
@@ -27,7 +28,8 @@ class HugeActivity : BaseActivity() {
 @Composable
 fun HugeBody() {
     val context = LocalContext.current
-    val imageDecoder = rememberDecoderImagePainter(inputStream = context.assets.open("a350.jpg"))
+    val inputStream = remember { context.assets.open("a350.jpg") }
+    val imageDecoder = rememberDecoderImagePainter(inputStream = inputStream)
     val scope = rememberCoroutineScope()
     val state = rememberViewerState()
     ImageViewer(
