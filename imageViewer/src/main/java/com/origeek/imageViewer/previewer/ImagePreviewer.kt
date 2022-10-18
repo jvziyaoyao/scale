@@ -117,6 +117,7 @@ class PreviewerLayerScope(
     var viewerContainer: @Composable (viewer: @Composable () -> Unit) -> Unit = { it() },
     var background: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> DefaultPreviewerBackground() },
     var foreground: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> },
+    var placeholder: PreviewerPlaceholder = PreviewerPlaceholder()
 )
 
 @Composable
@@ -128,7 +129,6 @@ fun ImagePreviewer(
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
     exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,
-    placeholder: PreviewerPlaceholder = PreviewerPlaceholder(),
     currentViewerState: (ImageViewerState) -> Unit = {},
     detectGesture: GalleryGestureScope.() -> Unit = {},
     previewerLayer: PreviewerLayerScope.() -> Unit = {},
@@ -199,10 +199,10 @@ fun ImagePreviewer(
                                 val viewerMounted by state.viewerMounted.collectAsState(initial = false)
                                 if (state.allowLoading) AnimatedVisibility(
                                     visible = !viewerMounted,
-                                    enter = placeholder.enterTransition,
-                                    exit = placeholder.exitTransition,
+                                    enter = layerScope.placeholder.enterTransition,
+                                    exit = layerScope.placeholder.exitTransition,
                                 ) {
-                                    placeholder.content()
+                                    layerScope.placeholder.content()
                                 }
                             }
                         }
