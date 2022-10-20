@@ -23,7 +23,7 @@ import com.google.accompanist.pager.rememberPagerState
  * @create: 2022-10-05 21:41
  **/
 
-class ImagePagerState {
+open class ImagePagerState {
 
     @OptIn(ExperimentalPagerApi::class)
     internal lateinit var pagerState: PagerState

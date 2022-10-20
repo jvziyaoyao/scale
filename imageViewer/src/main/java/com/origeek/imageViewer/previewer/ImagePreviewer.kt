@@ -21,10 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.origeek.imageViewer.gallery.GalleryGestureScope
-import com.origeek.imageViewer.gallery.ImageGallery
-import com.origeek.imageViewer.gallery.ImagePagerState
-import com.origeek.imageViewer.gallery.rememberImagePagerState
+import com.origeek.imageViewer.gallery.*
 import com.origeek.imageViewer.viewer.ImageViewerState
 import kotlinx.coroutines.CoroutineScope
 
@@ -68,7 +65,7 @@ class ImagePreviewerState internal constructor() : PreviewerVerticalDragState() 
 
 @Composable
 fun rememberPreviewerState(
-    pagerState: ImagePagerState = rememberImagePagerState(),
+    galleryState: ImageGalleryState = rememberImageGalleryState(),
     transformState: TransformContentState = rememberTransformContentState(),
     viewerContainerState: ViewerContainerState = rememberViewerContainerState(),
     scope: CoroutineScope = rememberCoroutineScope(),
@@ -77,7 +74,7 @@ fun rememberPreviewerState(
     val previewerState = rememberSaveable(saver = ImagePreviewerState.Saver) {
         ImagePreviewerState()
     }
-    previewerState.pagerState = pagerState
+    previewerState.galleryState = galleryState
     previewerState.transformState = transformState
     previewerState.viewerContainerState = viewerContainerState
     previewerState.scope = scope
@@ -115,8 +112,8 @@ class PreviewerPlaceholder(
 
 class PreviewerLayerScope(
     var viewerContainer: @Composable (viewer: @Composable () -> Unit) -> Unit = { it() },
-    var background: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> DefaultPreviewerBackground() },
-    var foreground: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> },
+    var background: @Composable ((page: Int) -> Unit) = { _ -> DefaultPreviewerBackground() },
+    var foreground: @Composable ((page: Int) -> Unit) = { _ -> },
     var placeholder: PreviewerPlaceholder = PreviewerPlaceholder()
 )
 
@@ -129,7 +126,6 @@ fun ImagePreviewer(
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
     exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,
-    currentViewerState: (ImageViewerState) -> Unit = {},
     detectGesture: GalleryGestureScope.() -> Unit = {},
     previewerLayer: PreviewerLayerScope.() -> Unit = {},
 ) {
@@ -168,12 +164,8 @@ fun ImagePreviewer(
             ImageGallery(
                 modifier = modifier.fillMaxSize(),
                 count = count,
-                state = state.pagerState,
+                state = state.galleryState,
                 imageLoader = imageLoader,
-                currentViewerState = {
-                    state.imageViewerState = it
-                    currentViewerState(it)
-                },
                 itemSpacing = itemSpacing,
                 detectGesture = detectGesture,
                 galleryLayer = {
@@ -209,12 +201,12 @@ fun ImagePreviewer(
                     }
                     this.background = {
                         UIContainer {
-                            layerScope.background(count, it)
+                            layerScope.background(it)
                         }
                     }
                     this.foreground = {
                         UIContainer {
-                            layerScope.foreground(count, it)
+                            layerScope.foreground(it)
                         }
                     }
                 },

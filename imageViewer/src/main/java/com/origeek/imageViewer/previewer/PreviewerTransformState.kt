@@ -142,9 +142,6 @@ open class PreviewerTransformState: PreviewerPagerState() {
     // 最外侧animateVisableState
     internal var animateContainerVisableState by mutableStateOf(MutableTransitionState(false))
 
-    // imageViewer状态对象
-    internal var imageViewerState by mutableStateOf<ImageViewerState?>(null)
-
     // UI透明度
     internal var uiAlpha = Animatable(1F)
 
@@ -239,6 +236,10 @@ open class PreviewerTransformState: PreviewerPagerState() {
     val canClose: Boolean
         get() = visible && visibleTarget == null && !animating
 
+    // imageViewer状态对象
+    val imageViewerState: ImageViewerState?
+        get() = galleryState.imageViewerState
+
     // 查找key关联的transformItem
     fun findTransformItem(key: Any) = transformState.findTransformItem(key)
 
@@ -298,7 +299,7 @@ open class PreviewerTransformState: PreviewerPagerState() {
                 ticket.awaitNextTicket()
                 ticket.awaitNextTicket()
                 // 跳转到index
-                pagerState.scrollToPage(index)
+                galleryState.scrollToPage(index)
                 // 等待viewer加载
                 awaitViewerLoading()
                 // viewer加载成功后显示viewer
@@ -367,7 +368,7 @@ open class PreviewerTransformState: PreviewerPagerState() {
         // 等待下一帧
         ticket.awaitNextTicket()
         // pager跳转到index页
-        pagerState.scrollToPage(index)
+        galleryState.scrollToPage(index)
         // 这两个一起执行
         listOf(
             scope.async {

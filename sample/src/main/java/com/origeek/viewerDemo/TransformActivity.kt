@@ -197,7 +197,6 @@ fun TransformBody(
                 val image = images[index].res
                 rememberCoilImagePainter(image = image)
             },
-            currentViewerState = {},
         )
     }
 }
