@@ -36,7 +36,9 @@ class GalleryGestureScope(
 )
 
 class GalleryLayerScope(
-    var viewerContainer: @Composable (viewer: @Composable () -> Unit) -> Unit = { it() },
+    var viewerContainer: @Composable (
+        page: Int, viewerState: ImageViewerState, viewer: @Composable () -> Unit
+    ) -> Unit = { _, _, viewer -> viewer() },
     var background: @Composable ((Int) -> Unit) = {},
     var foreground: @Composable ((Int) -> Unit) = {},
 )
@@ -128,7 +130,7 @@ fun ImageGallery(
                     state.imageViewerState = imageState
                 }
             }
-            galleryLayerScope.viewerContainer {
+            galleryLayerScope.viewerContainer(page, imageState) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize(),

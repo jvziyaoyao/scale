@@ -52,7 +52,8 @@ class ImagePreviewerState internal constructor() : PreviewerVerticalDragState() 
             },
             restore = {
                 val previewerState = ImagePreviewerState()
-                previewerState.animateContainerVisableState = MutableTransitionState(it[0] as Boolean)
+                previewerState.animateContainerVisableState =
+                    MutableTransitionState(it[0] as Boolean)
                 previewerState.uiAlpha = Animatable(it[1] as Float)
                 previewerState.transformContentAlpha = Animatable(it[2] as Float)
                 previewerState.viewerContainerAlpha = Animatable(it[3] as Float)
@@ -111,7 +112,9 @@ class PreviewerPlaceholder(
 )
 
 class PreviewerLayerScope(
-    var viewerContainer: @Composable (viewer: @Composable () -> Unit) -> Unit = { it() },
+    var viewerContainer: @Composable (
+        page: Int, viewerState: ImageViewerState, viewer: @Composable () -> Unit
+    ) -> Unit = { _, _, viewer -> viewer() },
     var background: @Composable ((page: Int) -> Unit) = { _ -> DefaultPreviewerBackground() },
     var foreground: @Composable ((page: Int) -> Unit) = { _ -> },
     var placeholder: PreviewerPlaceholder = PreviewerPlaceholder()
@@ -169,8 +172,8 @@ fun ImagePreviewer(
                 itemSpacing = itemSpacing,
                 detectGesture = detectGesture,
                 galleryLayer = {
-                    this.viewerContainer = {
-                        layerScope.viewerContainer {
+                    this.viewerContainer = { page, viewerState, viewer ->
+                        layerScope.viewerContainer(page, viewerState) {
                             ImageViewerContainer(
                                 containerState = state.viewerContainerState,
                             ) {
@@ -186,7 +189,7 @@ fun ImagePreviewer(
                                         .fillMaxSize()
                                         .alpha(state.viewerContainerAlpha.value)
                                 ) {
-                                    it()
+                                    viewer()
                                 }
                                 val viewerMounted by state.viewerMounted.collectAsState(initial = false)
                                 if (state.allowLoading) AnimatedVisibility(
