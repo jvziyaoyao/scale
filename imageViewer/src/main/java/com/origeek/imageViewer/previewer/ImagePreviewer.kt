@@ -132,93 +132,95 @@ fun ImagePreviewer(
     detectGesture: GalleryGestureScope.() -> Unit = {},
     previewerLayer: PreviewerLayerScope.() -> Unit = {},
 ) {
-    // 图层相关
-    val layerScope = remember { PreviewerLayerScope() }
-    previewerLayer.invoke(layerScope)
-    LaunchedEffect(
-        key1 = state.animateContainerVisableState,
-        key2 = state.animateContainerVisableState.currentState
-    ) {
-        state.onAnimateContainerStateChanged()
-    }
-    AnimatedVisibility(
-        modifier = Modifier.fillMaxSize(),
-        visibleState = state.animateContainerVisableState,
-        enter = state.enterTransition ?: enter,
-        exit = state.exitTransition ?: exit,
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .pointerInput(state.getKey) {
-                    state.verticalDrag(this)
-                }
+    state.apply {
+        // 图层相关
+        val layerScope = remember { PreviewerLayerScope() }
+        previewerLayer.invoke(layerScope)
+        LaunchedEffect(
+            key1 = animateContainerVisableState,
+            key2 = animateContainerVisableState.currentState
         ) {
-            @Composable
-            fun UIContainer(content: @Composable () -> Unit) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .alpha(state.uiAlpha.value)
-                ) {
-                    content()
+            onAnimateContainerStateChanged()
+        }
+        AnimatedVisibility(
+            modifier = Modifier.fillMaxSize(),
+            visibleState = animateContainerVisableState,
+            enter = enterTransition ?: enter,
+            exit = exitTransition ?: exit,
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(getKey) {
+                        verticalDrag(this)
+                    }
+            ) {
+                @Composable
+                fun UIContainer(content: @Composable () -> Unit) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .alpha(uiAlpha.value)
+                    ) {
+                        content()
+                    }
                 }
-            }
-            ImageGallery(
-                modifier = modifier.fillMaxSize(),
-                count = count,
-                state = state.galleryState,
-                imageLoader = imageLoader,
-                itemSpacing = itemSpacing,
-                detectGesture = detectGesture,
-                galleryLayer = {
-                    this.viewerContainer = { page, viewerState, viewer ->
-                        layerScope.viewerContainer(page, viewerState) {
-                            ImageViewerContainer(
-                                containerState = state.viewerContainerState,
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .alpha(state.transformContentAlpha.value)
+                ImageGallery(
+                    modifier = modifier.fillMaxSize(),
+                    count = count,
+                    state = galleryState,
+                    imageLoader = imageLoader,
+                    itemSpacing = itemSpacing,
+                    detectGesture = detectGesture,
+                    galleryLayer = {
+                        this.viewerContainer = { page, viewerState, viewer ->
+                            layerScope.viewerContainer(page, viewerState) {
+                                ImageViewerContainer(
+                                    containerState = viewerContainerState,
                                 ) {
-                                    TransformContentView(state.transformState)
-                                }
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .alpha(state.viewerContainerAlpha.value)
-                                ) {
-                                    viewer()
-                                }
-                                val viewerMounted by state.viewerMounted.collectAsState(initial = false)
-                                if (state.allowLoading) AnimatedVisibility(
-                                    visible = !viewerMounted,
-                                    enter = layerScope.placeholder.enterTransition,
-                                    exit = layerScope.placeholder.exitTransition,
-                                ) {
-                                    layerScope.placeholder.content()
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .alpha(transformContentAlpha.value)
+                                    ) {
+                                        TransformContentView(transformState)
+                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .alpha(viewerContainerAlpha.value)
+                                    ) {
+                                        viewer()
+                                    }
+                                    val viewerMounted by viewerMounted.collectAsState(initial = false)
+                                    if (allowLoading) AnimatedVisibility(
+                                        visible = !viewerMounted,
+                                        enter = layerScope.placeholder.enterTransition,
+                                        exit = layerScope.placeholder.exitTransition,
+                                    ) {
+                                        layerScope.placeholder.content()
+                                    }
                                 }
                             }
                         }
-                    }
-                    this.background = {
-                        UIContainer {
-                            layerScope.background(it)
+                        this.background = {
+                            UIContainer {
+                                layerScope.background(it)
+                            }
                         }
-                    }
-                    this.foreground = {
-                        UIContainer {
-                            layerScope.foreground(it)
+                        this.foreground = {
+                            UIContainer {
+                                layerScope.foreground(it)
+                            }
                         }
-                    }
-                },
-            )
-            if (!state.visible)
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInput(Unit) { detectTapGestures { } }) { }
+                    },
+                )
+                if (!visible)
+                    Box(modifier = Modifier
+                        .fillMaxSize()
+                        .pointerInput(Unit) { detectTapGestures { } }) { }
+            }
         }
+        ticket.Next()
     }
-    state.ticket.Next()
 }
