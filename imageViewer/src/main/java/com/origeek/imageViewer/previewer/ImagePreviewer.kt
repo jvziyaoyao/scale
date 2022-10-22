@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -25,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import com.origeek.imageViewer.gallery.GalleryGestureScope
 import com.origeek.imageViewer.gallery.ImageGallery
 import com.origeek.imageViewer.gallery.ImageGalleryState
-import com.origeek.imageViewer.gallery.rememberImageGalleryState
 import com.origeek.imageViewer.viewer.ImageViewerState
 import kotlinx.coroutines.CoroutineScope
 
@@ -47,12 +45,12 @@ class ImagePreviewerState internal constructor() : PreviewerVerticalDragState() 
         val Saver: Saver<ImagePreviewerState, *> = mapSaver(
             save = {
                 mapOf<String, Any>(
-                    ImagePreviewerState::currentPage.name to it.currentPage,
-                    ImagePreviewerState::animateContainerVisibleState.name to it.animateContainerVisibleState.currentState,
-                    ImagePreviewerState::uiAlpha.name to it.uiAlpha.value,
-                    ImagePreviewerState::transformContentAlpha.name to it.transformContentAlpha.value,
-                    ImagePreviewerState::viewerContainerAlpha.name to it.viewerContainerAlpha.value,
-                    ImagePreviewerState::visible.name to it.visible,
+                    it::currentPage.name to it.currentPage,
+                    it::animateContainerVisibleState.name to it.animateContainerVisibleState.currentState,
+                    it::uiAlpha.name to it.uiAlpha.value,
+                    it::transformContentAlpha.name to it.transformContentAlpha.value,
+                    it::viewerContainerAlpha.name to it.viewerContainerAlpha.value,
+                    it::visible.name to it.visible,
                 )
             },
             restore = {

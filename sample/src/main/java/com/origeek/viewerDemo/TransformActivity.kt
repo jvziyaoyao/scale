@@ -1,7 +1,6 @@
 package com.origeek.viewerDemo
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
@@ -19,7 +18,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -195,8 +194,12 @@ fun TransformBody(
             count = images.size,
             state = previewerState,
             imageLoader = { index ->
-                val image = images[index].res
-                rememberCoilImagePainter(image = image)
+                if (settingState.loaderError && (index % 2 == 0)) {
+                    null
+                } else {
+                    val image = images[index].res
+                    rememberCoilImagePainter(image = image)
+                }
             },
         )
     }
@@ -233,6 +236,7 @@ fun SettingItemSwitch(
     }
 }
 
+const val DEFAULT_LOADER_ERROR = false
 const val DEFAULT_VERTICAL_DRAG = true
 const val DEFAULT_TRANSFORM_ENTER = true
 const val DEFAULT_TRANSFORM_EXIT = true
@@ -240,6 +244,8 @@ const val DEFAULT_ANIMATION_DURATION = 400
 const val DEFAULT_DATA_REPEAT = 1
 
 class TransformSettingState {
+
+    var loaderError by mutableStateOf(DEFAULT_LOADER_ERROR)
 
     var verticalDrag by mutableStateOf(DEFAULT_VERTICAL_DRAG)
 
@@ -252,6 +258,7 @@ class TransformSettingState {
     var dataRepeat by mutableStateOf(DEFAULT_DATA_REPEAT)
 
     fun reset() {
+        loaderError = DEFAULT_LOADER_ERROR
         verticalDrag = DEFAULT_VERTICAL_DRAG
         transformEnter = DEFAULT_TRANSFORM_ENTER
         transformExit = DEFAULT_TRANSFORM_EXIT
@@ -260,23 +267,25 @@ class TransformSettingState {
     }
 
     companion object {
-        val Saver: Saver<TransformSettingState, *> = listSaver(
+        val Saver: Saver<TransformSettingState, *> = mapSaver(
             save = {
-                listOf<Any>(
-                    it.verticalDrag,
-                    it.transformEnter,
-                    it.transformExit,
-                    it.animationDuration,
-                    it.dataRepeat,
+                mapOf<String, Any>(
+                    it::loaderError.name to it.loaderError,
+                    it::verticalDrag.name to it.verticalDrag,
+                    it::transformEnter.name to it.transformEnter,
+                    it::transformExit.name to it.transformExit,
+                    it::animationDuration.name to it.animationDuration,
+                    it::dataRepeat.name to it.dataRepeat,
                 )
             },
             restore = {
                 val state = TransformSettingState()
-                state.verticalDrag = it[0] as Boolean
-                state.transformEnter = it[1] as Boolean
-                state.transformExit = it[2] as Boolean
-                state.animationDuration = it[3] as Int
-                state.dataRepeat = it[4] as Int
+                state.loaderError = it[state::loaderError.name] as Boolean
+                state.verticalDrag = it[state::verticalDrag.name] as Boolean
+                state.transformEnter = it[state::transformEnter.name] as Boolean
+                state.transformExit = it[state::transformExit.name] as Boolean
+                state.animationDuration = it[state::animationDuration.name] as Int
+                state.dataRepeat = it[state::dataRepeat.name] as Int
                 state
             }
         )
@@ -301,6 +310,12 @@ fun SettingPanel(state: TransformSettingState, onClose: () -> Unit) {
                 .weight(1F)
                 .verticalScroll(rememberScrollState())
         ) {
+            SettingItem(label = "Loader Error") {
+                SettingItemSwitch(checked = state.loaderError, onCheckedChanged = {
+                    state.loaderError = it
+                })
+            }
+            Spacer(modifier = Modifier.height(pxs))
             SettingItem(label = "Vertical Drag") {
                 SettingItemSwitch(checked = state.verticalDrag, onCheckedChanged = {
                     state.verticalDrag = it
