@@ -15,12 +15,14 @@ import com.origeek.imageViewer.gallery.ImagePagerState
  * @create: 2022-10-17 14:41
  **/
 
-open class PreviewerPagerState {
+open class PreviewerPagerState(
+    @IntRange(from = 0) currentPage: Int = 0,
+) {
 
     /**
      * pagerState
      */
-    lateinit var galleryState: ImageGalleryState
+    var galleryState: ImageGalleryState = ImageGalleryState(currentPage)
 
     /**
      * 当前页码

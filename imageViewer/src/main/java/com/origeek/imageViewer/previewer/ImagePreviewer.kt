@@ -13,6 +13,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,23 +44,29 @@ fun DefaultPreviewerBackground() {
 
 class ImagePreviewerState internal constructor() : PreviewerVerticalDragState() {
     companion object {
-        val Saver: Saver<ImagePreviewerState, *> = listSaver(
+        val Saver: Saver<ImagePreviewerState, *> = mapSaver(
             save = {
-                listOf<Any>(
-                    it.animateContainerVisibleState.currentState,
-                    it.uiAlpha.value,
-                    it.transformContentAlpha.value,
-                    it.viewerContainerAlpha.value,
-                    it.visible,
+                mapOf<String, Any>(
+                    ImagePreviewerState::currentPage.name to it.currentPage,
+                    ImagePreviewerState::animateContainerVisibleState.name to it.animateContainerVisibleState.currentState,
+                    ImagePreviewerState::uiAlpha.name to it.uiAlpha.value,
+                    ImagePreviewerState::transformContentAlpha.name to it.transformContentAlpha.value,
+                    ImagePreviewerState::viewerContainerAlpha.name to it.viewerContainerAlpha.value,
+                    ImagePreviewerState::visible.name to it.visible,
                 )
             },
             restore = {
                 val previewerState = ImagePreviewerState()
-                previewerState.animateContainerVisibleState = MutableTransitionState(it[0] as Boolean)
-                previewerState.uiAlpha = Animatable(it[1] as Float)
-                previewerState.transformContentAlpha = Animatable(it[2] as Float)
-                previewerState.viewerContainerAlpha = Animatable(it[3] as Float)
-                previewerState.visible = it[4] as Boolean
+                previewerState.galleryState =
+                    ImageGalleryState(it[ImagePreviewerState::currentPage.name] as Int)
+                previewerState.animateContainerVisibleState =
+                    MutableTransitionState(it[ImagePreviewerState::animateContainerVisibleState.name] as Boolean)
+                previewerState.uiAlpha = Animatable(it[ImagePreviewerState::uiAlpha.name] as Float)
+                previewerState.transformContentAlpha =
+                    Animatable(it[ImagePreviewerState::transformContentAlpha.name] as Float)
+                previewerState.viewerContainerAlpha =
+                    Animatable(it[ImagePreviewerState::viewerContainerAlpha.name] as Float)
+                previewerState.visible = it[ImagePreviewerState::visible.name] as Boolean
                 previewerState
             }
         )
@@ -71,13 +78,11 @@ fun rememberPreviewerState(
     scope: CoroutineScope = rememberCoroutineScope(),
     animationSpec: AnimationSpec<Float>? = null,
 ): ImagePreviewerState {
-    val galleryState = rememberImageGalleryState()
     val transformState = rememberTransformContentState()
     val viewerContainerState = rememberViewerContainerState()
     val previewerState = rememberSaveable(saver = ImagePreviewerState.Saver) {
         ImagePreviewerState()
     }
-    previewerState.galleryState = galleryState
     previewerState.transformState = transformState
     previewerState.viewerContainerState = viewerContainerState
     previewerState.scope = scope
@@ -194,7 +199,9 @@ fun ImagePreviewer(
                                     ) {
                                         viewer()
                                     }
-                                    val viewerMounted by viewerState.mountedFlow.collectAsState(initial = false)
+                                    val viewerMounted by viewerState.mountedFlow.collectAsState(
+                                        initial = false
+                                    )
                                     if (allowLoading) AnimatedVisibility(
                                         visible = !viewerMounted,
                                         enter = layerScope.placeholder.enterTransition,

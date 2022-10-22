@@ -276,6 +276,8 @@ open class PreviewerTransformState: PreviewerPagerState() {
             scope.launch {
                 // 标记开始
                 stateOpenStart()
+                // 跳转到index
+                galleryState = ImageGalleryState(index)
                 // container动画立即设置为关闭
                 animateContainerVisibleState = MutableTransitionState(false)
                 // 允许显示loading
@@ -296,9 +298,6 @@ open class PreviewerTransformState: PreviewerPagerState() {
                 animateContainerVisibleState.targetState = true
                 // 可能要跳两次才行，否则会闪退
                 ticket.awaitNextTicket()
-                ticket.awaitNextTicket()
-                // 跳转到index
-                galleryState.scrollToPage(index)
                 // 等待viewer加载
                 awaitViewerLoading()
                 // viewer加载成功后显示viewer
@@ -358,16 +357,16 @@ open class PreviewerTransformState: PreviewerPagerState() {
         val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
         // 关闭loading
         allowLoading = false
+        // 跳转到index页
+        galleryState = ImageGalleryState(index)
         // 设置新的container状态立刻设置为true
         animateContainerVisibleState = MutableTransitionState(true)
         // 关闭viewer。打开transform
         transformSnapToViewer(false)
         // 关闭UI
         uiAlpha.snapTo(0F)
-        // 等待下一帧
+//        // 等待下一帧
         ticket.awaitNextTicket()
-        // pager跳转到index页
-        galleryState.scrollToPage(index)
         // 这两个一起执行
         listOf(
             scope.async {
