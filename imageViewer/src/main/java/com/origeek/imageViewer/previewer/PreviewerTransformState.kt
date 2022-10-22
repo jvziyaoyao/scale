@@ -9,6 +9,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.origeek.imageViewer.gallery.ImageGalleryState
 import com.origeek.imageViewer.viewer.ImageViewerState
 import com.origeek.ui.common.compose.Ticket
 import kotlinx.coroutines.*
@@ -139,8 +140,8 @@ open class PreviewerTransformState: PreviewerPagerState() {
     // 默认动画窗格
     internal var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
 
-    // 最外侧animateVisableState
-    internal var animateContainerVisableState by mutableStateOf(MutableTransitionState(false))
+    // 最外侧animateVisibleState
+    internal var animateContainerVisibleState by mutableStateOf(MutableTransitionState(false))
 
     // UI透明度
     internal var uiAlpha = Animatable(1F)
@@ -203,7 +204,7 @@ open class PreviewerTransformState: PreviewerPagerState() {
      * animateVisable执行完成后调用回调方法
      */
     internal fun onAnimateContainerStateChanged() {
-        if (animateContainerVisableState.currentState) {
+        if (animateContainerVisibleState.currentState) {
             openCallback?.invoke()
             transformState.setEnterState()
         } else {
@@ -276,7 +277,7 @@ open class PreviewerTransformState: PreviewerPagerState() {
                 // 标记开始
                 stateOpenStart()
                 // container动画立即设置为关闭
-                animateContainerVisableState = MutableTransitionState(false)
+                animateContainerVisibleState = MutableTransitionState(false)
                 // 允许显示loading
                 allowLoading = true
                 // 开启UI
@@ -291,10 +292,8 @@ open class PreviewerTransformState: PreviewerPagerState() {
                         transformState.enterTransform(itemState, animationSpec = tween(0))
                     }
                 }
-                // 等待下一帧
-                ticket.awaitNextTicket()
                 // 开启container
-                animateContainerVisableState.targetState = true
+                animateContainerVisibleState.targetState = true
                 // 可能要跳两次才行，否则会闪退
                 ticket.awaitNextTicket()
                 ticket.awaitNextTicket()
@@ -332,9 +331,9 @@ open class PreviewerTransformState: PreviewerPagerState() {
             // 关闭正在进行的开启操作
             cancelOpenTransform()
             // 这里创建一个全新的state是为了让exitTransition的设置得到响应
-            animateContainerVisableState = MutableTransitionState(true)
+            animateContainerVisibleState = MutableTransitionState(true)
             // 开启container关闭动画
-            animateContainerVisableState.targetState = false
+            animateContainerVisibleState.targetState = false
             // 等待下一帧
             ticket.awaitNextTicket()
             // transformState标记退出
@@ -360,7 +359,7 @@ open class PreviewerTransformState: PreviewerPagerState() {
         // 关闭loading
         allowLoading = false
         // 设置新的container状态立刻设置为true
-        animateContainerVisableState = MutableTransitionState(true)
+        animateContainerVisibleState = MutableTransitionState(true)
         // 关闭viewer。打开transform
         transformSnapToViewer(false)
         // 关闭UI
@@ -441,12 +440,12 @@ open class PreviewerTransformState: PreviewerPagerState() {
             // 等待下一帧
             ticket.awaitNextTicket()
             // 彻底关闭container
-            animateContainerVisableState = MutableTransitionState(false)
+            animateContainerVisibleState = MutableTransitionState(false)
         } else {
             // transform标记退出
             transformState.setExitState()
             // container动画退出
-            animateContainerVisableState.targetState = false
+            animateContainerVisibleState.targetState = false
         }
         // 允许使用loading
         allowLoading = true

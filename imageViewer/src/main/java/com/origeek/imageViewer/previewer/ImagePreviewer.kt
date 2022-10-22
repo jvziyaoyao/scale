@@ -21,7 +21,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.origeek.imageViewer.gallery.*
+import com.origeek.imageViewer.gallery.GalleryGestureScope
+import com.origeek.imageViewer.gallery.ImageGallery
+import com.origeek.imageViewer.gallery.ImageGalleryState
+import com.origeek.imageViewer.gallery.rememberImageGalleryState
 import com.origeek.imageViewer.viewer.ImageViewerState
 import kotlinx.coroutines.CoroutineScope
 
@@ -43,7 +46,7 @@ class ImagePreviewerState internal constructor() : PreviewerVerticalDragState() 
         val Saver: Saver<ImagePreviewerState, *> = listSaver(
             save = {
                 listOf<Any>(
-                    it.animateContainerVisableState.currentState,
+                    it.animateContainerVisibleState.currentState,
                     it.uiAlpha.value,
                     it.transformContentAlpha.value,
                     it.viewerContainerAlpha.value,
@@ -52,8 +55,7 @@ class ImagePreviewerState internal constructor() : PreviewerVerticalDragState() 
             },
             restore = {
                 val previewerState = ImagePreviewerState()
-                previewerState.animateContainerVisableState =
-                    MutableTransitionState(it[0] as Boolean)
+                previewerState.animateContainerVisibleState = MutableTransitionState(it[0] as Boolean)
                 previewerState.uiAlpha = Animatable(it[1] as Float)
                 previewerState.transformContentAlpha = Animatable(it[2] as Float)
                 previewerState.viewerContainerAlpha = Animatable(it[3] as Float)
@@ -66,12 +68,12 @@ class ImagePreviewerState internal constructor() : PreviewerVerticalDragState() 
 
 @Composable
 fun rememberPreviewerState(
-    galleryState: ImageGalleryState = rememberImageGalleryState(),
-    transformState: TransformContentState = rememberTransformContentState(),
-    viewerContainerState: ViewerContainerState = rememberViewerContainerState(),
     scope: CoroutineScope = rememberCoroutineScope(),
     animationSpec: AnimationSpec<Float>? = null,
 ): ImagePreviewerState {
+    val galleryState = rememberImageGalleryState()
+    val transformState = rememberTransformContentState()
+    val viewerContainerState = rememberViewerContainerState()
     val previewerState = rememberSaveable(saver = ImagePreviewerState.Saver) {
         ImagePreviewerState()
     }
@@ -137,14 +139,14 @@ fun ImagePreviewer(
         val layerScope = remember { PreviewerLayerScope() }
         previewerLayer.invoke(layerScope)
         LaunchedEffect(
-            key1 = animateContainerVisableState,
-            key2 = animateContainerVisableState.currentState
+            key1 = animateContainerVisibleState,
+            key2 = animateContainerVisibleState.currentState
         ) {
             onAnimateContainerStateChanged()
         }
         AnimatedVisibility(
             modifier = Modifier.fillMaxSize(),
-            visibleState = animateContainerVisableState,
+            visibleState = animateContainerVisibleState,
             enter = enterTransition ?: enter,
             exit = exitTransition ?: exit,
         ) {
@@ -192,7 +194,7 @@ fun ImagePreviewer(
                                     ) {
                                         viewer()
                                     }
-                                    val viewerMounted by viewerMounted.collectAsState(initial = false)
+                                    val viewerMounted by viewerState.mountedFlow.collectAsState(initial = false)
                                     if (allowLoading) AnimatedVisibility(
                                         visible = !viewerMounted,
                                         enter = layerScope.placeholder.enterTransition,

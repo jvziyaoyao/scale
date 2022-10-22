@@ -65,7 +65,7 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
             }
         ).awaitAll()
         ticket.awaitNextTicket()
-        animateContainerVisableState = MutableTransitionState(false)
+        animateContainerVisibleState = MutableTransitionState(false)
         ticket.awaitNextTicket()
         viewerContainerState.reset(defaultAnimationSpec)
         transformState.setExitState()

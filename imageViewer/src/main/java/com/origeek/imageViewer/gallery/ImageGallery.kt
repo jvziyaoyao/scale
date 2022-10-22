@@ -1,22 +1,21 @@
 package com.origeek.imageViewer.gallery
 
+import android.util.Log
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
 import com.origeek.imageViewer.previewer.DEFAULT_ITEM_SPACE
 import com.origeek.imageViewer.viewer.ImageViewer
 import com.origeek.imageViewer.viewer.ImageViewerState
 import com.origeek.imageViewer.viewer.rememberViewerState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 /**
@@ -43,9 +42,11 @@ class GalleryLayerScope(
     var foreground: @Composable ((Int) -> Unit) = {},
 )
 
-open class ImageGalleryState {
+open class ImageGalleryState(
+    @IntRange(from = 0) currentPage: Int = 0,
+) {
 
-    internal lateinit var pagerState: ImagePagerState
+    internal var pagerState: ImagePagerState = ImagePagerState(currentPage)
 
     var imageViewerState by mutableStateOf<ImageViewerState?>(null)
         internal set
@@ -75,14 +76,28 @@ open class ImageGalleryState {
         @FloatRange(from = 0.0, to = 1.0) pageOffset: Float = 0f,
     ) = pagerState.animateScrollToPage(page, pageOffset)
 
+    companion object {
+        val Saver: Saver<ImageGalleryState, *> = listSaver(
+            save = {
+                listOf<Any>(
+                    it.currentPage,
+                )
+            },
+            restore = {
+                val imageGalleryState = ImageGalleryState()
+                imageGalleryState.pagerState = ImagePagerState(it[0] as Int)
+                imageGalleryState
+            }
+        )
+    }
+
 }
 
 @Composable
-fun rememberImageGalleryState(): ImageGalleryState {
-    val pageState = rememberImagePagerState()
-    val imagePagerState = remember { ImageGalleryState() }
-    imagePagerState.pagerState = pageState
-    return imagePagerState
+fun rememberImageGalleryState(
+    @IntRange(from = 0) currentPage: Int = 0,
+): ImageGalleryState {
+    return rememberSaveable(saver = ImageGalleryState.Saver) { ImageGalleryState(currentPage) }
 }
 
 @Composable
@@ -104,7 +119,7 @@ fun ImageGallery(
     val galleryLayerScope = remember { GalleryLayerScope() }
     galleryLayer.invoke(galleryLayerScope)
     // 确保不会越界
-    val currentPage by remember {
+    val currentPage by remember(key1 = state.currentPage, key2 = state) {
         derivedStateOf {
             if (state.currentPage >= count) {
                 if (count > 0) count - 1 else 0

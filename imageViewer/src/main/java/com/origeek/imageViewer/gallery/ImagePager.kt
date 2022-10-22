@@ -4,14 +4,15 @@ import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
 
 /**
  * @program: ImageViewer
@@ -23,10 +24,12 @@ import com.google.accompanist.pager.rememberPagerState
  * @create: 2022-10-05 21:41
  **/
 
-open class ImagePagerState {
+open class ImagePagerState(
+    @IntRange(from = 0) currentPage: Int = 0,
+) {
 
     @OptIn(ExperimentalPagerApi::class)
-    internal lateinit var pagerState: PagerState
+    internal var pagerState: PagerState = PagerState(currentPage)
 
     @OptIn(ExperimentalPagerApi::class)
     val currentPage: Int
@@ -60,15 +63,31 @@ open class ImagePagerState {
         @FloatRange(from = 0.0, to = 1.0) pageOffset: Float = 0f,
     ) = pagerState.animateScrollToPage(page, pageOffset)
 
+    companion object {
+        @OptIn(ExperimentalPagerApi::class)
+        val Saver: Saver<ImagePagerState, *> = listSaver(
+            save = {
+                listOf<Any>(
+                    it.currentPage,
+                )
+            },
+            restore = {
+                val imagePagerState = ImagePagerState()
+                imagePagerState.pagerState = PagerState(it[0] as Int)
+                imagePagerState
+            }
+        )
+    }
+
 }
 
 @Composable
-@OptIn(ExperimentalPagerApi::class)
-fun rememberImagePagerState(): ImagePagerState {
-    val pageState = rememberPagerState()
-    val imagePagerState = remember { ImagePagerState() }
-    imagePagerState.pagerState = pageState
-    return imagePagerState
+fun rememberImagePagerState(
+    @IntRange(from = 0) currentPage: Int = 0,
+): ImagePagerState {
+    return rememberSaveable(saver = ImagePagerState.Saver) {
+        ImagePagerState(currentPage)
+    }
 }
 
 @OptIn(ExperimentalPagerApi::class)
