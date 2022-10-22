@@ -150,7 +150,7 @@ fun TransformImageView(
     modifier: Modifier = Modifier,
     key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
-    contentState: TransformContentState = rememberTransformContentState(),
+    contentState: TransformContentState? = rememberTransformContentState(),
     content: @Composable () -> Unit,
 ) {
     TransformItemView(
@@ -168,7 +168,7 @@ fun TransformItemView(
     modifier: Modifier = Modifier,
     key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
-    contentState: TransformContentState,
+    contentState: TransformContentState?,
     content: @Composable () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -199,7 +199,7 @@ fun TransformItemView(
             .fillMaxSize()
     ) {
         if (
-            contentState.itemState != itemState || !contentState.onAction
+            contentState?.itemState != itemState || !contentState.onAction
         ) {
             itemState.blockCompose()
         }

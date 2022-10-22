@@ -48,8 +48,8 @@ class ImagePreviewerState internal constructor() : PreviewerVerticalDragState() 
                     it::currentPage.name to it.currentPage,
                     it::animateContainerVisibleState.name to it.animateContainerVisibleState.currentState,
                     it::uiAlpha.name to it.uiAlpha.value,
-                    it::transformContentAlpha.name to it.transformContentAlpha.value,
-                    it::viewerContainerAlpha.name to it.viewerContainerAlpha.value,
+//                    it::transformContentAlpha.name to it.transformContentAlpha.value,
+//                    it::viewerContainerAlpha.name to it.viewerContainerAlpha.value,
                     it::visible.name to it.visible,
                 )
             },
@@ -60,10 +60,10 @@ class ImagePreviewerState internal constructor() : PreviewerVerticalDragState() 
                 previewerState.animateContainerVisibleState =
                     MutableTransitionState(it[ImagePreviewerState::animateContainerVisibleState.name] as Boolean)
                 previewerState.uiAlpha = Animatable(it[ImagePreviewerState::uiAlpha.name] as Float)
-                previewerState.transformContentAlpha =
-                    Animatable(it[ImagePreviewerState::transformContentAlpha.name] as Float)
-                previewerState.viewerContainerAlpha =
-                    Animatable(it[ImagePreviewerState::viewerContainerAlpha.name] as Float)
+//                previewerState.transformContentAlpha =
+//                    Animatable(it[ImagePreviewerState::transformContentAlpha.name] as Float)
+//                previewerState.viewerContainerAlpha =
+//                    Animatable(it[ImagePreviewerState::viewerContainerAlpha.name] as Float)
                 previewerState.visible = it[ImagePreviewerState::visible.name] as Boolean
                 previewerState
             }
@@ -76,13 +76,9 @@ fun rememberPreviewerState(
     scope: CoroutineScope = rememberCoroutineScope(),
     animationSpec: AnimationSpec<Float>? = null,
 ): ImagePreviewerState {
-    val transformState = rememberTransformContentState()
-    val viewerContainerState = rememberViewerContainerState()
     val previewerState = rememberSaveable(saver = ImagePreviewerState.Saver) {
         ImagePreviewerState()
     }
-    previewerState.transformState = transformState
-    previewerState.viewerContainerState = viewerContainerState
     previewerState.scope = scope
     if (animationSpec != null) previewerState.defaultAnimationSpec = animationSpec
     return previewerState
@@ -180,34 +176,17 @@ fun ImagePreviewer(
                     galleryLayer = {
                         this.viewerContainer = { page, viewerState, viewer ->
                             layerScope.viewerContainer(page, viewerState) {
-                                ImageViewerContainer(
-                                    containerState = viewerContainerState,
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .alpha(transformContentAlpha.value)
-                                    ) {
-                                        TransformContentView(transformState)
-                                    }
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .alpha(viewerContainerAlpha.value)
-                                    ) {
-                                        viewer()
-                                    }
-                                    val viewerMounted by viewerState.mountedFlow.collectAsState(
-                                        initial = false
-                                    )
-                                    if (allowLoading) AnimatedVisibility(
-                                        visible = !viewerMounted,
-                                        enter = layerScope.placeholder.enterTransition,
-                                        exit = layerScope.placeholder.exitTransition,
-                                    ) {
-                                        layerScope.placeholder.content()
+                                val viewerContainerState = rememberViewerContainerState(viewerState = viewerState)
+                                LaunchedEffect(key1 = currentPage) {
+                                    if (currentPage == page) {
+                                        state.viewerContainerState = viewerContainerState
                                     }
                                 }
+                                ImageViewerContainer(
+                                    containerState = viewerContainerState,
+                                    placeholder = layerScope.placeholder,
+                                    viewer = viewer,
+                                )
                             }
                         }
                         this.background = {

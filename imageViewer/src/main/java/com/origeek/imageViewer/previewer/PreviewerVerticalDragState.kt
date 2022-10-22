@@ -30,9 +30,6 @@ const val DEFAULT_SCALE_TO_CLOSE_MIN_VALUE = 0.8F
  */
 open class PreviewerVerticalDragState : PreviewerTransformState() {
 
-    // 从外部传入viewer容器
-    lateinit var viewerContainerState: ViewerContainerState
-
     // 下拉关闭的缩放的阈值，当scale小于这个值，就关闭，否则还原
     private var scaleToCloseMinValue = DEFAULT_SCALE_TO_CLOSE_MIN_VALUE
 
@@ -40,14 +37,16 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
      * 将viewer容器的位置大小复制给transformContent
      */
     private suspend fun copyViewerContainerStateToTransformState() {
-        transformState.apply {
-            val targetScale = viewerContainerState.scale.value * fitScale
-            graphicScaleX.snapTo(targetScale)
-            graphicScaleY.snapTo(targetScale)
-            val centerOffsetY = (containerSize.height - realSize.height).div(2)
-            val centerOffsetX = (containerSize.width - realSize.width).div(2)
-            offsetY.snapTo(centerOffsetY + viewerContainerState.offsetY.value)
-            offsetX.snapTo(centerOffsetX + viewerContainerState.offsetX.value)
+        transformState?.apply {
+            if (viewerContainerState != null) {
+                val targetScale = viewerContainerState!!.scale.value * fitScale
+                graphicScaleX.snapTo(targetScale)
+                graphicScaleY.snapTo(targetScale)
+                val centerOffsetY = (containerSize.height - realSize.height).div(2)
+                val centerOffsetX = (containerSize.width - realSize.width).div(2)
+                offsetY.snapTo(centerOffsetY + viewerContainerState!!.offsetY.value)
+                offsetX.snapTo(centerOffsetX + viewerContainerState!!.offsetX.value)
+            }
         }
     }
 
@@ -58,7 +57,7 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
         stateCloseStart()
         listOf(
             scope.async {
-                viewerContainerState.scale.animateTo(0F, animationSpec = defaultAnimationSpec)
+                viewerContainerState?.scale?.animateTo(0F, animationSpec = defaultAnimationSpec)
             },
             scope.async {
                 uiAlpha.animateTo(0F, animationSpec = defaultAnimationSpec)
@@ -67,8 +66,8 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
         ticket.awaitNextTicket()
         animateContainerVisibleState = MutableTransitionState(false)
         ticket.awaitNextTicket()
-        viewerContainerState.reset(defaultAnimationSpec)
-        transformState.setExitState()
+        viewerContainerState?.reset(defaultAnimationSpec)
+        transformState?.setExitState()
         stateCloseEnd()
     }
 
@@ -76,11 +75,11 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
      * 响应下拉关闭
      */
     private suspend fun dragDownClose(key: Any) {
-        transformState.notifyEnterChanged()
+        transformState?.notifyEnterChanged()
         allowLoading = false
         ticket.awaitNextTicket()
         copyViewerContainerStateToTransformState()
-        viewerContainerState.resetImmediately()
+        viewerContainerState?.resetImmediately()
         transformSnapToViewer(false)
         ticket.awaitNextTicket()
         closeTransform(key, defaultAnimationSpec)
@@ -112,7 +111,7 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
                         }
                     }
                     // 更新当前transformItem
-                    transformState.itemState = transformItemState
+                    transformState?.itemState = transformItemState
                     // 只有viewer的缩放率为1时才允许下拉手势
                     if (imageViewerState?.scale?.value == 1F) {
                         vStartOffset = it
@@ -122,10 +121,12 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
                 },
                 onDragEnd = OnDragEnd@{
                     if (vStartOffset == null) return@OnDragEnd
+                    // TODO
+                    if (viewerContainerState == null) return@OnDragEnd
                     vStartOffset = null
                     vOrientationDown = null
                     imageViewerState?.allowGestureInput = true
-                    if (viewerContainerState.scale.value < scaleToCloseMinValue) {
+                    if (viewerContainerState!!.scale.value < scaleToCloseMinValue) {
                         scope.launch {
                             if (getKey != null) {
                                 val key = getKey!!.invoke(currentPage)
@@ -146,26 +147,28 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
                             uiAlpha.animateTo(1F, defaultAnimationSpec)
                         }
                         scope.launch {
-                            viewerContainerState.reset(defaultAnimationSpec)
+                            viewerContainerState?.reset(defaultAnimationSpec)
                         }
                     }
                 },
                 onVerticalDrag = OnVerticalDrag@{ change, dragAmount ->
                     if (imageViewerState == null) return@OnVerticalDrag
                     if (vStartOffset == null) return@OnVerticalDrag
+                    // TODO
+                    if (viewerContainerState == null) return@OnVerticalDrag
                     if (vOrientationDown == null) vOrientationDown = dragAmount > 0
                     if (vOrientationDown == true) {
                         val offsetY = change.position.y - vStartOffset!!.y
                         val offsetX = change.position.x - vStartOffset!!.x
-                        val containerHeight = viewerContainerState.containerSize.height
+                        val containerHeight = viewerContainerState!!.containerSize.height
                         val scale = (containerHeight - offsetY.absoluteValue).div(
                             containerHeight
                         )
                         scope.launch {
                             uiAlpha.snapTo(scale)
-                            viewerContainerState.offsetX.snapTo(offsetX)
-                            viewerContainerState.offsetY.snapTo(offsetY)
-                            viewerContainerState.scale.snapTo(scale)
+                            viewerContainerState?.offsetX?.snapTo(offsetX)
+                            viewerContainerState?.offsetY?.snapTo(offsetY)
+                            viewerContainerState?.scale?.snapTo(scale)
                         }
                     } else {
                         // 如果不是向上，就返还输入权，以免页面卡顿

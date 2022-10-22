@@ -1,11 +1,9 @@
 package com.origeek.imageViewer.previewer
 
+import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -31,7 +29,7 @@ import kotlin.coroutines.suspendCoroutine
  * @create: 2022-10-17 14:41
  **/
 
-open class PreviewerTransformState: PreviewerPagerState() {
+open class PreviewerTransformState : PreviewerPagerState() {
 
     /**
      *   +-------------------+
@@ -79,30 +77,32 @@ open class PreviewerTransformState: PreviewerPagerState() {
      * @param itemState TransformItemState
      */
     private suspend fun copyViewerPosToContent(itemState: TransformItemState) {
-        // 更新itemState，确保itemState一致
-        transformState.itemState = itemState
-        // 确保viewer的容器大小与transform的容器大小一致
-        transformState.containerSize = imageViewerState!!.containerSize
-        val scale = imageViewerState!!.scale
-        val offsetX = imageViewerState!!.offsetX
-        val offsetY = imageViewerState!!.offsetY
-        // 计算transform的实际大小
-        val rw = transformState.fitSize.width * scale.value
-        val rh = transformState.fitSize.height * scale.value
-        // 计算目标平移量
-        val goOffsetX =
-            (transformState.containerSize.width - rw).div(2) + offsetX.value
-        val goOffsetY =
-            (transformState.containerSize.height - rh).div(2) + offsetY.value
-        // 计算缩放率
-        val fixScale = transformState.fitScale * scale.value
-        // 更新值
-        transformState.graphicScaleX.snapTo(fixScale)
-        transformState.graphicScaleY.snapTo(fixScale)
-        transformState.displayWidth.snapTo(transformState.displayRatioSize.width)
-        transformState.displayHeight.snapTo(transformState.displayRatioSize.height)
-        transformState.offsetX.snapTo(goOffsetX)
-        transformState.offsetY.snapTo(goOffsetY)
+        transformState?.apply {
+            // 更新itemState，确保itemState一致
+            this@apply.itemState = itemState
+            // 确保viewer的容器大小与transform的容器大小一致
+            containerSize = imageViewerState!!.containerSize
+            val scale = imageViewerState!!.scale
+            val offsetX = imageViewerState!!.offsetX
+            val offsetY = imageViewerState!!.offsetY
+            // 计算transform的实际大小
+            val rw = fitSize.width * scale.value
+            val rh = fitSize.height * scale.value
+            // 计算目标平移量
+            val goOffsetX =
+                (containerSize.width - rw).div(2) + offsetX.value
+            val goOffsetY =
+                (containerSize.height - rh).div(2) + offsetY.value
+            // 计算缩放率
+            val fixScale = fitScale * scale.value
+            // 更新值
+            graphicScaleX.snapTo(fixScale)
+            graphicScaleY.snapTo(fixScale)
+            displayWidth.snapTo(displayRatioSize.width)
+            displayHeight.snapTo(displayRatioSize.height)
+            offsetX.snapTo(goOffsetX)
+            offsetY.snapTo(goOffsetY)
+        }
     }
 
     /**
@@ -125,9 +125,6 @@ open class PreviewerTransformState: PreviewerPagerState() {
     // 从外部提供作用域
     lateinit var scope: CoroutineScope
 
-    // 从外部提供transformContentState
-    lateinit var transformState: TransformContentState
-
     /**
      *   +-------------------+
      *         INTERNAL
@@ -144,17 +141,36 @@ open class PreviewerTransformState: PreviewerPagerState() {
     internal var animateContainerVisibleState by mutableStateOf(MutableTransitionState(false))
 
     // UI透明度
-    internal var uiAlpha = Animatable(1F)
+    internal var uiAlpha = Animatable(0F)
+
+    // 从外部传入viewer容器
+    internal var viewerContainerState by mutableStateOf<ViewerContainerState?>(null)
+
+    // 从外部提供transformContentState
+    internal val transformState: TransformContentState?
+        get() = viewerContainerState?.transformState
 
     // 转换图层transformContent透明度
-    internal var transformContentAlpha = Animatable(1F)
+    internal var transformContentAlpha: Animatable<Float, AnimationVector1D>?
+        get() = viewerContainerState?.transformContentAlpha
+        set(value) {
+            if (value != null) {
+                viewerContainerState?.transformContentAlpha = value
+            }
+        }
 
     // viewer容器的透明度
-    internal var viewerContainerAlpha = Animatable(1F)
+    internal var viewerContainerAlpha: Animatable<Float, AnimationVector1D>?
+        get() = viewerContainerState?.viewerContainerAlpha
+        set(value) {
+            if (value != null) {
+                viewerContainerState?.viewerContainerAlpha = value
+            }
+        }
 
     // 是否显示viewer容器的标识
     internal val viewerContainerVisible: Boolean
-        get() = viewerContainerAlpha.value == 1F
+        get() = viewerContainerState?.viewerContainerAlpha?.value == 1F
 
     // 进入转换动画
     internal var enterTransition: EnterTransition? = null
@@ -167,7 +183,13 @@ open class PreviewerTransformState: PreviewerPagerState() {
         get() = imageViewerState?.mountedFlow ?: MutableStateFlow(false)
 
     // 是否允许界面显示loading
-    internal var allowLoading by mutableStateOf(true)
+    internal var allowLoading: Boolean?
+        get() = viewerContainerState?.allowLoading
+        set(value) {
+            if (value != null) {
+                viewerContainerState?.allowLoading = value
+            }
+        }
 
     // 标记打开动作，执行开始
     internal suspend fun stateOpenStart() =
@@ -192,11 +214,11 @@ open class PreviewerTransformState: PreviewerPagerState() {
     internal suspend fun transformSnapToViewer(isViewer: Boolean) {
         if (isViewer) {
             if (visibleTarget == false) return
-            transformContentAlpha.snapTo(0F)
-            viewerContainerAlpha.snapTo(1F)
+            transformContentAlpha?.snapTo(0F)
+            viewerContainerAlpha?.snapTo(1F)
         } else {
-            transformContentAlpha.snapTo(1F)
-            viewerContainerAlpha.snapTo(0F)
+            transformContentAlpha?.snapTo(1F)
+            viewerContainerAlpha?.snapTo(0F)
         }
     }
 
@@ -206,7 +228,7 @@ open class PreviewerTransformState: PreviewerPagerState() {
     internal fun onAnimateContainerStateChanged() {
         if (animateContainerVisibleState.currentState) {
             openCallback?.invoke()
-            transformState.setEnterState()
+            transformState?.setEnterState()
         } else {
             closeCallback?.invoke()
         }
@@ -239,13 +261,13 @@ open class PreviewerTransformState: PreviewerPagerState() {
 
     // imageViewer状态对象
     val imageViewerState: ImageViewerState?
-        get() = galleryState.imageViewerState
+        get() = viewerContainerState?.imageViewerState
 
     // 查找key关联的transformItem
-    fun findTransformItem(key: Any) = transformState.findTransformItem(key)
+    fun findTransformItem(key: Any) = transformState?.findTransformItem(key)
 
     // 清除全部transformItems
-    fun clearTransformItems() = transformState.clearTransformItems()
+    fun clearTransformItems() = transformState?.clearTransformItems()
 
     /**
      * 打开previewer
@@ -285,13 +307,13 @@ open class PreviewerTransformState: PreviewerPagerState() {
                 // 开启UI
                 uiAlpha.snapTo(1F)
                 // 开启viewer
-                viewerContainerAlpha.snapTo(1F)
+                viewerContainerAlpha?.snapTo(1F)
                 // 如果输入itemState，则用itemState做为背景
                 if (itemState != null) {
                     scope.launch {
-                        transformContentAlpha.snapTo(1F)
-                        transformState.awaitContainerSizeSpecifier()
-                        transformState.enterTransform(itemState, animationSpec = tween(0))
+                        transformContentAlpha?.snapTo(1F)
+                        transformState?.awaitContainerSizeSpecifier()
+                        transformState?.enterTransform(itemState, animationSpec = tween(0))
                     }
                 }
                 // 开启container
@@ -336,7 +358,7 @@ open class PreviewerTransformState: PreviewerPagerState() {
             // 等待下一帧
             ticket.awaitNextTicket()
             // transformState标记退出
-            transformState.setExitState()
+            transformState?.setExitState()
         }
     }
 
@@ -355,23 +377,23 @@ open class PreviewerTransformState: PreviewerPagerState() {
         stateOpenStart()
         // 设置当前动画窗格
         val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
-        // 关闭loading
-        allowLoading = false
         // 跳转到index页
         galleryState = ImageGalleryState(index)
-        // 设置新的container状态立刻设置为true
-        animateContainerVisibleState = MutableTransitionState(true)
-        // 关闭viewer。打开transform
-        transformSnapToViewer(false)
         // 关闭UI
         uiAlpha.snapTo(0F)
-//        // 等待下一帧
+        // 设置新的container状态立刻设置为true
+        animateContainerVisibleState = MutableTransitionState(true)
+        // 等待下一帧
         ticket.awaitNextTicket()
+        // 关闭loading
+        allowLoading = false
+        // 关闭viewer。打开transform
+        transformSnapToViewer(false)
         // 这两个一起执行
         listOf(
             scope.async {
                 // 开启动画
-                transformState.enterTransform(itemState, animationSpec = currentAnimationSpec)
+                transformState?.enterTransform(itemState, animationSpec = currentAnimationSpec)
                 // 开启loading
                 allowLoading = true
             },
@@ -380,10 +402,8 @@ open class PreviewerTransformState: PreviewerPagerState() {
                 uiAlpha.animateTo(1F, animationSpec = currentAnimationSpec)
             }
         ).awaitAll()
-
         // 执行完成后的回调
         stateOpenEnd()
-
         // 这里需要等待viewer挂载，显示loading界面
         openTransformJob = scope.async {
             // 等待viewer加载
@@ -415,8 +435,12 @@ open class PreviewerTransformState: PreviewerPagerState() {
         val itemState = findTransformItem(key)
         // 如果存在，就transform退出，否则就普通退出
         if (itemState != null) {
+            Log.i("TAG", "closeTransform: ${transformContentAlpha?.value} - ${viewerContainerAlpha?.value}")
             // 如果viewer在显示的状态，退出时将viewer的pose复制给content
             if (viewerContainerVisible) {
+                // TODO
+                transformState?.onAction = true
+                transformState?.notifyEnterChanged()
                 // 复制viewer的pos给transform
                 copyViewerPosToContent(itemState)
                 // 切换为transform
@@ -427,9 +451,9 @@ open class PreviewerTransformState: PreviewerPagerState() {
             listOf(
                 scope.async {
                     // transform动画退出
-                    transformState.exitTransform(animationSpec = currentAnimationSpec)
+                    transformState?.exitTransform(animationSpec = currentAnimationSpec)
                     // 退出结束后隐藏content
-                    transformContentAlpha.snapTo(0F)
+                    transformContentAlpha?.snapTo(0F)
                 },
                 scope.async {
                     // 动画隐藏UI
@@ -442,7 +466,7 @@ open class PreviewerTransformState: PreviewerPagerState() {
             animateContainerVisibleState = MutableTransitionState(false)
         } else {
             // transform标记退出
-            transformState.setExitState()
+            transformState?.setExitState()
             // container动画退出
             animateContainerVisibleState.targetState = false
         }
