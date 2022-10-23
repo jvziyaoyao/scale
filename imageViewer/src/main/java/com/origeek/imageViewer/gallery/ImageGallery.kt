@@ -1,6 +1,5 @@
 package com.origeek.imageViewer.gallery
 
-import android.util.Log
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.compose.foundation.interaction.InteractionSource

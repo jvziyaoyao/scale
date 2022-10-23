@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -52,10 +53,11 @@ fun NetBody() {
         val previewerState = rememberPreviewerState()
         val itemState = rememberTransformItemState()
         val inputStream = remember { context.assets.open("a350.jpg") }
-        var transformEnable by remember { mutableStateOf(true) }
         val painter = painterResource(R.drawable.a350_temp)
-        var loadDelay by remember { mutableStateOf(0F) }
         val horizontal = maxWidth > maxHeight
+        // Save
+        var transformEnable by rememberSaveable { mutableStateOf(true) }
+        var loadDelay by rememberSaveable { mutableStateOf(0F) }
 
         if (previewerState.canClose || previewerState.animating) BackHandler {
             if (previewerState.canClose) scope.launch {

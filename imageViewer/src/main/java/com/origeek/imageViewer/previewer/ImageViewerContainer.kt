@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -196,19 +196,22 @@ class ViewerContainerState {
     }
 
     companion object {
-        val Saver: Saver<ViewerContainerState, *> = listSaver(
+        val Saver: Saver<ViewerContainerState, *> = mapSaver(
             save = {
-                listOf<Any>(
-                    it.offsetX.value,
-                    it.offsetY.value,
-                    it.scale.value,
+                mapOf<String, Any>(
+                    it::offsetX.name to it.offsetX.value,
+                    it::offsetY.name to it.offsetY.value,
+                    it::scale.name to it.scale.value,
                 )
             },
             restore = {
                 val viewerContainerState = ViewerContainerState()
-                viewerContainerState.offsetX = Animatable(it[0] as Float)
-                viewerContainerState.offsetY = Animatable(it[1] as Float)
-                viewerContainerState.scale = Animatable(it[2] as Float)
+                viewerContainerState.offsetX =
+                    Animatable(it[viewerContainerState::offsetX.name] as Float)
+                viewerContainerState.offsetY =
+                    Animatable(it[viewerContainerState::offsetY.name] as Float)
+                viewerContainerState.scale =
+                    Animatable(it[viewerContainerState::scale.name] as Float)
                 viewerContainerState
             }
         )
