@@ -34,23 +34,6 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
     private var scaleToCloseMinValue = DEFAULT_SCALE_TO_CLOSE_MIN_VALUE
 
     /**
-     * 将viewer容器的位置大小复制给transformContent
-     */
-    private suspend fun copyViewerContainerStateToTransformState() {
-        transformState?.apply {
-            if (viewerContainerState != null) {
-                val targetScale = viewerContainerState!!.scale.value * fitScale
-                graphicScaleX.snapTo(targetScale)
-                graphicScaleY.snapTo(targetScale)
-                val centerOffsetY = (containerSize.height - realSize.height).div(2)
-                val centerOffsetX = (containerSize.width - realSize.width).div(2)
-                offsetY.snapTo(centerOffsetY + viewerContainerState!!.offsetY.value)
-                offsetX.snapTo(centerOffsetX + viewerContainerState!!.offsetX.value)
-            }
-        }
-    }
-
-    /**
      * viewer容器缩小关闭
      */
     private suspend fun viewerContainerShrinkDown() {
@@ -76,14 +59,14 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
      */
     private suspend fun dragDownClose(key: Any) {
         transformState?.notifyEnterChanged()
-        allowLoading = false
+        viewerContainerState?.allowLoading = false
         ticket.awaitNextTicket()
-        copyViewerContainerStateToTransformState()
+        viewerContainerState?.copyViewerContainerStateToTransformState()
         viewerContainerState?.resetImmediately()
         transformSnapToViewer(false)
         ticket.awaitNextTicket()
         closeTransform(key, defaultAnimationSpec)
-        allowLoading = true
+        viewerContainerState?.allowLoading = true
     }
 
     /**
@@ -110,6 +93,11 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
                             transformItemState = this
                         }
                     }
+                    if (canTransformOut) {
+                        transformState?.onAction = true
+                    } else {
+                        transformState?.setExitState()
+                    }
                     // 更新当前transformItem
                     transformState?.itemState = transformItemState
                     // 只有viewer的缩放率为1时才允许下拉手势
@@ -121,14 +109,13 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
                 },
                 onDragEnd = OnDragEnd@{
                     if (vStartOffset == null) return@OnDragEnd
-                    // TODO
                     if (viewerContainerState == null) return@OnDragEnd
                     vStartOffset = null
                     vOrientationDown = null
                     imageViewerState?.allowGestureInput = true
                     if (viewerContainerState!!.scale.value < scaleToCloseMinValue) {
                         scope.launch {
-                            if (getKey != null) {
+                            if (getKey != null && canTransformOut) {
                                 val key = getKey!!.invoke(currentPage)
                                 val transformItem = findTransformItem(key)
                                 if (transformItem != null) {
@@ -153,9 +140,8 @@ open class PreviewerVerticalDragState : PreviewerTransformState() {
                 },
                 onVerticalDrag = OnVerticalDrag@{ change, dragAmount ->
                     if (imageViewerState == null) return@OnVerticalDrag
-                    if (vStartOffset == null) return@OnVerticalDrag
-                    // TODO
                     if (viewerContainerState == null) return@OnVerticalDrag
+                    if (vStartOffset == null) return@OnVerticalDrag
                     if (vOrientationDown == null) vOrientationDown = dragAmount > 0
                     if (vOrientationDown == true) {
                         val offsetY = change.position.y - vStartOffset!!.y

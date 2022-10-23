@@ -48,8 +48,6 @@ class ImagePreviewerState internal constructor() : PreviewerVerticalDragState() 
                     it::currentPage.name to it.currentPage,
                     it::animateContainerVisibleState.name to it.animateContainerVisibleState.currentState,
                     it::uiAlpha.name to it.uiAlpha.value,
-//                    it::transformContentAlpha.name to it.transformContentAlpha.value,
-//                    it::viewerContainerAlpha.name to it.viewerContainerAlpha.value,
                     it::visible.name to it.visible,
                 )
             },
@@ -60,10 +58,6 @@ class ImagePreviewerState internal constructor() : PreviewerVerticalDragState() 
                 previewerState.animateContainerVisibleState =
                     MutableTransitionState(it[ImagePreviewerState::animateContainerVisibleState.name] as Boolean)
                 previewerState.uiAlpha = Animatable(it[ImagePreviewerState::uiAlpha.name] as Float)
-//                previewerState.transformContentAlpha =
-//                    Animatable(it[ImagePreviewerState::transformContentAlpha.name] as Float)
-//                previewerState.viewerContainerAlpha =
-//                    Animatable(it[ImagePreviewerState::viewerContainerAlpha.name] as Float)
                 previewerState.visible = it[ImagePreviewerState::visible.name] as Boolean
                 previewerState
             }
@@ -176,7 +170,10 @@ fun ImagePreviewer(
                     galleryLayer = {
                         this.viewerContainer = { page, viewerState, viewer ->
                             layerScope.viewerContainer(page, viewerState) {
-                                val viewerContainerState = rememberViewerContainerState(viewerState = viewerState)
+                                val viewerContainerState = rememberViewerContainerState(
+                                    viewerState = viewerState,
+                                    animationSpec = defaultAnimationSpec
+                                )
                                 LaunchedEffect(key1 = currentPage) {
                                     if (currentPage == page) {
                                         state.viewerContainerState = viewerContainerState

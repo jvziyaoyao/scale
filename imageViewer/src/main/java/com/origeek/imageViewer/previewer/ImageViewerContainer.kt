@@ -15,9 +15,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import com.origeek.imageViewer.viewer.ImageViewerState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import com.origeek.imageViewer.viewer.rememberViewerState
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.takeWhile
 
 /**
  * @program: ImageViewer
@@ -31,15 +32,27 @@ import kotlinx.coroutines.awaitAll
 
 class ViewerContainerState {
 
+    /**
+     *   +-------------------+
+     *         LATE INIT
+     *   +-------------------+
+     */
+
     internal lateinit var scope: CoroutineScope
 
     // 从外部提供transformContentState
-    lateinit var transformState: TransformContentState
+    internal lateinit var transformState: TransformContentState
 
     // imageViewer状态对象
-    lateinit var imageViewerState: ImageViewerState
+    internal lateinit var imageViewerState: ImageViewerState
 
-    // TODO
+    /**
+     *   +-------------------+
+     *         INTERNAL
+     *   +-------------------+
+     */
+
+    // 默认动画窗格
     internal var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
 
     // 转换图层transformContent透明度
@@ -50,6 +63,106 @@ class ViewerContainerState {
 
     // 是否允许界面显示loading
     internal var allowLoading by mutableStateOf(true)
+
+    // 打开图片后到加载成功过程的协程任务
+    internal var openTransformJob: Deferred<Unit>? = null
+
+    /**
+     * 取消打开动作
+     */
+    internal fun cancelOpenTransform() {
+        openTransformJob?.cancel()
+        openTransformJob = null
+    }
+
+    /**
+     * 等待挂载成功
+     */
+    internal suspend fun awaitOpenTransform() {
+        // 这里需要等待viewer挂载，显示loading界面
+        openTransformJob = scope.async {
+            // 等待viewer加载
+            awaitViewerLoading()
+            // viewer加载成功后显示viewer
+            transformSnapToViewer(true)
+        }
+        openTransformJob?.await()
+        openTransformJob = null
+    }
+
+    /**
+     * 等待viewer挂载成功
+     */
+    internal suspend fun awaitViewerLoading() {
+        imageViewerState.mountedFlow.apply {
+            withContext(Dispatchers.Default) {
+                takeWhile { !it }.collect()
+            }
+        }
+    }
+
+    /**
+     * 转换图层转viewer图层，true显示viewer，false显示转换图层
+     * @param isViewer Boolean
+     */
+    internal suspend fun transformSnapToViewer(isViewer: Boolean) {
+        if (isViewer) {
+            transformContentAlpha.snapTo(0F)
+            viewerContainerAlpha.snapTo(1F)
+        } else {
+            transformContentAlpha.snapTo(1F)
+            viewerContainerAlpha.snapTo(0F)
+        }
+    }
+
+    /**
+     * 将viewer容器的位置大小复制给transformContent
+     */
+    internal suspend fun copyViewerContainerStateToTransformState() {
+        transformState.apply {
+            val targetScale = scale.value * fitScale
+            graphicScaleX.snapTo(targetScale)
+            graphicScaleY.snapTo(targetScale)
+            val centerOffsetY = (containerSize.height - realSize.height).div(2)
+            val centerOffsetX = (containerSize.width - realSize.width).div(2)
+            offsetY.snapTo(centerOffsetY + this@ViewerContainerState.offsetY.value)
+            offsetX.snapTo(centerOffsetX + this@ViewerContainerState.offsetX.value)
+        }
+    }
+
+    /**
+     * 将viewer的位置大小等信息复制给transformContent
+     * @param itemState TransformItemState
+     */
+    internal suspend fun copyViewerPosToContent(itemState: TransformItemState) {
+        transformState.apply {
+            // 更新itemState，确保itemState一致
+            this@apply.itemState = itemState
+            // 确保viewer的容器大小与transform的容器大小一致
+            containerSize = imageViewerState.containerSize
+            val scale = imageViewerState.scale
+            val offsetX = imageViewerState.offsetX
+            val offsetY = imageViewerState.offsetY
+            // 计算transform的实际大小
+            val rw = fitSize.width * scale.value
+            val rh = fitSize.height * scale.value
+            // 计算目标平移量
+            val goOffsetX =
+                (containerSize.width - rw).div(2) + offsetX.value
+            val goOffsetY =
+                (containerSize.height - rh).div(2) + offsetY.value
+            // 计算缩放率
+            val fixScale = fitScale * scale.value
+
+            // 更新值
+            graphicScaleX.snapTo(fixScale)
+            graphicScaleY.snapTo(fixScale)
+            displayWidth.snapTo(displayRatioSize.width)
+            displayHeight.snapTo(displayRatioSize.height)
+            this@apply.offsetX.snapTo(goOffsetX)
+            this@apply.offsetY.snapTo(goOffsetY)
+        }
+    }
 
     var containerSize: IntSize by mutableStateOf(IntSize.Zero)
 
@@ -105,7 +218,7 @@ class ViewerContainerState {
 @Composable
 fun rememberViewerContainerState(
     scope: CoroutineScope = rememberCoroutineScope(),
-    viewerState: ImageViewerState,
+    viewerState: ImageViewerState = rememberViewerState(),
     animationSpec: AnimationSpec<Float>? = null,
 ): ViewerContainerState {
     val containerState = rememberSaveable(saver = ViewerContainerState.Saver) {
