@@ -26,13 +26,10 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.takeWhile
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -242,11 +239,12 @@ fun TransformContentView(
     }
 }
 
-class TransformContentState internal constructor() {
-
-    lateinit var scope: CoroutineScope
-
-    var defaultAnimationSpec: AnimationSpec<Float> = SpringSpec()
+class TransformContentState(
+    // 协程作用域
+    var scope: CoroutineScope = MainScope(),
+    // 默认动画窗格
+    var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
+) {
 
     var itemState: TransformItemState? by mutableStateOf(null)
 
@@ -499,7 +497,7 @@ class TransformContentState internal constructor() {
 @Composable
 fun rememberTransformContentState(
     scope: CoroutineScope = rememberCoroutineScope(),
-    animationSpec: AnimationSpec<Float> = SpringSpec()
+    animationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
 ): TransformContentState {
     val transformContentState = rememberSaveable(saver = TransformContentState.Saver) {
         TransformContentState()

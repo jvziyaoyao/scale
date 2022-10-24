@@ -12,10 +12,7 @@ import androidx.compose.runtime.setValue
 import com.origeek.imageViewer.gallery.ImageGalleryState
 import com.origeek.imageViewer.viewer.ImageViewerState
 import com.origeek.ui.common.compose.Ticket
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.resume
@@ -31,7 +28,12 @@ import kotlin.coroutines.suspendCoroutine
  * @create: 2022-10-17 14:41
  **/
 
-open class PreviewerTransformState : PreviewerPagerState() {
+open class PreviewerTransformState(
+    // 协程作用域
+    var scope: CoroutineScope = MainScope(),
+    // 默认动画窗格
+    var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
+) : PreviewerPagerState() {
 
     /**
      *   +-------------------+
@@ -68,24 +70,12 @@ open class PreviewerTransformState : PreviewerPagerState() {
 
     /**
      *   +-------------------+
-     *         LATE INIT
-     *   +-------------------+
-     */
-
-    // 从外部提供作用域
-    lateinit var scope: CoroutineScope
-
-    /**
-     *   +-------------------+
      *         INTERNAL
      *   +-------------------+
      */
 
     // 等待界面刷新的ticket
     internal val ticket = Ticket()
-
-    // 默认动画窗格
-    internal var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
 
     // 最外侧animateVisibleState
     internal var animateContainerVisibleState by mutableStateOf(MutableTransitionState(false))

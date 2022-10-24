@@ -30,30 +30,22 @@ import kotlinx.coroutines.flow.takeWhile
  * @create: 2022-10-17 14:45
  **/
 
-class ViewerContainerState {
-
-    /**
-     *   +-------------------+
-     *         LATE INIT
-     *   +-------------------+
-     */
-
-    internal lateinit var scope: CoroutineScope
-
-    // 从外部提供transformContentState
-    internal lateinit var transformState: TransformContentState
-
-    // imageViewer状态对象
-    internal lateinit var imageViewerState: ImageViewerState
+class ViewerContainerState(
+    // 协程作用域
+    var scope: CoroutineScope = MainScope(),
+    // 转换图层的状态
+    var transformState: TransformContentState = TransformContentState(),
+    // viewer的状态
+    var imageViewerState: ImageViewerState = ImageViewerState(),
+    // 默认动画窗格
+    var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
+) {
 
     /**
      *   +-------------------+
      *         INTERNAL
      *   +-------------------+
      */
-
-    // 默认动画窗格
-    internal var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
 
     // 转换图层transformContent透明度
     internal var transformContentAlpha = Animatable(0F)
@@ -222,17 +214,17 @@ class ViewerContainerState {
 fun rememberViewerContainerState(
     scope: CoroutineScope = rememberCoroutineScope(),
     viewerState: ImageViewerState = rememberViewerState(),
-    animationSpec: AnimationSpec<Float>? = null,
+    animationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
 ): ViewerContainerState {
-    val containerState = rememberSaveable(saver = ViewerContainerState.Saver) {
+    val transformContentState = rememberTransformContentState()
+    val viewerContainerState = rememberSaveable(saver = ViewerContainerState.Saver) {
         ViewerContainerState()
     }
-    val transformContentState = rememberTransformContentState()
-    containerState.scope = scope
-    containerState.imageViewerState = viewerState
-    containerState.transformState = transformContentState
-    if (animationSpec != null) containerState.defaultAnimationSpec = animationSpec
-    return containerState
+    viewerContainerState.scope = scope
+    viewerContainerState.imageViewerState = viewerState
+    viewerContainerState.transformState = transformContentState
+    viewerContainerState.defaultAnimationSpec = animationSpec
+    return viewerContainerState
 }
 
 @Composable

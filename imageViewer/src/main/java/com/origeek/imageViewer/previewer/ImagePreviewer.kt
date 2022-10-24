@@ -26,6 +26,7 @@ import com.origeek.imageViewer.gallery.ImageGallery
 import com.origeek.imageViewer.gallery.ImageGalleryState
 import com.origeek.imageViewer.viewer.ImageViewerState
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
 
 val DEEP_DARK_FANTASY = Color(0xFF000000)
 val DEFAULT_ITEM_SPACE = 12.dp
@@ -40,7 +41,12 @@ fun DefaultPreviewerBackground() {
     )
 }
 
-class ImagePreviewerState internal constructor() : PreviewerVerticalDragState() {
+class ImagePreviewerState(
+    // 协程作用域
+    scope: CoroutineScope = MainScope(),
+    // 默认动画窗格
+    defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
+) : PreviewerVerticalDragState(scope, defaultAnimationSpec) {
     companion object {
         val Saver: Saver<ImagePreviewerState, *> = mapSaver(
             save = {
@@ -68,14 +74,14 @@ class ImagePreviewerState internal constructor() : PreviewerVerticalDragState() 
 @Composable
 fun rememberPreviewerState(
     scope: CoroutineScope = rememberCoroutineScope(),
-    animationSpec: AnimationSpec<Float>? = null,
+    animationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
 ): ImagePreviewerState {
-    val previewerState = rememberSaveable(saver = ImagePreviewerState.Saver) {
+    val imagePreviewerState = rememberSaveable(saver = ImagePreviewerState.Saver) {
         ImagePreviewerState()
     }
-    previewerState.scope = scope
-    if (animationSpec != null) previewerState.defaultAnimationSpec = animationSpec
-    return previewerState
+    imagePreviewerState.scope = scope
+    imagePreviewerState.defaultAnimationSpec = animationSpec
+    return imagePreviewerState
 }
 
 @OptIn(ExperimentalAnimationApi::class)
