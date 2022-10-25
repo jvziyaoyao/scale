@@ -186,6 +186,7 @@ fun ImagePreviewer(
                                     }
                                 }
                                 ImageViewerContainer(
+                                    modifier = Modifier.alpha(viewerAlpha.value),
                                     containerState = viewerContainerState,
                                     placeholder = layerScope.placeholder,
                                     viewer = viewer,

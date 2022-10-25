@@ -83,6 +83,9 @@ open class PreviewerTransformState(
     // UI透明度
     internal var uiAlpha = Animatable(0F)
 
+    // viewer透明度
+    internal var viewerAlpha = Animatable(1F)
+
     // 从外部传入viewer容器
     internal var viewerContainerState by mutableStateOf<ViewerContainerState?>(null)
 
@@ -282,6 +285,8 @@ open class PreviewerTransformState(
         galleryState = ImageGalleryState(index)
         // 关闭UI
         uiAlpha.snapTo(0F)
+        // 关闭viewer
+        viewerAlpha.snapTo(0F)
         // 设置新的container状态立刻设置为true
         animateContainerVisibleState = MutableTransitionState(true)
         // 等待下一帧
@@ -290,6 +295,8 @@ open class PreviewerTransformState(
         viewerContainerState?.allowLoading = false
         // 关闭viewer。打开transform
         transformSnapToViewer(false)
+        // 开启viewer
+        viewerAlpha.snapTo(1F)
         // 这两个一起执行
         listOf(
             scope.async {

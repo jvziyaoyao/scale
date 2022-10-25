@@ -23,16 +23,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.origeek.imageViewer.previewer.ImagePreviewer
-import com.origeek.imageViewer.previewer.TransformImageView
-import com.origeek.imageViewer.previewer.rememberPreviewerState
-import com.origeek.imageViewer.previewer.rememberTransformItemState
+import com.origeek.imageViewer.previewer.*
 import com.origeek.ui.common.compose.LazyGridLayout
 import com.origeek.ui.common.compose.ScaleGrid
 import com.origeek.viewerDemo.base.BaseActivity
@@ -200,7 +198,7 @@ fun TransformBody(
                     val image = images[index].res
                     rememberCoilImagePainter(image = image)
                 }
-            },
+            }
         )
     }
 }
