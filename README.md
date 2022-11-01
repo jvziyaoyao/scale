@@ -59,19 +59,46 @@ fun NormalBody() {
 }
 ```
 ### 加载超大图
-‼ 仅在model类型为`BitmapRegionDecoder`才会被当做大图进行加载
+‼ 仅在model类型为`ImageDecoder`才会被当做大图进行加载
 ```kotlin
+/**
+ * 声明一个方法用于加载ImageDecoder
+ * @param inputStream InputStream
+ * @return ImageDecoder?
+ */
+@Composable
+fun rememberDecoderImagePainter(inputStream: InputStream): ImageDecoder? {
+    var imageDecoder by remember { mutableStateOf<ImageDecoder?>(null) }
+    LaunchedEffect(inputStream) {
+        // 尽可能在IO线程上进行该操作
+        launch(Dispatchers.IO) {
+            imageDecoder = try {
+                val decoder = BitmapRegionDecoder.newInstance(inputStream, false) 
+                    ?: throw Exception()
+                ImageDecoder(decoder = decoder)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+    // 释放资源
+    DisposableEffect(Unit) {
+        onDispose {
+            imageDecoder?.release()
+        }
+    }
+    return imageDecoder
+}
+
+/**
+ * 在界面中加载大图
+ */
 @Composable
 fun HugeBody() {
     val context = LocalContext.current
-    val imageDecoder = remember {
-        ImageDecoder(
-            BitmapRegionDecoder.newInstance(
-                context.assets.open("a350.jpg"),
-                false
-            )!!
-        )
-    }
+    val inputStream = remember { context.assets.open("a350.jpg") }
+    val imageDecoder = rememberDecoderImagePainter(inputStream = inputStream)
     val scope = rememberCoroutineScope()
     val state = rememberViewerState()
     ImageViewer(
@@ -123,11 +150,13 @@ ImagePreviewer(
   state = imageViewerState,
   imageLoader = { index -> painterResource(id = images[index]) },
   onTap = {
-    imageViewerState.hide()
+    // 关闭Popup
+    imageViewerState.close()
   }
 )
+
 // 弹出Popup
-imageViewerState.show()
+imageViewerState.open()
 ```
 📓 API
 --------

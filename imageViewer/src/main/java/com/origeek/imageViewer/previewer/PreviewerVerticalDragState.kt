@@ -34,9 +34,6 @@ open class PreviewerVerticalDragState(
     defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
 ) : PreviewerTransformState(scope, defaultAnimationSpec) {
 
-    // 下拉关闭的缩放的阈值，当scale小于这个值，就关闭，否则还原
-    private var scaleToCloseMinValue = DEFAULT_SCALE_TO_CLOSE_MIN_VALUE
-
     /**
      * viewer容器缩小关闭
      */
@@ -70,7 +67,7 @@ open class PreviewerVerticalDragState(
     /**
      * 响应下拉关闭
      */
-    private suspend fun dragDownClose(key: Any) {
+    private suspend fun dragDownClose() {
         // 刷新transform的pos
         transformState?.notifyEnterChanged()
         // 关闭loading
@@ -86,15 +83,10 @@ open class PreviewerVerticalDragState(
         // 等待下一帧
         ticket.awaitNextTicket()
         // 执行转换关闭
-        closeTransform(key, defaultAnimationSpec)
+        closeTransform(defaultAnimationSpec)
         // 解除loading限制
         viewerContainerState?.allowLoading = true
     }
-
-    /**
-     * 根据页面获取当前页码所属的key
-     */
-    internal var getKey: ((Int) -> Any)? = null
 
     /**
      * 设置下拉手势的方法
@@ -107,7 +99,7 @@ open class PreviewerVerticalDragState(
             // 标记是否为下拉关闭
             var vOrientationDown by mutableStateOf<Boolean?>(null)
             // 如果getKay不为空才开始检测手势
-            if (getKey != null) detectVerticalDragGestures(
+            if (verticalDragEnable) detectVerticalDragGestures(
                 onDragStart = OnDragStart@{
                     // 如果imageViewerState不存在，无法进行下拉手势
                     if (imageViewerState == null) return@OnDragStart
@@ -152,7 +144,7 @@ open class PreviewerVerticalDragState(
                                 val transformItem = findTransformItem(key)
                                 // 如果item在画面内，就执行变换关闭，否则缩小关闭
                                 if (transformItem != null) {
-                                    dragDownClose(key)
+                                    dragDownClose()
                                 } else {
                                     viewerContainerShrinkDown()
                                 }
@@ -199,20 +191,13 @@ open class PreviewerVerticalDragState(
     }
 
     /**
-     * 开启下拉手势
-     * @param getKey Function1<Int, Any>?
-     * @param minScale Float?
+     * 是否开启下拉关闭
      */
-    fun enableVerticalDrag(minScale: Float? = null, getKey: ((Int) -> Any)? = null) {
-        minScale?.let { scaleToCloseMinValue = it }
-        this.getKey = getKey
-    }
+    var verticalDragEnable by mutableStateOf(false)
 
     /**
-     * 关闭下拉手势
+     * 下拉关闭的缩放的阈值，当scale小于这个值，就关闭，否则还原
      */
-    fun disableVerticalDrag() {
-        this.getKey = null
-        scaleToCloseMinValue = DEFAULT_SCALE_TO_CLOSE_MIN_VALUE
-    }
+    var scaleToCloseMinValue by mutableStateOf(DEFAULT_SCALE_TO_CLOSE_MIN_VALUE)
+
 }

@@ -80,12 +80,15 @@ fun TransformBody(
     imageIds: List<Int>
 ) {
 
+    val images = remember { mutableStateListOf<DrawableItem>() }
     val settingState = rememberSettingState()
     val scope = rememberCoroutineScope()
     val previewerState = rememberPreviewerState(
-        animationSpec = tween(settingState.animationDuration)
-    )
-    val images = remember { mutableStateListOf<DrawableItem>() }
+        animationSpec = tween(settingState.animationDuration),
+        verticalDragEnable = settingState.verticalDrag,
+    ) {
+        images[it].id
+    }
     LaunchedEffect(
         key1 = imageIds,
         key2 = settingState,
@@ -110,16 +113,10 @@ fun TransformBody(
         }
     }
 
-    if (settingState.verticalDrag) {
-        previewerState.enableVerticalDrag { images[it].id }
-    } else {
-        previewerState.disableVerticalDrag()
-    }
     if (previewerState.canClose || previewerState.animating) BackHandler {
         if (previewerState.canClose) scope.launch {
             if (settingState.transformExit) {
-                val id = images[previewerState.currentPage].id
-                previewerState.closeTransform(id)
+                previewerState.closeTransform()
             } else {
                 previewerState.close()
             }

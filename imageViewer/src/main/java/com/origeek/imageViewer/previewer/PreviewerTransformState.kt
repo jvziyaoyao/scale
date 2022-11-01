@@ -1,5 +1,6 @@
 package com.origeek.imageViewer.previewer
 
+import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
@@ -169,11 +170,22 @@ open class PreviewerTransformState(
     val imageViewerState: ImageViewerState?
         get() = viewerContainerState?.imageViewerState
 
+    /**
+     * 根据页面获取当前页码所属的key
+     */
+    var getKey: ((Int) -> Any)? = null
+
     // 查找key关联的transformItem
-    fun findTransformItem(key: Any) = transformState?.findTransformItem(key)
+    fun findTransformItem(key: Any) = transformItemStateMap[key]
 
     // 清除全部transformItems
-    fun clearTransformItems() = transformState?.clearTransformItems()
+    fun clearTransformItems() = transformItemStateMap.clear()
+
+    // 根据index查询key
+    fun fondTransformItemByIndex(index: Int): TransformItemState? {
+        val key = getKey?.invoke(index) ?: return null
+        return findTransformItem(key)
+    }
 
     /**
      * 打开previewer
@@ -183,7 +195,7 @@ open class PreviewerTransformState(
      */
     suspend fun open(
         index: Int = 0,
-        itemState: TransformItemState? = null,
+        itemState: TransformItemState? = fondTransformItemByIndex(index),
         enterTransition: EnterTransition? = null
     ) =
         suspendCoroutine<Unit> { c ->
@@ -223,7 +235,7 @@ open class PreviewerTransformState(
                     scope.launch {
                         viewerContainerState?.transformContentAlpha?.snapTo(1F)
                         transformState?.awaitContainerSizeSpecifier()
-                        transformState?.enterTransform(itemState, animationSpec = tween(0))
+                        transformState?.enterTransform(itemState, tween(0))
                     }
                 }
                 // 这里需要等待viewer挂载，显示loading界面
@@ -274,13 +286,16 @@ open class PreviewerTransformState(
      */
     suspend fun openTransform(
         index: Int,
-        itemState: TransformItemState,
-        animationSpec: AnimationSpec<Float>? = null
+        itemState: TransformItemState? = fondTransformItemByIndex(index),
+        animationSpec: AnimationSpec<Float> = defaultAnimationSpec
     ) {
+        // 如果itemState为空，改用open的方式打开
+        if (itemState == null) {
+            open(index)
+            return
+        }
         // 动画开始
         stateOpenStart()
-        // 设置当前动画窗格
-        val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
         // 跳转到index页
         galleryState = ImageGalleryState(index)
         // 关闭UI
@@ -301,13 +316,13 @@ open class PreviewerTransformState(
         listOf(
             scope.async {
                 // 开启动画
-                transformState?.enterTransform(itemState, animationSpec = currentAnimationSpec)
+                transformState?.enterTransform(itemState, animationSpec)
                 // 开启loading
                 viewerContainerState?.allowLoading = true
             },
             scope.async {
                 // UI慢慢显示
-                uiAlpha.animateTo(1F, animationSpec = currentAnimationSpec)
+                uiAlpha.animateTo(1F, animationSpec)
             }
         ).awaitAll()
         // 执行完成后的回调
@@ -322,11 +337,8 @@ open class PreviewerTransformState(
      * @param animationSpec AnimationSpec<Float>?
      */
     suspend fun closeTransform(
-        key: Any,
-        animationSpec: AnimationSpec<Float>? = null,
+        animationSpec: AnimationSpec<Float> = defaultAnimationSpec,
     ) {
-        // 设置当前动画窗格
-        val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
         // 标记开始
         stateCloseStart()
         // 判断当前状态是否允许transform结束
@@ -337,7 +349,7 @@ open class PreviewerTransformState(
         // 关闭loading的显示
         viewerContainerState?.allowLoading = false
         // 查询item是否存在
-        val itemState = findTransformItem(key)
+        val itemState = fondTransformItemByIndex(currentPage)
         // 如果存在，就transform退出，否则就普通退出
         if (itemState != null && canNowTransformOut) {
             // 如果viewer在显示的状态，退出时将viewer的pose复制给content
@@ -358,13 +370,13 @@ open class PreviewerTransformState(
             listOf(
                 scope.async {
                     // transform动画退出
-                    transformState?.exitTransform(animationSpec = currentAnimationSpec)
+                    transformState?.exitTransform(animationSpec)
                     // 退出结束后隐藏content
                     viewerContainerState?.transformContentAlpha?.snapTo(0F)
                 },
                 scope.async {
                     // 动画隐藏UI
-                    uiAlpha.animateTo(0F, animationSpec = currentAnimationSpec)
+                    uiAlpha.animateTo(0F, animationSpec)
                 }
             ).awaitAll()
             // 等待下一帧

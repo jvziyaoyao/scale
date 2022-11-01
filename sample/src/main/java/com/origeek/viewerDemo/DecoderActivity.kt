@@ -50,7 +50,7 @@ fun NetBody() {
         val key = "2887"
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
-        val previewerState = rememberPreviewerState()
+        val previewerState = rememberPreviewerState(verticalDragEnable = true) { key }
         val itemState = rememberTransformItemState()
         val inputStream = remember { context.assets.open("a350.jpg") }
         val painter = painterResource(R.drawable.a350_temp)
@@ -62,13 +62,12 @@ fun NetBody() {
         if (previewerState.canClose || previewerState.animating) BackHandler {
             if (previewerState.canClose) scope.launch {
                 if (transformEnable) {
-                    previewerState.closeTransform(key)
+                    previewerState.closeTransform()
                 } else {
                     previewerState.close()
                 }
             }
         }
-        previewerState.enableVerticalDrag { key }
         Column(
             modifier = Modifier
                 .fillMaxSize(),
