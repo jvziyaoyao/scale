@@ -92,6 +92,7 @@ class ImageViewerState(
 
     // 默认显示大小
     var defaultSize by mutableStateOf(IntSize(0, 0))
+        internal set
 
     // 容器大小
     internal var containerSize by mutableStateOf(IntSize(0, 0))
@@ -132,23 +133,22 @@ class ImageViewerState(
     /**
      * 设置回初始值
      */
-    suspend fun reset(animationSpec: AnimationSpec<Float>? = null) {
-        val currentAnimateSpec = animationSpec ?: defaultAnimateSpec
+    suspend fun reset(animationSpec: AnimationSpec<Float> = defaultAnimateSpec) {
         coroutineScope {
             launch {
-                rotation.animateTo(DEFAULT_ROTATION, currentAnimateSpec)
+                rotation.animateTo(DEFAULT_ROTATION, animationSpec)
                 resetTimeStamp = System.currentTimeMillis()
             }
             launch {
-                offsetX.animateTo(DEFAULT_OFFSET_X, currentAnimateSpec)
+                offsetX.animateTo(DEFAULT_OFFSET_X, animationSpec)
                 resetTimeStamp = System.currentTimeMillis()
             }
             launch {
-                offsetY.animateTo(DEFAULT_OFFSET_Y, currentAnimateSpec)
+                offsetY.animateTo(DEFAULT_OFFSET_Y, animationSpec)
                 resetTimeStamp = System.currentTimeMillis()
             }
             launch {
-                scale.animateTo(DEFAULT_SCALE, currentAnimateSpec)
+                scale.animateTo(DEFAULT_SCALE, animationSpec)
                 resetTimeStamp = System.currentTimeMillis()
             }
         }
@@ -189,7 +189,7 @@ class ImageViewerState(
      */
     suspend fun toggleScale(
         offset: Offset,
-        animationSpec: AnimationSpec<Float>? = null
+        animationSpec: AnimationSpec<Float> = defaultAnimateSpec
     ) {
         // 如果不等于1，就调回1
         if (scale.value != 1F) {
@@ -296,7 +296,7 @@ class ComposeModel(
 }
 
 /**
- * model支持Painter、ImageBitmap、ImageVector、BitmapRegionDecoder、ComposeModel
+ * model支持Painter、ImageBitmap、ImageVector、ImageDecoder、ComposeModel
  */
 @Composable
 fun ImageViewer(

@@ -232,11 +232,9 @@ fun TransformBody() {
 @Composable
 fun ImageViewer(
     modifier: Modifier = Modifier,
-    model: Any,
+    model: Any?,
     state: ImageViewerState = rememberViewerState(),
-    onTap: (Offset) -> Unit = {},
-    onDoubleTap: (Offset) -> Unit = {},
-    onLongPress: (Offset) -> Unit = {},
+    detectGesture: ViewerGestureScope.() -> Unit = {},
     boundClip: Boolean = true,
     debugMode: Boolean = false,
 ) { ... }
@@ -246,11 +244,9 @@ fun ImageViewer(
 | 名称 | 描述 | 默认值 |
 | --- | --- | :---: |
 | `modifier` | Composable修改参数 | `Modifier` |
-| `model` | 传入图片数据，支持 `Painter`、`ImageBitmap`、`ImageVector`、`BitmapRegionDecoder` | `无` |
+| `model` | 传入图片数据，仅支持 `Painter`、`ImageBitmap`、`ImageVector`、`ImageDecoder`、`ComposeModel` | `无` |
 | `state` | 组件状态对象，可通过其获取图片的位置信息等 | `ImageViewerState` |
-| `onTap` | 图片的单击事件，传入参数为点击的坐标 | `{}` |
-| `onDoubleTap` | 图片的双击事件，传入参数为点击的坐标 | `{}` |
-| `onLongPress` | 图片的长按事件，传入参数为点击的坐标 | `{}` |
+| `detectGesture` | 监听手势事件 | `{}` |
 | `boundClip` | 图片超出容器部分是否需要裁剪 | `true` |
 | `debugMode` | 调试模式，调试模式会显示手指操作的中心坐标 | `false` |
 
@@ -273,12 +269,17 @@ state.reset()
 | `offsetY` | 图片Y轴偏移量 | `0` |
 | `scale` | 图片放大倍率 | `1` |
 | `rotation` | 图片转角度 | `0` |
+| `defaultSize` | 默认显示大小 | `IntSize(0, 0)` |
+| `allowGestureInput` | 是否允许手势输入 | `true` |
+| `defaultAnimateSpec` | 默认动画窗格 | `true` |
+| `crossfadeAnimationSpec` | 挂载成功后显示时的动画窗格 | `true` |
 
 🛠 方法
 
 | 名称 | 参数 | 描述 |
 | --- | --- | --- |
-| `reset` | 无 | 图片位置、放大倍率、旋转角度设置回初始值 |
+| `resetImmediately` | 无 | 图片位置、缩放率、角度立刻变换回初始值 |
+| `reset` | (AnimationSpec\<Float>) | 图片位置、缩放率、角度动画变换回初始值 |
 | `scaleToMax` | (offset: Offset) | 图片按中心点放大到最大 |
 | `toggleScale` | (offset: Offset) | 图片在显示区域内最大和最小之间切换 |
 | `fixToBound` | 无 | 图片如超出显示范围则回到显示范围内 |
@@ -289,15 +290,11 @@ state.reset()
 fun ImageGallery(
     modifier: Modifier = Modifier,
     count: Int,
-    state: PagerState = rememberPagerState(),
-    imageLoader: @Composable (Int) -> Any,
+    state: ImageGalleryState = rememberImageGalleryState(),
+    imageLoader: @Composable (Int) -> Any?,
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
-    currentViewerState: (ImageViewerState) -> Unit = {},
-    onTap: () -> Unit = {},
-    onDoubleTap: () -> Boolean = { false },
-    onLongPress: () -> Unit = {},
-    background: @Composable ((Int) -> Unit) = {},
-    foreground: @Composable ((Int) -> Unit) = {},
+    detectGesture: GalleryGestureScope.() -> Unit = {},
+    galleryLayer: GalleryLayerScope.() -> Unit = {},
 ) { ... }
 ```
 
@@ -307,35 +304,53 @@ fun ImageGallery(
 | --- | --- | :---: |
 | `modifier` | Composable修改参数 | `Modifier` |
 | `count` | 传入图片数组的长度 | `无` |
-| `state` | Pager状态 | `无` |
-| `imageLoader` | 图片加载器，入参为当前页码，用户返回 `Painter`、`ImageBitmap`、`ImageVector` 或 `BitmapRegionDecoder` | `无` |
-| `itemSpacing` | 相邻两个图片之间的间隔 | `12.dp` |
-| `currentViewerState` | 该方法允许用户获取当前预览图片的`ImageViewerState` | `{}` |
-| `onTap` | 当前图片的单击事件 | `{}` |
-| `onDoubleTap` | 当前图片的双击事件 | `{ false }` |
-| `onLongPress` | 当前图片的长按事件 | `{}` |
-| `background` | 设置图片浏览器的背景，入参为当前页码 | `{}` |
-| `foreground` | 设置图片浏览器的前景，入参为当前页码 | `{}` |
+| `state` | Gallery状态 | `ImageGalleryState` |
+| `imageLoader` | 图片加载器，入参为页码，须返回ImageViewer可接受的model | `无` |
+| `itemSpacing` | 图片间的间隔 | `12.dp` |
+| `detectGesture` | 监听手势事件 | `{}` |
+| `galleryLayer` | 支持自定义viewer的前景、背景、viewer容器图层 | `{}` |
+
+## `ImageGalleryState`
+```kotlin
+val state = rememberImageGalleryState()
+// 在gallery中使用
+ImageGallery(
+  state = state,
+  ...
+)
+// 滚动到第0页
+state.animateScrollToPage(0)
+```
+💾 属性
+
+| 名称 | 描述 | 默认值 |
+| --- | --- | :---: |
+| `imageViewerState` | 当前页码中ImageViewer的状态 | `null` |
+| `currentPage` | 当前页码 | `0` |
+| `targetPage` | 目标页码 | `0` |
+| `pageCount` | 总页数 | `0` |
+| `currentPageOffset` | 当前页面的偏移量 | `0F` |
+
+🛠 方法
+
+| 名称 | 参数 | 描述 |
+| --- | --- | --- |
+| `scrollToPage` | (page: Int, pageOffset: Float) | 滚动到指定页面 |
+| `animateScrollToPage` | (page: Int, pageOffset: Float) | 动画滚动到指定页面 |
 
 ## `ImagePreviewer`
 ```kotlin
 @Composable
 fun ImagePreviewer(
     modifier: Modifier = Modifier,
-    state: ImagePreviewerState = rememberPreviewerState(),
     count: Int,
-    imageLoader: @Composable (index: Int) -> Any,
-    background: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> DefaultPreviewerBackground() },
-    foreground: @Composable ((size: Int, page: Int) -> Unit) = { _, _ -> },
-    currentViewerState: (ImageViewerState) -> Unit = {},
-    onTap: () -> Unit = {},
-    onDoubleTap: () -> Boolean = { false },
-    onLongPress: () -> Unit = {},
-    backHandlerEnable: Boolean = true,
-    enter: EnterTransition = scaleIn(animationSpec = spring(stiffness = Spring.StiffnessMedium))
-            + fadeIn(animationSpec = spring(stiffness = 4000f)),
-    exit: ExitTransition = fadeOut(animationSpec = spring(stiffness = 2000f))
-            + scaleOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)),
+    state: ImagePreviewerState = rememberPreviewerState(),
+    imageLoader: @Composable (Int) -> Any?,
+    itemSpacing: Dp = DEFAULT_ITEM_SPACE,
+    enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
+    exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,
+    detectGesture: GalleryGestureScope.() -> Unit = {},
+    previewerLayer: PreviewerLayerScope.() -> Unit = {},
 ) { ... }
 ```
 
@@ -344,18 +359,14 @@ fun ImagePreviewer(
 | 名称 | 描述 | 默认值 |
 | --- | --- | :---: |
 | `modifier` | Composable修改参数 | `Modifier` |
-| `state` | 当前组件显示和图片浏览的状态 | `ImagePreviewerState` |
 | `count` | 传入图片数组的长度 | `无` |
-| `imageLoader` | 图片加载器，入参为当前页码，用户返回 `Painter`、`ImageBitmap`、`ImageVector` 或 `BitmapRegionDecoder` | `无` |
-| `background` | 图片浏览器的背景，入参为当前总页数和页码 | `Default` |
-| `foreground` | 图片浏览器的前景，入参为当前总页数和页码 | `{ _, _ -> }` |
-| `currentViewerState` | 该方法允许用户获取当前预览图片的`ImageViewerState` | `{}` |
-| `onTap` | 当前图片的单击事件 | `{}` |
-| `onDoubleTap` | 当前图片的双击事件 | `{ false }` |
-| `onLongPress` | 当前图片的长按事件 | `{}` |
-| `backHandlerEnable` | 传入true，按下返回键时会隐藏组件 | `true` |
+| `state` | 当前组件显示和图片浏览的状态 | `ImagePreviewerState` |
+| `imageLoader` | 图片加载器，入参为页码，须返回ImageViewer可接受的model | `无` |
+| `itemSpacing` | 图片间的间隔 | `12.dp` |
 | `enter` | 组件的弹出动画 | `Default` |
 | `exit` | 组件的隐藏动画 | `Default` |
+| `detectGesture` | 监听手势事件 | `{}` |
+| `previewerLayer` | 支持自定义viewer的前景、背景、viewer容器图层 | `{}` |
 
 ## `ImagePreviewerState`
 ```kotlin
@@ -372,16 +383,35 @@ imageViewerState.hide()
 
 | 名称 | 描述 | 默认值 |
 | --- | --- | :---: |
-| `index` | 当前页码 | `0` |
-| `show` | 组件标识显示 | `false` |
+| `galleryState` | ImageGallery组件状态 | `ImageGalleryState` |
+| `imageViewerState` | 当前页面的ImageViewer的状态对象 | `null` |
+| `currentPage` | 当前页码 | `0` |
+| `targetPage` | 目标页码 | `0` |
+| `pageCount` | 总页数 | `0` |
+| `currentPageOffset` | 当前页面的偏移量 | `0F` |
+| `animating` | 是否正在进行动画 | `false` |
+| `visible` | 是否可见 | `false` |
+| `visibleTarget` | 是否可见的目标值 | `null` |
+| `canOpen` | 是否允许执行open操作 | `false` |
+| `canClose` | 是否允许执行close操作 | `false` |
+| `getKey` | 取当前页码所属的key的方法 | `null` |
+| `enableVerticalDrag` | 是否开启垂直手势 | `false` |
+| `scaleToCloseMinValue` | 下拉手势结束的时，判断是否关闭的阈值 | `0.8F` |
 
 🛠 方法
 
 | 名称 | 参数 | 描述 |
 | --- | --- | --- |
-| `show` | (index: Int = 0) | 显示图片预览组件，参数设置当前页码 |
-| `scrollTo` | (index: Int) | 滚动到目标页码 |
-| `hide` | 无 | 隐藏组件 |
+| `scrollToPage` | (page: Int, pageOffset: Float) | 滚动到指定页面 |
+| `animateScrollToPage` | (page: Int, pageOffset: Float) | 动画滚动到指定页面 |
+| `findTransformItem` | (key: Any) | 查找key关联的transformItem |
+| `clearTransformItems` | 无 | 清除全部已缓存的transformItems |
+| `fondTransformItemByIndex` | (index: Int) | 根据页码查询key |
+| `open` | (Int, TransformItemState, EnterTransition) | 开启图片预览 |
+| `close` | (ExitTransition) | 关闭图片预览 |
+| `openTransform` | (Int, TransformItemState, AnimationSpec\<Float>) | 开启图片预览，带转换效果 |
+| `closeTransform` | (AnimationSpec\<Float>) | 开启图片预览，带转换效果 |
+
 
 🕵️‍♀️ 开源许可
 --------
