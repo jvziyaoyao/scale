@@ -13,6 +13,7 @@
 - 符合直觉的手势动效；
 - 支持超大图片显示；
 - 提供图片列表浏览组件；
+- 支持图片弹出预览时的过渡动画；
 
 🧐 预览
 --------
@@ -265,10 +266,10 @@ state.reset()
 
 | 名称 | 描述 | 默认值 |
 | --- | --- | :---: |
-| `offsetX` | 图片X轴偏移量 | `0` |
-| `offsetY` | 图片Y轴偏移量 | `0` |
-| `scale` | 图片放大倍率 | `1` |
-| `rotation` | 图片转角度 | `0` |
+| `offsetX` | 图片X轴偏移量 | `0F` |
+| `offsetY` | 图片Y轴偏移量 | `0F` |
+| `scale` | 图片放大倍率 | `1F` |
+| `rotation` | 图片转角度 | `0F` |
 | `defaultSize` | 默认显示大小 | `IntSize(0, 0)` |
 | `allowGestureInput` | 是否允许手势输入 | `true` |
 | `defaultAnimateSpec` | 默认动画窗格 | `true` |
@@ -394,8 +395,8 @@ imageViewerState.hide()
 | `visibleTarget` | 是否可见的目标值 | `null` |
 | `canOpen` | 是否允许执行open操作 | `false` |
 | `canClose` | 是否允许执行close操作 | `false` |
-| `getKey` | 取当前页码所属的key的方法 | `null` |
-| `enableVerticalDrag` | 是否开启垂直手势 | `false` |
+| `getKey` | 用户提供的获取当前页码所属的key的方法 | `null` |
+| `enableVerticalDrag` | 是否开启垂直下拉手势 | `false` |
 | `scaleToCloseMinValue` | 下拉手势结束的时，判断是否关闭的阈值 | `0.8F` |
 
 🛠 方法
@@ -405,12 +406,12 @@ imageViewerState.hide()
 | `scrollToPage` | (page: Int, pageOffset: Float) | 滚动到指定页面 |
 | `animateScrollToPage` | (page: Int, pageOffset: Float) | 动画滚动到指定页面 |
 | `findTransformItem` | (key: Any) | 查找key关联的transformItem |
+| `findTransformItemByIndex` | (index: Int) | 根据页码查询关联的transformItem |
 | `clearTransformItems` | 无 | 清除全部已缓存的transformItems |
-| `fondTransformItemByIndex` | (index: Int) | 根据页码查询key |
 | `open` | (Int, TransformItemState, EnterTransition) | 开启图片预览 |
 | `close` | (ExitTransition) | 关闭图片预览 |
 | `openTransform` | (Int, TransformItemState, AnimationSpec\<Float>) | 开启图片预览，带转换效果 |
-| `closeTransform` | (AnimationSpec\<Float>) | 开启图片预览，带转换效果 |
+| `closeTransform` | (AnimationSpec\<Float>) | 关闭图片预览，带转换效果 |
 
 
 🕵️‍♀️ 开源许可

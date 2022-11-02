@@ -178,14 +178,14 @@ open class PreviewerTransformState(
     // 查找key关联的transformItem
     fun findTransformItem(key: Any) = transformItemStateMap[key]
 
-    // 清除全部transformItems
-    fun clearTransformItems() = transformItemStateMap.clear()
-
     // 根据index查询key
-    fun fondTransformItemByIndex(index: Int): TransformItemState? {
+    fun findTransformItemByIndex(index: Int): TransformItemState? {
         val key = getKey?.invoke(index) ?: return null
         return findTransformItem(key)
     }
+
+    // 清除全部transformItems
+    fun clearTransformItems() = transformItemStateMap.clear()
 
     /**
      * 打开previewer
@@ -286,7 +286,7 @@ open class PreviewerTransformState(
      */
     suspend fun openTransform(
         index: Int,
-        itemState: TransformItemState? = fondTransformItemByIndex(index),
+        itemState: TransformItemState? = findTransformItemByIndex(index),
         animationSpec: AnimationSpec<Float> = defaultAnimationSpec
     ) {
         // 如果itemState为空，改用open的方式打开
@@ -349,7 +349,7 @@ open class PreviewerTransformState(
         // 关闭loading的显示
         viewerContainerState?.allowLoading = false
         // 查询item是否存在
-        val itemState = fondTransformItemByIndex(currentPage)
+        val itemState = findTransformItemByIndex(currentPage)
         // 如果存在，就transform退出，否则就普通退出
         if (itemState != null && canNowTransformOut) {
             // 如果viewer在显示的状态，退出时将viewer的pose复制给content
