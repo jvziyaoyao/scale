@@ -222,9 +222,6 @@ internal class ViewerContainerState(
 
 /**
  * 记录Viewer容器的状态
- * @param scope CoroutineScope
- * @param viewerState ImageViewerState
- * @param animationSpec AnimationSpec<Float>
  * @return ViewerContainerState
  */
 @Composable
@@ -250,10 +247,6 @@ internal fun rememberViewerContainerState(
 
 /**
  * Viewer容器
- * @param modifier Modifier
- * @param containerState ViewerContainerState
- * @param placeholder PreviewerPlaceholder
- * @param viewer [@androidx.compose.runtime.Composable] Function0<Unit>
  */
 @Composable
 internal fun ImageViewerContainer(

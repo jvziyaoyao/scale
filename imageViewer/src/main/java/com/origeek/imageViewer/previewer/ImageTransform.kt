@@ -43,7 +43,9 @@ import kotlin.coroutines.suspendCoroutine
  * @create: 2022-09-22 10:13
  **/
 
+// 用于操作transformItemStateMap的锁对象
 internal val imageTransformMutex = Mutex()
+// 用于缓存界面上的transformItemState
 internal val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>()
 
 @Composable

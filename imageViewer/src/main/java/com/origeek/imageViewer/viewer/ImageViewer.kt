@@ -34,23 +34,38 @@ import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 
+// 默认X轴偏移量
 const val DEFAULT_OFFSET_X = 0F
+// 默认Y轴偏移量
 const val DEFAULT_OFFSET_Y = 0F
+// 默认缩放率
 const val DEFAULT_SCALE = 1F
+// 默认旋转角度
 const val DEFAULT_ROTATION = 0F
 
+// 图片最小缩放率
 const val MIN_SCALE = 0.5F
+// 图片最大缩放率
 const val MAX_SCALE_RATE = 3.2F
 
 // 最小手指手势间距
 const val MIN_GESTURE_FINGER_DISTANCE = 200
 
+/**
+ * viewer状态对象，用于记录compose组件状态
+ */
 class ImageViewerState(
+    // X轴偏移量
     offsetX: Float = DEFAULT_OFFSET_X,
+    // Y轴偏移量
     offsetY: Float = DEFAULT_OFFSET_Y,
+    // 缩放率
     scale: Float = DEFAULT_SCALE,
+    // 旋转角度
     rotation: Float = DEFAULT_ROTATION,
+    // 动画窗格
     animationSpec: AnimationSpec<Float>? = null,
+    // 淡入淡出效果
     crossfadeAnimationSpec: AnimationSpec<Float>? = null,
 ) : CoroutineScope by MainScope() {
 
@@ -184,6 +199,9 @@ class ImageViewerState(
         }
     }
 
+    /**
+     * 修正offsetX,offsetY的位置
+     */
     suspend fun fixToBound() {
         val boundX =
             getBound(defaultSize.width.toFloat() * scale.value, containerSize.width.toFloat())
@@ -211,24 +229,45 @@ class ImageViewerState(
     }
 }
 
+/**
+ * 记录viewer状态
+ * @return ImageViewerState 返回一个状态实例
+ */
 @Composable
 fun rememberViewerState(
+    // X轴偏移量
     offsetX: Float = DEFAULT_OFFSET_X,
+    // Y轴偏移量
     offsetY: Float = DEFAULT_OFFSET_Y,
+    // 缩放率
     scale: Float = DEFAULT_SCALE,
+    // 旋转
     rotation: Float = DEFAULT_ROTATION,
+    // 动画窗格
     animationSpec: AnimationSpec<Float>? = null,
+    // 淡入淡出效果
     crossfadeAnimationSpec: AnimationSpec<Float>? = null,
 ): ImageViewerState = rememberSaveable(saver = ImageViewerState.SAVER) {
     ImageViewerState(offsetX, offsetY, scale, rotation, animationSpec, crossfadeAnimationSpec)
 }
 
+/**
+ * viewer手势对象
+ */
 class ViewerGestureScope(
+    // 点击事件
     var onTap: (Offset) -> Unit = {},
+    // 双击事件
     var onDoubleTap: (Offset) -> Unit = {},
+    // 长按事件
     var onLongPress: (Offset) -> Unit = {},
 )
 
+/**
+ * viewer传入的Compose数据类型参数
+ * @property content [@androidx.compose.runtime.Composable] [@kotlin.ExtensionFunctionType] Function1<ComposeModelScope, Unit>
+ * @constructor
+ */
 class ComposeModel(
     private val content: @Composable ComposeModelScope.() -> Unit = {}
 ) {
@@ -257,15 +296,21 @@ class ComposeModel(
 }
 
 /**
- * model支持Painter、ImageBitmap、ImageVector、BitmapRegionDecoder, ComposeModel
+ * model支持Painter、ImageBitmap、ImageVector、BitmapRegionDecoder、ComposeModel
  */
 @Composable
 fun ImageViewer(
+    // 修改参数
     modifier: Modifier = Modifier,
+    // 图片数据
     model: Any?,
+    // viewer状态
     state: ImageViewerState = rememberViewerState(),
+    // 检测手势
     detectGesture: ViewerGestureScope.() -> Unit = {},
+    // 超出容器是否显示
     boundClip: Boolean = true,
+    // 调试模式
     debugMode: Boolean = false,
 ) {
     val viewerGestureScope = remember { ViewerGestureScope() }

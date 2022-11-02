@@ -27,49 +27,96 @@ import kotlinx.coroutines.launch
  * @create: 2022-10-10 11:50
  **/
 
+/**
+ * gallery手势对象
+ */
 class GalleryGestureScope(
+    // 点击事件
     var onTap: () -> Unit = {},
+    // 双击事件
     var onDoubleTap: () -> Boolean = { false },
+    // 长按事件
     var onLongPress: () -> Unit = {},
 )
 
+/**
+ * gallery图层对象
+ */
 class GalleryLayerScope(
+    // viewer图层
     var viewerContainer: @Composable (
         page: Int, viewerState: ImageViewerState, viewer: @Composable () -> Unit
     ) -> Unit = { _, _, viewer -> viewer() },
+    // 背景图层
     var background: @Composable ((Int) -> Unit) = {},
+    // 前景图层
     var foreground: @Composable ((Int) -> Unit) = {},
 )
 
+/**
+ * gallery状态
+ */
 open class ImageGalleryState(
+    // 初始化的当前页码
     @IntRange(from = 0) currentPage: Int = 0,
 ) {
 
+    /**
+     * 记录pager状态
+     */
     internal var pagerState: ImagePagerState = ImagePagerState(currentPage)
 
+    /**
+     * 当前viewer的状态
+     */
     var imageViewerState by mutableStateOf<ImageViewerState?>(null)
         internal set
 
+    /**
+     * 当前页码
+     */
     val currentPage: Int
         get() = pagerState.currentPage
 
+    /**
+     * 目标页码
+     */
     val targetPage: Int
         get() = pagerState.targetPage
 
+    /**
+     * 总页数
+     */
     val pageCount: Int
         get() = pagerState.pageCount
 
+    /**
+     * 当前页面的偏移量
+     */
     val currentPageOffset: Float
         get() = pagerState.currentPageOffset
 
+    /**
+     * interactionSource
+     */
     val interactionSource: InteractionSource
         get() = pagerState.interactionSource
 
+    /**
+     * 滚动到指定页面
+     * @param page Int
+     * @param pageOffset Float
+     */
     suspend fun scrollToPage(
         @IntRange(from = 0) page: Int,
         @FloatRange(from = 0.0, to = 1.0) pageOffset: Float = 0f,
     ) = pagerState.scrollToPage(page, pageOffset)
 
+    /**
+     * 动画滚动到指定页面
+     * @param page Int
+     * @param pageOffset Float
+     */
     suspend fun animateScrollToPage(
         @IntRange(from = 0) page: Int,
         @FloatRange(from = 0.0, to = 1.0) pageOffset: Float = 0f,
@@ -92,6 +139,9 @@ open class ImageGalleryState(
 
 }
 
+/**
+ * 记录gallery状态
+ */
 @Composable
 fun rememberImageGalleryState(
     @IntRange(from = 0) currentPage: Int = 0,
@@ -99,14 +149,24 @@ fun rememberImageGalleryState(
     return rememberSaveable(saver = ImageGalleryState.Saver) { ImageGalleryState(currentPage) }
 }
 
+/**
+ * 图片gallery,基于Pager实现的一个图片查看列表组件
+ */
 @Composable
 fun ImageGallery(
+    // 编辑参数
     modifier: Modifier = Modifier,
+    // 总页数
     count: Int,
+    // gallery状态
     state: ImageGalleryState = rememberImageGalleryState(),
+    // 图片加载器
     imageLoader: @Composable (Int) -> Any?,
+    // 每张图片之间的间隔
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
+    // 检测手势
     detectGesture: GalleryGestureScope.() -> Unit = {},
+    // gallery图层
     galleryLayer: GalleryLayerScope.() -> Unit = {},
 ) {
     require(count >= 0) { "imageCount must be >= 0" }
