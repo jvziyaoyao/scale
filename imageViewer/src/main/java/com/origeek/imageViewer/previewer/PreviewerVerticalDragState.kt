@@ -31,7 +31,11 @@ open class PreviewerVerticalDragState(
     // 协程作用域
     scope: CoroutineScope = MainScope(),
     // 默认动画窗格
-    defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
+    defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
+    // 是否默认开启垂直手势
+    enableVerticalDrag: Boolean = false,
+    // 下拉关闭的缩小的阈值
+    scaleToCloseMinValue: Float = DEFAULT_SCALE_TO_CLOSE_MIN_VALUE,
 ) : PreviewerTransformState(scope, defaultAnimationSpec) {
 
     /**
@@ -99,7 +103,7 @@ open class PreviewerVerticalDragState(
             // 标记是否为下拉关闭
             var vOrientationDown by mutableStateOf<Boolean?>(null)
             // 如果getKay不为空才开始检测手势
-            if (verticalDragEnable) detectVerticalDragGestures(
+            if (enableVerticalDrag) detectVerticalDragGestures(
                 onDragStart = OnDragStart@{
                     // 如果imageViewerState不存在，无法进行下拉手势
                     if (imageViewerState == null) return@OnDragStart
@@ -193,11 +197,11 @@ open class PreviewerVerticalDragState(
     /**
      * 是否开启下拉关闭
      */
-    var verticalDragEnable by mutableStateOf(false)
+    var enableVerticalDrag by mutableStateOf(enableVerticalDrag)
 
     /**
      * 下拉关闭的缩放的阈值，当scale小于这个值，就关闭，否则还原
      */
-    var scaleToCloseMinValue by mutableStateOf(DEFAULT_SCALE_TO_CLOSE_MIN_VALUE)
+    var scaleToCloseMinValue by mutableStateOf(scaleToCloseMinValue)
 
 }

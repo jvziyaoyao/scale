@@ -22,6 +22,7 @@ open class PreviewerPagerState(
      * pagerState
      */
     var galleryState: ImageGalleryState = ImageGalleryState(currentPage)
+        internal set
 
     /**
      * 当前页码

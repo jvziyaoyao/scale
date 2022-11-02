@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.takeWhile
  * @create: 2022-10-17 14:45
  **/
 
-class ViewerContainerState(
+internal class ViewerContainerState(
     // 协程作用域
     var scope: CoroutineScope = MainScope(),
     // 转换图层的状态
@@ -156,31 +156,41 @@ class ViewerContainerState(
         }
     }
 
+    // 容器大小
     var containerSize: IntSize by mutableStateOf(IntSize.Zero)
 
+    // 容器的偏移量X
     var offsetX = Animatable(0F)
 
+    // 容器的偏移量Y
     var offsetY = Animatable(0F)
 
+    // 容器缩放
     var scale = Animatable(1F)
 
-    suspend fun reset(animationSpec: AnimationSpec<Float>? = null) {
-        val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
+    /**
+     * 重置回原来的状态
+     * @param animationSpec AnimationSpec<Float>
+     */
+    suspend fun reset(animationSpec: AnimationSpec<Float> = defaultAnimationSpec) {
         scope.apply {
             listOf(
                 async {
-                    offsetX.animateTo(0F, currentAnimationSpec)
+                    offsetX.animateTo(0F, animationSpec)
                 },
                 async {
-                    offsetY.animateTo(0F, currentAnimationSpec)
+                    offsetY.animateTo(0F, animationSpec)
                 },
                 async {
-                    scale.animateTo(1F, currentAnimationSpec)
+                    scale.animateTo(1F, animationSpec)
                 },
             ).awaitAll()
         }
     }
 
+    /**
+     * 立刻重置
+     */
     suspend fun resetImmediately() {
         offsetX.snapTo(0F)
         offsetY.snapTo(0F)
@@ -210,13 +220,24 @@ class ViewerContainerState(
     }
 }
 
+/**
+ * 记录Viewer容器的状态
+ * @param scope CoroutineScope
+ * @param viewerState ImageViewerState
+ * @param animationSpec AnimationSpec<Float>
+ * @return ViewerContainerState
+ */
 @Composable
-fun rememberViewerContainerState(
+internal fun rememberViewerContainerState(
+    // 协程作用域
     scope: CoroutineScope = rememberCoroutineScope(),
+    // viewer状态
     viewerState: ImageViewerState = rememberViewerState(),
+    // 转换content的state
+    transformContentState: TransformContentState = rememberTransformContentState(),
+    // 动画窗格
     animationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
 ): ViewerContainerState {
-    val transformContentState = rememberTransformContentState()
     val viewerContainerState = rememberSaveable(saver = ViewerContainerState.Saver) {
         ViewerContainerState()
     }
@@ -227,11 +248,22 @@ fun rememberViewerContainerState(
     return viewerContainerState
 }
 
+/**
+ * Viewer容器
+ * @param modifier Modifier
+ * @param containerState ViewerContainerState
+ * @param placeholder PreviewerPlaceholder
+ * @param viewer [@androidx.compose.runtime.Composable] Function0<Unit>
+ */
 @Composable
 internal fun ImageViewerContainer(
+    // 修改对象
     modifier: Modifier = Modifier,
+    // 容器状态
     containerState: ViewerContainerState,
+    // 未加载成功时的占位
     placeholder: PreviewerPlaceholder = PreviewerPlaceholder(),
+    // viewer主体
     viewer: @Composable () -> Unit,
 ) {
     containerState.apply {
@@ -248,6 +280,7 @@ internal fun ImageViewerContainer(
                     translationY = offsetY.value
                 }
         ) {
+            // 支持转换效果的图层
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -255,6 +288,7 @@ internal fun ImageViewerContainer(
             ) {
                 TransformContentView(transformState)
             }
+            // viewer图层
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -262,6 +296,7 @@ internal fun ImageViewerContainer(
             ) {
                 viewer()
             }
+            // 判断viewer是否加载成功
             val viewerMounted by imageViewerState.mountedFlow.collectAsState(
                 initial = false
             )

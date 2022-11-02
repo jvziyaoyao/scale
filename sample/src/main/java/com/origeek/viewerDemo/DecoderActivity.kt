@@ -50,7 +50,7 @@ fun NetBody() {
         val key = "2887"
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
-        val previewerState = rememberPreviewerState(verticalDragEnable = true) { key }
+        val previewerState = rememberPreviewerState(enableVerticalDrag = true) { key }
         val itemState = rememberTransformItemState()
         val inputStream = remember { context.assets.open("a350.jpg") }
         val painter = painterResource(R.drawable.a350_temp)

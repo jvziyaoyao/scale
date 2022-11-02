@@ -1,6 +1,5 @@
 package com.origeek.imageViewer.previewer
 
-import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
@@ -149,6 +148,7 @@ open class PreviewerTransformState(
 
     // 是否正在进行动画
     var animating by mutableStateOf(false)
+        internal set
 
     // 是否可见
     var visible by mutableStateOf(false)

@@ -46,9 +46,9 @@ fun EasyBody() {
     ).entries.toList()
     // 协程作用域
     val scope = rememberCoroutineScope()
-    // verticalDragEnable 开启垂直方向的拖拽手势
+    // enableVerticalDrag 开启垂直方向的拖拽手势
     // getKey 指定getKey方法，否则转换效果不会生效
-    val previewerState = rememberPreviewerState(verticalDragEnable = true) { index ->
+    val previewerState = rememberPreviewerState(enableVerticalDrag = true) { index ->
         images[index].key
     }
     Row(

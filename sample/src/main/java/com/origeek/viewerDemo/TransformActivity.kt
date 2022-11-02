@@ -85,7 +85,7 @@ fun TransformBody(
     val scope = rememberCoroutineScope()
     val previewerState = rememberPreviewerState(
         animationSpec = tween(settingState.animationDuration),
-        verticalDragEnable = settingState.verticalDrag,
+        enableVerticalDrag = settingState.verticalDrag,
     ) {
         images[it].id
     }

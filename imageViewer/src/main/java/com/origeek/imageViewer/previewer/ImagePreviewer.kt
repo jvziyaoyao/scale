@@ -77,17 +77,17 @@ class ImagePreviewerState(
 @Composable
 fun rememberPreviewerState(
     scope: CoroutineScope = rememberCoroutineScope(),
-    verticalDragEnable: Boolean = false,
     animationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
+    enableVerticalDrag: Boolean = false,
     getKey: ((Int) -> Any)? = null,
 ): ImagePreviewerState {
     val imagePreviewerState = rememberSaveable(saver = ImagePreviewerState.Saver) {
         ImagePreviewerState()
     }
     imagePreviewerState.scope = scope
-    imagePreviewerState.defaultAnimationSpec = animationSpec
     imagePreviewerState.getKey = getKey
-    imagePreviewerState.verticalDragEnable = verticalDragEnable
+    imagePreviewerState.defaultAnimationSpec = animationSpec
+    imagePreviewerState.enableVerticalDrag = enableVerticalDrag
     return imagePreviewerState
 }
 
