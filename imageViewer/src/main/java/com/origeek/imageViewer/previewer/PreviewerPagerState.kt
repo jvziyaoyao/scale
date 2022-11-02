@@ -3,7 +3,6 @@ package com.origeek.imageViewer.previewer
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import com.origeek.imageViewer.gallery.ImageGalleryState
-import com.origeek.imageViewer.gallery.ImagePagerState
 
 /**
  * @program: ImageViewer

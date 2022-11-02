@@ -195,7 +195,7 @@ open class PreviewerTransformState(
      */
     suspend fun open(
         index: Int = 0,
-        itemState: TransformItemState? = fondTransformItemByIndex(index),
+        itemState: TransformItemState? = null,
         enterTransition: EnterTransition? = null
     ) =
         suspendCoroutine<Unit> { c ->
