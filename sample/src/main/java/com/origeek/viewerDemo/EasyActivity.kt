@@ -1,8 +1,6 @@
 package com.origeek.viewerDemo
 
 import android.os.Bundle
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
@@ -12,13 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.origeek.imageViewer.gallery.ImageGallery
 import com.origeek.imageViewer.previewer.ImagePreviewer
-import com.origeek.imageViewer.previewer.PreviewerPlaceholder
 import com.origeek.imageViewer.previewer.TransformImageView
 import com.origeek.imageViewer.previewer.rememberPreviewerState
-import com.origeek.imageViewer.viewer.ImageViewer
-import com.origeek.imageViewer.viewer.ImageViewerState
 import com.origeek.viewerDemo.base.BaseActivity
 import kotlinx.coroutines.launch
 
