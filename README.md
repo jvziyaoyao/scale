@@ -1,11 +1,12 @@
 # ImageViewer
 🖼 ImageViewer for jetpack compose.
 
-中文介绍 | [English](/README_en.md)
-
-一款基于Jekpack Compose开发的图片预览库，支持超大图片的显示
+一款基于Jetpack Compose开发的图片预览库，支持超大图片的显示
 
 [![](https://www.jitpack.io/v/jvziyaoyao/ImageViewer.svg)](https://www.jitpack.io/#jvziyaoyao/ImageViewer)
+
+### 📝 更新日志 👉 [CHANGELOG](/CHANGELOG.md)
+<br/>
 
 👌 特性
 --------
@@ -13,7 +14,7 @@
 - 符合直觉的手势动效；
 - 支持超大图片显示；
 - 提供图片列表浏览组件；
-- 支持图片弹出预览时的过渡动画；
+- 支持图片预览组件弹出时的过渡动画；
 
 🧐 预览
 --------
@@ -112,7 +113,6 @@ fun HugeBody() {
             }
         }
     )
-
 }
 ```
 ### 图片列表浏览
@@ -251,6 +251,18 @@ fun ImageViewer(
 | `boundClip` | 图片超出容器部分是否需要裁剪 | `true` |
 | `debugMode` | 调试模式，调试模式会显示手指操作的中心坐标 | `false` |
 
+```kotlin
+// detectGesture的使用
+ImageViewer(
+    ...
+    detectGesture = {
+        onTap = { /* 点击事件 */ }
+        onDoubleTap = { /* 双击事件 */ }
+        onLongPress = { /* 长按事件 */ }
+    }
+)
+```
+
 ## `ImageViewerState`
 ```kotlin
 val state = rememberViewerState()
@@ -311,6 +323,32 @@ fun ImageGallery(
 | `detectGesture` | 监听手势事件 | `{}` |
 | `galleryLayer` | 支持自定义viewer的前景、背景、viewer容器图层 | `{}` |
 
+```kotlin
+// detectGesture,galleryLayer的使用
+ImageGallery(
+    ...
+    detectGesture = {
+        onTap = { /* 单击事件 */ }
+        onDoubleTap = { 
+          // 双击事件
+          // ImageGallery默认双击时会放大或缩小当前查看的图片
+          // 返回true则不会执行上述操作
+          false 
+        }
+        onLongPress = { /* 长按事件 */ }
+    },
+    galleryLayer = {
+        background = { /** 自定义背景 */ }
+        foreground = { /** 自定义前景 */ }
+        viewerContainer = { page, viewerState, viewer -> 
+          // 在这里你可以自定义一个view来包裹住viewer
+          // 请务必要执行这个方法
+          viewer()
+        }
+    },
+)
+```
+
 ## `ImageGalleryState`
 ```kotlin
 val state = rememberImageGalleryState()
@@ -368,6 +406,38 @@ fun ImagePreviewer(
 | `exit` | 组件的隐藏动画 | `Default` |
 | `detectGesture` | 监听手势事件 | `{}` |
 | `previewerLayer` | 支持自定义viewer的前景、背景、viewer容器图层 | `{}` |
+
+```kotlin
+// detectGesture,previewerLayer的使用
+ImagePreviewer(
+    ...
+    detectGesture = {
+        onTap = { /* 单击事件 */ }
+        onDoubleTap = { 
+          // 双击事件
+          // ImagePreviewer默认双击时会放大或缩小当前查看的图片
+          // 返回true则不会执行上述操作
+          false 
+        }
+        onLongPress = { /* 长按事件 */ }
+    },
+    previewerLayer = {
+        foreground = { /** 自定义前景 */ }
+        background = { /** 自定义背景 */ }
+        viewerContainer = { page, viewerState, viewer ->
+            // 在这里你可以自定义一个view来包裹住viewer
+            // 请务必要执行这个方法
+            viewer()
+        }
+        placeholder = PreviewerPlaceholder(
+            enterTransition = fadeIn(),
+            exitTransition = fadeOut(),
+        ) {
+            /** 自定义placeholder */
+        }
+    }
+)
+```
 
 ## `ImagePreviewerState`
 ```kotlin
