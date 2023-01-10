@@ -1,16 +1,14 @@
 package com.origeek.viewerDemo
 
-import android.graphics.BitmapRegionDecoder
 import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import com.origeek.imageViewer.ImageDecoder
-import com.origeek.imageViewer.ImageViewer
-import com.origeek.imageViewer.rememberViewerState
+import com.origeek.imageViewer.viewer.ImageViewer
+import com.origeek.imageViewer.viewer.rememberViewerState
 import com.origeek.viewerDemo.base.BaseActivity
-import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
+import com.origeek.viewerDemo.ui.component.rememberDecoderImagePainter
 import kotlinx.coroutines.launch
 
 class HugeActivity : BaseActivity() {
@@ -18,9 +16,7 @@ class HugeActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBasicContent {
-            ViewerDemoTheme {
-                HugeBody()
-            }
+            HugeBody()
         }
     }
 
@@ -29,25 +25,20 @@ class HugeActivity : BaseActivity() {
 @Composable
 fun HugeBody() {
     val context = LocalContext.current
-    val imageDecoder = remember {
-        ImageDecoder(
-            BitmapRegionDecoder.newInstance(
-                context.assets.open("a350.jpg"),
-                false
-            )!!
-        )
-    }
+    val inputStream = remember { context.assets.open("a350.jpg") }
+    val imageDecoder = rememberDecoderImagePainter(inputStream = inputStream)
     val scope = rememberCoroutineScope()
     val state = rememberViewerState()
     ImageViewer(
         model = imageDecoder,
         state = state,
         boundClip = false,
-        onDoubleTap = {
-            scope.launch {
-                state.toggleScale(it)
+        detectGesture = {
+            onDoubleTap = {
+                scope.launch {
+                    state.toggleScale(it)
+                }
             }
-        }
+        },
     )
-
 }

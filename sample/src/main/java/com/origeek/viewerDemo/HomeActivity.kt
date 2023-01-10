@@ -14,24 +14,25 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.insets.systemBarsPadding
 import com.origeek.viewerDemo.base.BaseActivity
-import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
 
 class HomeActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBasicContent {
-            ViewerDemoTheme {
-                HomeBody(goSample = {
-                    goActivity(NormalActivity::class.java)
-                }, goHuge = {
-                    goActivity(HugeActivity::class.java)
-                }, goGallery = {
-                    goActivity(GalleryActivity::class.java)
-                }, goPreviewer = {
-                    goActivity(PreviewerActivity::class.java)
-                })
-            }
+            HomeBody(goSample = {
+                goActivity(NormalActivity::class.java)
+            }, goHuge = {
+                goActivity(HugeActivity::class.java)
+            }, goGallery = {
+                goActivity(GalleryActivity::class.java)
+            }, goPreviewer = {
+                goActivity(PreviewerActivity::class.java)
+            }, goTransform = {
+                goActivity(TransformActivity::class.java)
+            }, goDecoder = {
+                goActivity(DecoderActivity::class.java)
+            })
         }
     }
 
@@ -48,6 +49,8 @@ fun HomeBody(
     goHuge: () -> Unit,
     goGallery: () -> Unit,
     goPreviewer: () -> Unit,
+    goTransform: () -> Unit,
+    goDecoder: () -> Unit,
 ) {
     val state = rememberScrollState()
     Column(
@@ -65,6 +68,11 @@ fun HomeBody(
         HomeLargeButton(title = "ImageGallery", onClick = goGallery)
         Spacer(modifier = Modifier.height(24.dp))
         HomeLargeButton(title = "ImagePreviewer", onClick = goPreviewer)
+        Spacer(modifier = Modifier.height(24.dp))
+        HomeLargeButton(title = "TransformPreviewer", onClick = goTransform)
+        Spacer(modifier = Modifier.height(24.dp))
+        HomeLargeButton(title = "ImageDecoder", onClick = goDecoder)
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 

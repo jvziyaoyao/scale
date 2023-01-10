@@ -6,26 +6,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.origeek.imageViewer.ImageGallery
+import com.origeek.imageViewer.gallery.ImageGallery
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.rememberCoilImagePainter
-import com.origeek.viewerDemo.ui.theme.ViewerDemoTheme
 
 class GalleryActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBasicContent {
-            ViewerDemoTheme {
-                GalleryBody()
-            }
+            GalleryBody()
         }
     }
 
 }
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun GalleryBody() {
     val images = remember {
@@ -41,6 +36,6 @@ fun GalleryBody() {
         imageLoader = { index ->
             val image = images[index]
             rememberCoilImagePainter(image = image)
-        }
+        },
     )
 }
