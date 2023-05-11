@@ -37,18 +37,6 @@ open class PreviewerPagerState(
         get() = galleryState.targetPage
 
     /**
-     * 总页数
-     */
-    val pageCount: Int
-        get() = galleryState.pageCount
-
-    /**
-     * 当前页面的平移量
-     */
-    val currentPageOffset: Float
-        get() = galleryState.currentPageOffset
-
-    /**
      * 滚动到指定页面
      * @param page Int
      * @param pageOffset Float

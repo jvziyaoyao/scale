@@ -67,7 +67,6 @@ android {
 
 dependencies {
     implementation "com.github.jvziyaoyao:OrigeekUI:$origeek_ui_version"
-    implementation "com.google.accompanist:accompanist-pager:0.24.3-alpha"
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.0'
