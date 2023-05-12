@@ -169,11 +169,7 @@ fun TransformItemView(
 ) {
     val scope = rememberCoroutineScope()
     itemState.key = key
-    itemState.blockCompose = remember {
-        movableContentOf {
-            content()
-        }
-    }
+    itemState.blockCompose = content
     DisposableEffect(Unit) {
         // 这个composable加载时添加到map
         scope.launch {

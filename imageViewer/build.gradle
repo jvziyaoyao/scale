@@ -6,8 +6,8 @@ plugins {
 
 def GROUP_NAME = 'com.github.jvziyaoyao'
 def ARTIFACT_NAME = 'image-viewer'
-def VERSION_CODE = 4
-def VERSION_NAME = '1.0.2-alpha.1'
+def VERSION_CODE = 6
+def VERSION_NAME = '1.0.2-alpha.3'
 
 group GROUP_NAME
 version VERSION_NAME
@@ -26,7 +26,7 @@ afterEvaluate {
 }
 
 android {
-    compileSdk 31
+    compileSdk 33
 
     defaultConfig {
         minSdk 24
@@ -67,7 +67,6 @@ android {
 
 dependencies {
     implementation "com.github.jvziyaoyao:OrigeekUI:$origeek_ui_version"
-    implementation "com.google.accompanist:accompanist-pager:0.24.3-alpha"
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.0'

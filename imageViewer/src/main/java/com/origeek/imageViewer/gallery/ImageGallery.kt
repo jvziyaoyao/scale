@@ -85,18 +85,6 @@ open class ImageGalleryState(
         get() = pagerState.targetPage
 
     /**
-     * 总页数
-     */
-    val pageCount: Int
-        get() = pagerState.pageCount
-
-    /**
-     * 当前页面的偏移量
-     */
-    val currentPageOffset: Float
-        get() = pagerState.currentPageOffset
-
-    /**
      * interactionSource
      */
     val interactionSource: InteractionSource
