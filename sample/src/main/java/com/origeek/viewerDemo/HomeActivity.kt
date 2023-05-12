@@ -32,8 +32,6 @@ class HomeActivity : BaseActivity() {
                 goActivity(TransformActivity::class.java)
             }, goDecoder = {
                 goActivity(DecoderActivity::class.java)
-            }, goPager = {
-                goActivity(PagerActivity::class.java)
             })
         }
     }
@@ -53,7 +51,6 @@ fun HomeBody(
     goPreviewer: () -> Unit,
     goTransform: () -> Unit,
     goDecoder: () -> Unit,
-    goPager: () -> Unit,
 ) {
     val state = rememberScrollState()
     Column(
@@ -75,8 +72,6 @@ fun HomeBody(
         HomeLargeButton(title = "TransformPreviewer", onClick = goTransform)
         Spacer(modifier = Modifier.height(24.dp))
         HomeLargeButton(title = "ImageDecoder", onClick = goDecoder)
-        Spacer(modifier = Modifier.height(24.dp))
-        HomeLargeButton(title = "NewPager", onClick = goPager)
         Spacer(modifier = Modifier.height(24.dp))
     }
 }

@@ -17,10 +17,6 @@
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.origeek.viewerDemo.PagerActivity"
-            android:exported="true"
-            android:theme="@style/Theme.ImageViewer.NoActionBar" />
-        <activity
             android:name="com.origeek.viewerDemo.GalleryActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />

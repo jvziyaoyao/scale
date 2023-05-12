@@ -6,8 +6,8 @@ plugins {
 
 def GROUP_NAME = 'com.github.jvziyaoyao'
 def ARTIFACT_NAME = 'image-viewer'
-def VERSION_CODE = 4
-def VERSION_NAME = '1.0.2-alpha.1'
+def VERSION_CODE = 6
+def VERSION_NAME = '1.0.2-alpha.3'
 
 group GROUP_NAME
 version VERSION_NAME
@@ -21,6 +21,10 @@ afterEvaluate {
                 artifactId = ARTIFACT_NAME
                 version = VERSION_NAME
             }
+        }
+        // TODO 发布的时候需要去除
+        repositories {
+            mavenLocal()
         }
     }
 }
