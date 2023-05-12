@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. 
 
+# 1.0.2-alpha.3
+- Fix: 移除TransformImageView中的movable，提高滚动性能；
+- Feat: Pager组件更新到官方的Pager；
+
 # 1.0.2-alpha.2
 - Fix: OrigeekUI切换到发布版本1.0.1-alpha.1
 
