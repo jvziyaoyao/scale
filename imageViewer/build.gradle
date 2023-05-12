@@ -22,10 +22,6 @@ afterEvaluate {
                 version = VERSION_NAME
             }
         }
-        // TODO 发布的时候需要去除
-        repositories {
-            mavenLocal()
-        }
     }
 }
 
