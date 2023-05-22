@@ -36,15 +36,19 @@ import kotlin.math.absoluteValue
 
 // 默认X轴偏移量
 const val DEFAULT_OFFSET_X = 0F
+
 // 默认Y轴偏移量
 const val DEFAULT_OFFSET_Y = 0F
+
 // 默认缩放率
 const val DEFAULT_SCALE = 1F
+
 // 默认旋转角度
 const val DEFAULT_ROTATION = 0F
 
 // 图片最小缩放率
 const val MIN_SCALE = 0.5F
+
 // 图片最大缩放率
 const val MAX_SCALE_RATE = 3.2F
 
@@ -73,7 +77,8 @@ class ImageViewerState(
     var defaultAnimateSpec: AnimationSpec<Float> = animationSpec ?: SpringSpec()
 
     // viewer挂载成功后显示时的动画窗格
-    var crossfadeAnimationSpec: AnimationSpec<Float> = crossfadeAnimationSpec ?: DEFAULT_CROSS_FADE_ANIMATE_SPEC
+    var crossfadeAnimationSpec: AnimationSpec<Float> =
+        crossfadeAnimationSpec ?: DEFAULT_CROSS_FADE_ANIMATE_SPEC
 
     // x偏移
     val offsetX = Animatable(offsetX)
@@ -269,30 +274,19 @@ class ViewerGestureScope(
  * @constructor
  */
 class ComposeModel(
-    private val content: @Composable ComposeModelScope.() -> Unit = {}
+    private val content: @Composable ComposeModel.() -> Unit = {}
 ) {
 
-    @Composable
-    fun ModelCompose(
-        composeModelScope: ComposeModelScope,
-        onMounted: () -> Unit = {},
-    ) {
-        content(composeModelScope)
-        DisposableEffect(Unit) {
-            onMounted()
-            onDispose { }
-        }
+    internal var intrinsicSize by mutableStateOf(IntSize.Zero)
+
+    fun updateIntrinsicSize(size: IntSize) {
+        intrinsicSize = size
     }
 
-    class ComposeModelScope(
-        var scale: Float = DEFAULT_SCALE,
-        var offsetX: Float = DEFAULT_OFFSET_X,
-        var offsetY: Float = DEFAULT_OFFSET_Y,
-        var rotation: Float = DEFAULT_ROTATION,
-        var gesture: RawGesture = RawGesture(),
-        var onSizeChange: suspend (SizeChangeContent) -> Unit = {},
-        var boundClip: Boolean = true,
-    )
+    @Composable
+    fun PoseContent() {
+        content()
+    }
 }
 
 /**
@@ -574,6 +568,7 @@ fun ImageViewer(
             is Painter,
             is ImageVector,
             is ImageBitmap,
+            is ComposeModel,
             -> {
                 ImageComposeOrigin(
                     model = model,
@@ -600,21 +595,6 @@ fun ImageViewer(
                     onMounted = onMounted,
                     boundClip = boundClip,
                     crossfadeAnimationSpec = state.crossfadeAnimationSpec,
-                )
-            }
-            is ComposeModel -> {
-                val composeModelScope = remember { ComposeModel.ComposeModelScope() }
-                model.ModelCompose(
-                    composeModelScope = composeModelScope.apply {
-                        this.scale = state.scale.value
-                        this.offsetX = state.offsetX.value
-                        this.offsetY = state.offsetY.value
-                        this.rotation = state.rotation.value
-                        this.gesture = gesture
-                        this.onSizeChange = sizeChange
-                        this.boundClip = boundClip
-                    },
-                    onMounted = onMounted,
                 )
             }
         }

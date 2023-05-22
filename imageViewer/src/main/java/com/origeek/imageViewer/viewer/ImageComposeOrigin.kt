@@ -171,7 +171,14 @@ fun ImageComposeOrigin(
             )
             goMounted()
         }
-        else -> throw Exception("不支持这种类型的数据！")
+        is ComposeModel -> {
+            imageSpecified = true
+            LaunchedEffect(key1 = model.intrinsicSize, block = {
+                oSize = model.intrinsicSize
+            })
+            goMounted()
+        }
+        else -> throw Exception("This model type is not supported!")
     }
 
     Box(
@@ -237,6 +244,11 @@ fun ImageComposeOrigin(
                     contentScale = ContentScale.Crop,
                     modifier = imageModifier,
                 )
+            }
+            is ComposeModel -> {
+                Box(modifier = imageModifier, contentAlignment = Alignment.Center) {
+                    model.PoseContent()
+                }
             }
         }
 
