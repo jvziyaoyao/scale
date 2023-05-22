@@ -39,8 +39,23 @@ data class RenderBlock(
     var renderOffset: IntOffset = IntOffset.Zero,
     var renderSize: IntSize = IntSize.Zero,
     var sliceRect: Rect = Rect(0, 0, 0, 0),
-    var bitmap: Bitmap? = null,
-)
+    private var bitmap: Bitmap? = null,
+) {
+
+    fun release() {
+        bitmap?.recycle()
+        bitmap = null
+    }
+
+    fun getBitmap(): Bitmap? {
+        return bitmap
+    }
+
+    fun setBitmap(bitmap: Bitmap) {
+        this.bitmap = bitmap
+    }
+
+}
 
 class ImageDecoder(
     private val decoder: BitmapRegionDecoder,
@@ -111,9 +126,10 @@ class ImageDecoder(
     // 设置最长边最大方块数
     fun setMaxBlockCount(count: Int): Boolean {
         if (maxBlockCount == count) return false
-        maxBlockCount = count
+        if (decoder.isRecycled) return false
         decoderWidth = decoder.width
         decoderHeight = decoder.height
+        maxBlockCount = count
         blockSize =
             (decoderWidth.coerceAtLeast(decoderHeight)).toFloat().div(count).toInt()
         countW = ceil(decoderWidth.toFloat().div(blockSize)).toInt()
@@ -134,7 +150,7 @@ class ImageDecoder(
     // 清除全部bitmap的引用
     fun clearAllBitmap() {
         forEachBlock { block, _, _ ->
-            block.bitmap = null
+            block.release()
         }
     }
 
@@ -177,7 +193,8 @@ class ImageDecoder(
                 while (!decoder.isRecycled) {
                     val block = renderQueue.take()
                     if (decoder.isRecycled) break
-                    block.bitmap = decodeRegion(block.inSampleSize, block.sliceRect)
+                    val bitmap = decodeRegion(block.inSampleSize, block.sliceRect)
+                    if (bitmap != null) block.setBitmap(bitmap)
                     onUpdate()
                 }
             } catch (e: InterruptedException) {
@@ -306,6 +323,10 @@ fun ImageComposeCanvas(
             val iss = if (needRenderHeightTexture) zeroInSampleSize else inSampleSize
             if (iss == backGroundInSample) return@launch
             backGroundInSample = iss
+            if (bitmap != null) {
+                bitmap?.recycle()
+                bitmap = null
+            }
             bitmap = imageDecoder.decodeRegion(
                 iss, Rect(
                     0,
@@ -314,6 +335,12 @@ fun ImageComposeCanvas(
                     imageDecoder.decoderHeight
                 )
             )
+        }
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            bitmap?.recycle()
+            bitmap = null
         }
     }
 
@@ -503,7 +530,7 @@ fun ImageComposeCanvas(
                     }
                 } else {
                     removeList.add(block)
-                    block.bitmap = null
+                    block.release()
                 }
             }
         }
@@ -618,7 +645,7 @@ fun ImageComposeCanvas(
             if (renderUpdateTimeStamp >= 0) updateRenderList()
             if (renderHeightTexture && !calcMaxCountPending) {
                 imageDecoder.forEachBlock { block, _, _ ->
-                    block.bitmap?.let {
+                    block.getBitmap()?.let {
                         drawImage(
                             image = it.asImageBitmap(),
                             dstSize = block.renderSize,
