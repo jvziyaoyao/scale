@@ -1,9 +1,7 @@
 package com.origeek.imageViewer.viewer
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.BitmapRegionDecoder
-import android.graphics.Rect
+import android.graphics.*
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.Canvas
@@ -127,8 +125,15 @@ class ImageDecoder(
     fun setMaxBlockCount(count: Int): Boolean {
         if (maxBlockCount == count) return false
         if (decoder.isRecycled) return false
-        decoderWidth = decoder.width
-        decoderHeight = decoder.height
+
+        // 90/270
+        decoderWidth = decoder.height
+        decoderHeight = decoder.width
+
+        // 0/180
+//        decoderWidth = decoder.width
+//        decoderHeight = decoder.height
+
         maxBlockCount = count
         blockSize =
             (decoderWidth.coerceAtLeast(decoderHeight)).toFloat().div(count).toInt()
@@ -169,6 +174,12 @@ class ImageDecoder(
         }
     }
 
+    fun getRotateBitmap(bitmap: Bitmap, degree: Float): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(degree)
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, false)
+    }
+
     /**
      * 解码渲染区域
      */
@@ -178,7 +189,36 @@ class ImageDecoder(
                 val ops = BitmapFactory.Options()
                 ops.inSampleSize = inSampleSize
                 if (decoder.isRecycled) return null
-                decoder.decodeRegion(rect, ops)
+
+                val degree = 90F
+                val nextX1 = rect.top
+                val nextX2 = rect.bottom
+                val nextY1 = decoderWidth - rect.right
+                val nextY2 = decoderWidth - rect.left
+
+//                val degree = 180F
+//                val nextX1 = decoderWidth - rect.right
+//                val nextX2 = decoderWidth - rect.left
+//                val nextY1 = decoderHeight - rect.bottom
+//                val nextY2 = decoderHeight - rect.top
+
+//                val degree = 270F
+//                val nextX1 = decoderHeight - rect.bottom
+//                val nextX2 = decoderHeight - rect.top
+//                val nextY1 = rect.left
+//                val nextY2 = rect.right
+
+                val newRect = Rect(nextX1, nextY1, nextX2, nextY2)
+//                Log.i("TAG", "decodeRegion: ($decoderWidth x $decoderHeight) $rect -> $newRect")
+
+//                decoder.decodeRegion(newRect, ops)
+
+//                decoder.decodeRegion(newRect, ops)
+
+                val srcBitmap = decoder.decodeRegion(newRect, ops)
+                getRotateBitmap(bitmap = srcBitmap, degree)
+
+//                decoder.decodeRegion(rect, ops)
             } catch (e: Exception) {
                 e.printStackTrace()
                 null
@@ -638,7 +678,7 @@ fun ImageComposeCanvas(
                 drawImage(
                     image = bitmap!!.asImageBitmap(),
                     dstSize = IntSize(rSize.width, rSize.height),
-                    dstOffset = IntOffset(deltaX.toInt(), deltaY.toInt())
+                    dstOffset = IntOffset(deltaX.toInt(), deltaY.toInt()),
                 )
             }
             // 更新渲染队列

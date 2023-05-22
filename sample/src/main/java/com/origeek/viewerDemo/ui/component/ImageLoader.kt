@@ -1,6 +1,7 @@
 package com.origeek.viewerDemo.ui.component
 
 import android.graphics.BitmapRegionDecoder
+import android.os.Build
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
@@ -33,7 +34,11 @@ fun rememberDecoderImagePainter(
         launch(Dispatchers.IO) {
             if (delay != null) delay(delay)
             imageDecoder = try {
-                val decoder = BitmapRegionDecoder.newInstance(inputStream, false)
+                val decoder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    BitmapRegionDecoder.newInstance(inputStream)
+                } else {
+                    BitmapRegionDecoder.newInstance(inputStream,false)
+                }
                 if (decoder == null) {
                     null
                 } else {
