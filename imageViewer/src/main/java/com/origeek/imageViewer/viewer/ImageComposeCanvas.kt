@@ -1,7 +1,6 @@
 package com.origeek.imageViewer.viewer
 
 import android.graphics.*
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.Canvas
@@ -55,8 +54,16 @@ data class RenderBlock(
 
 }
 
+val ROTATION_0 = 0
+val ROTATION_90 = 90
+val ROTATION_180 = 180
+val ROTATION_270 = 270
+
+class RotationIllegalException(msg: String = "Illegal rotation angle."): RuntimeException(msg)
+
 class ImageDecoder(
     private val decoder: BitmapRegionDecoder,
+    private val rotation: Int = ROTATION_0,
     private val onRelease: () -> Unit = {},
 ) : CoroutineScope by MainScope() {
 
@@ -126,13 +133,17 @@ class ImageDecoder(
         if (maxBlockCount == count) return false
         if (decoder.isRecycled) return false
 
-        // 90/270
-        decoderWidth = decoder.height
-        decoderHeight = decoder.width
-
-        // 0/180
-//        decoderWidth = decoder.width
-//        decoderHeight = decoder.height
+        when (rotation) {
+            ROTATION_0, ROTATION_180 -> {
+                decoderWidth = decoder.width
+                decoderHeight = decoder.height
+            }
+            ROTATION_90, ROTATION_270 -> {
+                decoderWidth = decoder.height
+                decoderHeight = decoder.width
+            }
+            else -> throw RotationIllegalException()
+        }
 
         maxBlockCount = count
         blockSize =
@@ -189,36 +200,36 @@ class ImageDecoder(
                 val ops = BitmapFactory.Options()
                 ops.inSampleSize = inSampleSize
                 if (decoder.isRecycled) return null
-
-                val degree = 90F
-                val nextX1 = rect.top
-                val nextX2 = rect.bottom
-                val nextY1 = decoderWidth - rect.right
-                val nextY2 = decoderWidth - rect.left
-
-//                val degree = 180F
-//                val nextX1 = decoderWidth - rect.right
-//                val nextX2 = decoderWidth - rect.left
-//                val nextY1 = decoderHeight - rect.bottom
-//                val nextY2 = decoderHeight - rect.top
-
-//                val degree = 270F
-//                val nextX1 = decoderHeight - rect.bottom
-//                val nextX2 = decoderHeight - rect.top
-//                val nextY1 = rect.left
-//                val nextY2 = rect.right
-
-                val newRect = Rect(nextX1, nextY1, nextX2, nextY2)
-//                Log.i("TAG", "decodeRegion: ($decoderWidth x $decoderHeight) $rect -> $newRect")
-
-//                decoder.decodeRegion(newRect, ops)
-
-//                decoder.decodeRegion(newRect, ops)
-
-                val srcBitmap = decoder.decodeRegion(newRect, ops)
-                getRotateBitmap(bitmap = srcBitmap, degree)
-
-//                decoder.decodeRegion(rect, ops)
+                return if (rotation == ROTATION_0) {
+                    decoder.decodeRegion(rect, ops)
+                } else {
+                    val newRect = when (rotation) {
+                        ROTATION_90 -> {
+                            val nextX1 = rect.top
+                            val nextX2 = rect.bottom
+                            val nextY1 = decoderWidth - rect.right
+                            val nextY2 = decoderWidth - rect.left
+                            Rect(nextX1, nextY1, nextX2, nextY2)
+                        }
+                        ROTATION_180 -> {
+                            val nextX1 = decoderWidth - rect.right
+                            val nextX2 = decoderWidth - rect.left
+                            val nextY1 = decoderHeight - rect.bottom
+                            val nextY2 = decoderHeight - rect.top
+                            Rect(nextX1, nextY1, nextX2, nextY2)
+                        }
+                        ROTATION_270 -> {
+                            val nextX1 = decoderHeight - rect.bottom
+                            val nextX2 = decoderHeight - rect.top
+                            val nextY1 = rect.left
+                            val nextY2 = rect.right
+                            Rect(nextX1, nextY1, nextX2, nextY2)
+                        }
+                        else -> throw RotationIllegalException()
+                    }
+                    val srcBitmap = decoder.decodeRegion(newRect, ops)
+                    getRotateBitmap(bitmap = srcBitmap, rotation.toFloat())
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 null

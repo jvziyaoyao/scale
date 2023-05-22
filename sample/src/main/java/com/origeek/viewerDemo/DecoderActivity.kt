@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -15,10 +16,15 @@ import com.origeek.imageViewer.previewer.ImagePreviewer
 import com.origeek.imageViewer.previewer.TransformImageView
 import com.origeek.imageViewer.previewer.rememberPreviewerState
 import com.origeek.imageViewer.previewer.rememberTransformItemState
+import com.origeek.imageViewer.viewer.ROTATION_0
+import com.origeek.imageViewer.viewer.ROTATION_180
+import com.origeek.imageViewer.viewer.ROTATION_270
+import com.origeek.imageViewer.viewer.ROTATION_90
 import com.origeek.ui.common.compose.ScaleGrid
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.rememberDecoderImagePainter
 import kotlinx.coroutines.launch
+import kotlin.math.ceil
 
 /**
  * @program: ImageViewer
@@ -58,6 +64,7 @@ fun NetBody() {
         // Save
         var transformEnable by rememberSaveable { mutableStateOf(true) }
         var loadDelay by rememberSaveable { mutableStateOf(0F) }
+        var rotation by rememberSaveable { mutableStateOf(0F) }
 
         if (previewerState.canClose || previewerState.animating) BackHandler {
             if (previewerState.canClose) scope.launch {
@@ -74,7 +81,9 @@ fun NetBody() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Box(Modifier.size(120.dp), contentAlignment = Alignment.Center) {
+            Box(
+                Modifier.size(120.dp), contentAlignment = Alignment.Center
+            ) {
                 ScaleGrid(onTap = {
                     scope.launch {
                         if (transformEnable) {
@@ -130,13 +139,47 @@ fun NetBody() {
                         },
                     )
                 }
+                Spacer(modifier = Modifier.height(if (horizontal) 10.dp else 20.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(text = "Rotation ${ceil(rotation).toInt()}:")
+                    Slider(
+                        modifier = Modifier
+                            .height(48.dp)
+                            .width(100.dp),
+                        value = rotation,
+                        valueRange = 0F..270F,
+                        steps = 2,
+                        onValueChange = {
+                            rotation = it
+                        },
+                    )
+                }
             }
         }
 
+        val insetRotation by remember {
+            derivedStateOf {
+                when (ceil(rotation).toInt()) {
+                    ROTATION_0 -> ROTATION_0
+                    ROTATION_90 -> ROTATION_90
+                    ROTATION_180 -> ROTATION_180
+                    ROTATION_270 -> ROTATION_270
+                    else -> ROTATION_0
+                }
+            }
+        }
         ImagePreviewer(
             count = 1,
             imageLoader = {
-                rememberDecoderImagePainter(inputStream = inputStream, delay = loadDelay.toLong())
+                rememberDecoderImagePainter(
+                    inputStream = inputStream,
+                    rotation = insetRotation,
+                    delay = loadDelay.toLong()
+                )
             },
             state = previewerState,
         )

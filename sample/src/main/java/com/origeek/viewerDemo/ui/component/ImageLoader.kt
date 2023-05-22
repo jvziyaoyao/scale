@@ -1,6 +1,7 @@
 package com.origeek.viewerDemo.ui.component
 
 import android.graphics.BitmapRegionDecoder
+import android.media.ExifInterface
 import android.os.Build
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.painter.Painter
@@ -8,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.origeek.imageViewer.viewer.ImageDecoder
+import com.origeek.imageViewer.viewer.ROTATION_0
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -27,6 +29,7 @@ fun rememberCoilImagePainter(image: Any): Painter {
 @Composable
 fun rememberDecoderImagePainter(
     inputStream: InputStream,
+    rotation: Int = ROTATION_0,
     delay: Long? = null,
 ): Any? {
     var imageDecoder by remember { mutableStateOf<ImageDecoder?>(null) }
@@ -42,7 +45,7 @@ fun rememberDecoderImagePainter(
                 if (decoder == null) {
                     null
                 } else {
-                    ImageDecoder(decoder = decoder)
+                    ImageDecoder(decoder = decoder, rotation = rotation)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

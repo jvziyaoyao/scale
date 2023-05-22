@@ -22,7 +22,7 @@ import kotlin.math.absoluteValue
  **/
 
 // 默认下拉关闭缩放阈值
-const val DEFAULT_SCALE_TO_CLOSE_MIN_VALUE = 0.8F
+const val DEFAULT_SCALE_TO_CLOSE_MIN_VALUE = 0.9F
 
 /**
  * 增加垂直方向拖拽的能力
