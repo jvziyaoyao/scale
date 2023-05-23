@@ -2,8 +2,10 @@ package com.origeek.viewerDemo
 
 import android.os.Bundle
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -54,10 +56,12 @@ fun ComposeBody() {
                         }
                     }
                 }
-                Image(
-                    painter = painter,
-                    contentDescription = null
-                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Image(
+                        painter = painter,
+                        contentDescription = null
+                    )
+                }
             },
             state = state,
             detectGesture = {

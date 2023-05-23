@@ -174,7 +174,11 @@ fun ImageComposeOrigin(
         is ComposeModel -> {
             imageSpecified = true
             LaunchedEffect(key1 = model.intrinsicSize, block = {
-                oSize = model.intrinsicSize
+                oSize = if (model.intrinsicSize == IntSize.Zero) {
+                    bSize
+                } else {
+                    model.intrinsicSize
+                }
             })
             goMounted()
         }
