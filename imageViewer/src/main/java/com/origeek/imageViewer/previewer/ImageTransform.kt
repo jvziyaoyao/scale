@@ -27,7 +27,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.sync.Mutex
 import kotlin.coroutines.resume
@@ -45,6 +44,7 @@ import kotlin.coroutines.suspendCoroutine
 
 // 用于操作transformItemStateMap的锁对象
 internal val imageTransformMutex = Mutex()
+
 // 用于缓存界面上的transformItemState
 internal val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>()
 
@@ -61,18 +61,20 @@ fun TransformImageView(
         key = key,
         itemState = itemState,
         contentState = previewerState.transformState,
-    ) {
-        LaunchedEffect(key1 = painter.intrinsicSize) {
-            if (painter.intrinsicSize.isSpecified) {
-                itemState.intrinsicSize = painter.intrinsicSize
+    ) { itemKey ->
+        key(itemKey) {
+            LaunchedEffect(key1 = painter.intrinsicSize) {
+                if (painter.intrinsicSize.isSpecified) {
+                    itemState.intrinsicSize = painter.intrinsicSize
+                }
             }
+            Image(
+                modifier = Modifier.fillMaxSize(),
+                painter = painter,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+            )
         }
-        Image(
-            modifier = Modifier.fillMaxSize(),
-            painter = painter,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-        )
     }
 }
 
@@ -138,7 +140,7 @@ fun TransformImageView(
     key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
     previewerState: ImagePreviewerState = rememberPreviewerState(),
-    content: @Composable () -> Unit,
+    content: @Composable (Any) -> Unit,
 ) = TransformImageView(modifier, key, itemState, previewerState.transformState, content)
 
 @Composable
@@ -147,7 +149,7 @@ fun TransformImageView(
     key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
     contentState: TransformContentState? = rememberTransformContentState(),
-    content: @Composable () -> Unit,
+    content: @Composable (Any) -> Unit,
 ) {
     TransformItemView(
         modifier = modifier,
@@ -155,7 +157,7 @@ fun TransformImageView(
         itemState = itemState,
         contentState = contentState,
     ) {
-        content()
+        content(key)
     }
 }
 
@@ -165,12 +167,12 @@ fun TransformItemView(
     key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
     contentState: TransformContentState?,
-    content: @Composable () -> Unit,
+    content: @Composable (Any) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     itemState.key = key
     itemState.blockCompose = content
-    DisposableEffect(Unit) {
+    DisposableEffect(key) {
         // 这个composable加载时添加到map
         scope.launch {
             itemState.addItem()
@@ -193,7 +195,7 @@ fun TransformItemView(
         if (
             contentState?.itemState != itemState || !contentState.onAction
         ) {
-            itemState.blockCompose()
+            itemState.blockCompose(key)
         }
     }
 }
@@ -230,7 +232,7 @@ fun TransformContentView(
                         scaleY = transformContentState.graphicScaleY.value
                     },
             ) {
-                transformContentState.srcCompose!!()
+                transformContentState.srcCompose!!(transformContentState.itemState?.key ?: Unit)
             }
         }
     }
@@ -263,7 +265,7 @@ class TransformContentState(
     val srcSize: IntSize
         get() = itemState?.blockSize ?: IntSize.Zero
 
-    val srcCompose: (@Composable () -> Unit)?
+    val srcCompose: (@Composable (Any) -> Unit)?
         get() = itemState?.blockCompose
 
     var onAction by mutableStateOf(false)
@@ -505,15 +507,14 @@ fun rememberTransformContentState(
 }
 
 class TransformItemState(
+    var key: Any = Unit,
+    var blockCompose: (@Composable (Any) -> Unit) = {},
     var scope: CoroutineScope,
     var blockPosition: Offset = Offset.Zero,
     var blockSize: IntSize = IntSize.Zero,
-    var blockCompose: (@Composable () -> Unit) = {},
     var intrinsicSize: Size? = null,
     var checkInBound: (TransformItemState.() -> Boolean)? = null,
 ) {
-
-    var key: Any? = null
 
     private fun checkItemInMap() {
         if (checkInBound == null) return

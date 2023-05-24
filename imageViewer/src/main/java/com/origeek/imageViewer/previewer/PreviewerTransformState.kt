@@ -176,7 +176,9 @@ open class PreviewerTransformState(
     var getKey: ((Int) -> Any)? = null
 
     // 查找key关联的transformItem
-    fun findTransformItem(key: Any) = transformItemStateMap[key]
+    fun findTransformItem(key: Any): TransformItemState? {
+        return transformItemStateMap[key]
+    }
 
     // 根据index查询key
     fun findTransformItemByIndex(index: Int): TransformItemState? {
