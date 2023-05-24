@@ -10,8 +10,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.origeek.imageViewer.gallery.ImageGalleryState
+import com.origeek.imageViewer.util.Ticket
 import com.origeek.imageViewer.viewer.ImageViewerState
-import com.origeek.ui.common.compose.Ticket
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock

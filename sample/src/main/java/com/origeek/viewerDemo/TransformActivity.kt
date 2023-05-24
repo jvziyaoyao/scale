@@ -9,6 +9,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -23,15 +25,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.origeek.imageViewer.previewer.*
-import com.origeek.ui.common.compose.LazyGridLayout
+import com.origeek.imageViewer.previewer.ImagePreviewer
+import com.origeek.imageViewer.previewer.TransformImageView
+import com.origeek.imageViewer.previewer.rememberPreviewerState
+import com.origeek.imageViewer.previewer.rememberTransformItemState
 import com.origeek.ui.common.compose.ScaleGrid
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.rememberCoilImagePainter
@@ -145,39 +148,39 @@ fun TransformBody(
                     .padding(start = pxxl, end = pxxl, bottom = pxxl)
                     .weight(if (horizontal) 6F else 7F)
             ) {
-                LazyGridLayout(
-                    modifier = Modifier.fillMaxSize(),
-                    columns = lineCount,
-                    size = images.size,
-                    padding = pxxs,
-                ) { index ->
-                    val item = images[index]
-                    val painter = painterResource(id = item.res)
-                    val itemState = rememberTransformItemState()
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1F),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ScaleGrid(onTap = {
-                            scope.launch {
-                                if (settingState.transformEnter) {
-                                    previewerState.openTransform(
-                                        index = index,
+                LazyVerticalGrid(columns = GridCells.Fixed(lineCount)) {
+                    images.forEachIndexed { index, item ->
+                        item(key = item.id) {
+                            val needStart = index % lineCount != 0
+                            val painter = painterResource(id = item.res)
+                            val itemState = rememberTransformItemState()
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(1F)
+                                    .padding(start = if (needStart) 2.dp else 0.dp, bottom = 2.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                ScaleGrid(onTap = {
+                                    scope.launch {
+                                        if (settingState.transformEnter) {
+                                            previewerState.openTransform(
+                                                index = index,
+                                                itemState = itemState,
+                                            )
+                                        } else {
+                                            previewerState.open(index)
+                                        }
+                                    }
+                                }) {
+                                    TransformImageView(
+                                        painter = painter,
+                                        key = item.id,
                                         itemState = itemState,
+                                        previewerState = previewerState,
                                     )
-                                } else {
-                                    previewerState.open(index)
                                 }
                             }
-                        }) {
-                            TransformImageView(
-                                painter = painter,
-                                key = item.id,
-                                itemState = itemState,
-                                previewerState = previewerState,
-                            )
                         }
                     }
                 }
