@@ -83,15 +83,18 @@ fun NetBody() {
             Box(
                 Modifier.size(120.dp), contentAlignment = Alignment.Center
             ) {
-                ScaleGrid(onTap = {
-                    scope.launch {
-                        if (transformEnable) {
-                            previewerState.openTransform(0, itemState)
-                        } else {
-                            previewerState.open(0, itemState)
+                ScaleGrid(
+                    detectGesture = {
+                        onPress = {
+                            scope.launch {
+                                if (transformEnable) {
+                                    previewerState.openTransform(0, itemState)
+                                } else {
+                                    previewerState.open(0, itemState)
+                                }
+                            }
                         }
-                    }
-                }) {
+                    }) {
                     TransformImageView(
                         painter = painter,
                         key = key,

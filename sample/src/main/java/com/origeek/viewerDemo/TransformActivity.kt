@@ -5,18 +5,16 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
@@ -53,52 +51,20 @@ import java.util.*
  **/
 class TransformActivity : BaseActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setBasicContent {
-            TransformBody(
-                listOf(
-                    R.drawable.img_01,
-                    R.drawable.img_02,
-                    R.drawable.img_03,
-                    R.drawable.img_04,
-                    R.drawable.img_05,
-                    R.drawable.img_06,
-                )
-            )
-        }
-    }
+    private val imageIds = listOf(
+        R.drawable.img_01,
+        R.drawable.img_02,
+        R.drawable.img_03,
+        R.drawable.img_04,
+        R.drawable.img_05,
+        R.drawable.img_06,
+    )
 
-}
+    private val images = mutableStateListOf<DrawableItem>()
 
-data class DrawableItem(
-    val id: String,
-    val res: Int,
-)
-
-val drawableItemTempIdMap = mutableMapOf<Int, String>()
-
-@Composable
-fun TransformBody(
-    imageIds: List<Int>
-) {
-
-    val images = remember { mutableStateListOf<DrawableItem>() }
-    val settingState = rememberSettingState()
-    val scope = rememberCoroutineScope()
-    val previewerState = rememberPreviewerState(
-        animationSpec = tween(settingState.animationDuration),
-        enableVerticalDrag = settingState.verticalDrag,
-    ) {
-        images[it].id
-    }
-    LaunchedEffect(
-        key1 = imageIds,
-        key2 = settingState,
-        key3 = settingState.dataRepeat
-    ) {
+    private fun syncImages(repeat: Int) {
         images.clear()
-        for (i in 0 until settingState.dataRepeat) {
+        for (i in 0 until repeat) {
             for ((index, res) in imageIds.withIndex()) {
                 val currentIndex = i * imageIds.size + index
                 var id = drawableItemTempIdMap[currentIndex]
@@ -116,6 +82,53 @@ fun TransformBody(
         }
     }
 
+    private fun deleteItem(item: DrawableItem) {
+        images.remove(item)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setBasicContent {
+            TransformBody(
+                images = images,
+                onRepeatChanged = { repeat ->
+                    syncImages(repeat)
+                },
+                onDeleteItem = { drawableItem ->
+                    deleteItem(drawableItem)
+                }
+            )
+        }
+    }
+
+}
+
+data class DrawableItem(
+    val id: String,
+    val res: Int,
+)
+
+val drawableItemTempIdMap = mutableMapOf<Int, String>()
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun TransformBody(
+    images: List<DrawableItem>,
+    onRepeatChanged: (Int) -> Unit = {},
+    onDeleteItem: (DrawableItem) -> Unit = {},
+) {
+
+    val settingState = rememberSettingState()
+    val scope = rememberCoroutineScope()
+    val previewerState = rememberPreviewerState(
+        animationSpec = tween(settingState.animationDuration),
+        enableVerticalDrag = settingState.verticalDrag,
+    ) {
+        images[it].id
+    }
+    LaunchedEffect(settingState.dataRepeat) {
+        onRepeatChanged(settingState.dataRepeat)
+    }
     if (previewerState.canClose || previewerState.animating) BackHandler {
         if (previewerState.canClose) scope.launch {
             if (settingState.transformExit) {
@@ -158,27 +171,55 @@ fun TransformBody(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .aspectRatio(1F)
+                                    .animateItemPlacement()
                                     .padding(start = if (needStart) 2.dp else 0.dp, bottom = 2.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                ScaleGrid(onTap = {
-                                    scope.launch {
-                                        if (settingState.transformEnter) {
-                                            previewerState.openTransform(
-                                                index = index,
-                                                itemState = itemState,
-                                            )
-                                        } else {
-                                            previewerState.open(index)
+                                ScaleGrid(
+                                    detectGesture = {
+                                        onPress = {
+                                            scope.launch {
+                                                if (settingState.transformEnter) {
+                                                    previewerState.openTransform(
+                                                        index = index,
+                                                        itemState = itemState,
+                                                    )
+                                                } else {
+                                                    previewerState.open(index)
+                                                }
+
+                                            }
                                         }
                                     }
-                                }) {
+                                ) {
                                     TransformImageView(
                                         painter = painter,
                                         key = item.id,
                                         itemState = itemState,
                                         previewerState = previewerState,
                                     )
+                                }
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.BottomCenter
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(MaterialTheme.colors.onBackground.copy(0.4F))
+                                            .padding(vertical = pxs)
+                                            .clickable {
+                                                onDeleteItem(item)
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            modifier = Modifier.size(16.dp),
+                                            imageVector = Icons.Filled.Delete,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colors.surface.copy(0.6F)
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -197,6 +238,33 @@ fun TransformBody(
                 } else {
                     val image = images[index].res
                     rememberCoilImagePainter(image = image)
+                }
+            },
+            previewerLayer = {
+                foreground = { index ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = 60.dp, end = pl),
+                        contentAlignment = Alignment.BottomEnd
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colors.surface.copy(0.2F))
+                                .clickable {
+                                    onDeleteItem(images[index])
+                                }
+                                .padding(pl)
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(22.dp),
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = null,
+                                tint = MaterialTheme.colors.surface
+                            )
+                        }
+                    }
                 }
             }
         )
