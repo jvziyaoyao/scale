@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -15,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.systemBarsPadding
 import com.origeek.imageViewer.previewer.ImagePreviewer
 import com.origeek.imageViewer.previewer.rememberPreviewerState
-import com.origeek.ui.common.compose.GridLayout
 import com.origeek.ui.common.util.hideSystemUI
 import com.origeek.ui.common.util.showSystemUI
 import com.origeek.viewerDemo.base.BaseActivity
@@ -86,25 +87,31 @@ fun PreviewerBody(
                 .fillMaxSize()
                 .systemBarsPadding()
         ) {
-            GridLayout(
-                columns = lineCount,
-                size = images.size,
-                padding = 2.dp,
-            ) { index ->
-                val item = images[index]
-                Image(
-                    modifier = Modifier
-                        .clickable {
-                            scope.launch {
-                                imageViewerState.open(index = index)
-                            }
+            LazyVerticalGrid(columns = GridCells.Fixed(lineCount)) {
+                images.forEachIndexed { index, item ->
+                    item {
+                        val needStart = index % lineCount != 0
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1F)
+                                .padding(start = if (needStart) 2.dp else 0.dp, bottom = 2.dp)
+                        ) {
+                            Image(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clickable {
+                                        scope.launch {
+                                            imageViewerState.open(index = index)
+                                        }
+                                    },
+                                painter = painterResource(id = item),
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                            )
                         }
-                        .fillMaxWidth()
-                        .aspectRatio(1F),
-                    painter = painterResource(id = item),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                )
+                    }
+                }
             }
         }
         LaunchedEffect(key1 = imageViewerState.visible, block = {

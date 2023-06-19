@@ -10,8 +10,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.origeek.imageViewer.gallery.ImageGalleryState
+import com.origeek.imageViewer.util.Ticket
 import com.origeek.imageViewer.viewer.ImageViewerState
-import com.origeek.ui.common.compose.Ticket
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -176,7 +176,9 @@ open class PreviewerTransformState(
     var getKey: ((Int) -> Any)? = null
 
     // 查找key关联的transformItem
-    fun findTransformItem(key: Any) = transformItemStateMap[key]
+    fun findTransformItem(key: Any): TransformItemState? {
+        return transformItemStateMap[key]
+    }
 
     // 根据index查询key
     fun findTransformItemByIndex(index: Int): TransformItemState? {

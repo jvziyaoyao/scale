@@ -1,9 +1,6 @@
 package com.origeek.imageViewer.viewer
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.BitmapRegionDecoder
-import android.graphics.Rect
+import android.graphics.*
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.Canvas
@@ -39,11 +36,34 @@ data class RenderBlock(
     var renderOffset: IntOffset = IntOffset.Zero,
     var renderSize: IntSize = IntSize.Zero,
     var sliceRect: Rect = Rect(0, 0, 0, 0),
-    var bitmap: Bitmap? = null,
-)
+    private var bitmap: Bitmap? = null,
+) {
+
+    fun release() {
+        bitmap?.recycle()
+        bitmap = null
+    }
+
+    fun getBitmap(): Bitmap? {
+        return bitmap
+    }
+
+    fun setBitmap(bitmap: Bitmap) {
+        this.bitmap = bitmap
+    }
+
+}
+
+val ROTATION_0 = 0
+val ROTATION_90 = 90
+val ROTATION_180 = 180
+val ROTATION_270 = 270
+
+class RotationIllegalException(msg: String = "Illegal rotation angle."): RuntimeException(msg)
 
 class ImageDecoder(
     private val decoder: BitmapRegionDecoder,
+    private val rotation: Int = ROTATION_0,
     private val onRelease: () -> Unit = {},
 ) : CoroutineScope by MainScope() {
 
@@ -111,9 +131,21 @@ class ImageDecoder(
     // 设置最长边最大方块数
     fun setMaxBlockCount(count: Int): Boolean {
         if (maxBlockCount == count) return false
+        if (decoder.isRecycled) return false
+
+        when (rotation) {
+            ROTATION_0, ROTATION_180 -> {
+                decoderWidth = decoder.width
+                decoderHeight = decoder.height
+            }
+            ROTATION_90, ROTATION_270 -> {
+                decoderWidth = decoder.height
+                decoderHeight = decoder.width
+            }
+            else -> throw RotationIllegalException()
+        }
+
         maxBlockCount = count
-        decoderWidth = decoder.width
-        decoderHeight = decoder.height
         blockSize =
             (decoderWidth.coerceAtLeast(decoderHeight)).toFloat().div(count).toInt()
         countW = ceil(decoderWidth.toFloat().div(blockSize)).toInt()
@@ -134,7 +166,7 @@ class ImageDecoder(
     // 清除全部bitmap的引用
     fun clearAllBitmap() {
         forEachBlock { block, _, _ ->
-            block.bitmap = null
+            block.release()
         }
     }
 
@@ -153,6 +185,12 @@ class ImageDecoder(
         }
     }
 
+    fun getRotateBitmap(bitmap: Bitmap, degree: Float): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(degree)
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, false)
+    }
+
     /**
      * 解码渲染区域
      */
@@ -162,7 +200,36 @@ class ImageDecoder(
                 val ops = BitmapFactory.Options()
                 ops.inSampleSize = inSampleSize
                 if (decoder.isRecycled) return null
-                decoder.decodeRegion(rect, ops)
+                return if (rotation == ROTATION_0) {
+                    decoder.decodeRegion(rect, ops)
+                } else {
+                    val newRect = when (rotation) {
+                        ROTATION_90 -> {
+                            val nextX1 = rect.top
+                            val nextX2 = rect.bottom
+                            val nextY1 = decoderWidth - rect.right
+                            val nextY2 = decoderWidth - rect.left
+                            Rect(nextX1, nextY1, nextX2, nextY2)
+                        }
+                        ROTATION_180 -> {
+                            val nextX1 = decoderWidth - rect.right
+                            val nextX2 = decoderWidth - rect.left
+                            val nextY1 = decoderHeight - rect.bottom
+                            val nextY2 = decoderHeight - rect.top
+                            Rect(nextX1, nextY1, nextX2, nextY2)
+                        }
+                        ROTATION_270 -> {
+                            val nextX1 = decoderHeight - rect.bottom
+                            val nextX2 = decoderHeight - rect.top
+                            val nextY1 = rect.left
+                            val nextY2 = rect.right
+                            Rect(nextX1, nextY1, nextX2, nextY2)
+                        }
+                        else -> throw RotationIllegalException()
+                    }
+                    val srcBitmap = decoder.decodeRegion(newRect, ops)
+                    getRotateBitmap(bitmap = srcBitmap, rotation.toFloat())
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 null
@@ -177,7 +244,8 @@ class ImageDecoder(
                 while (!decoder.isRecycled) {
                     val block = renderQueue.take()
                     if (decoder.isRecycled) break
-                    block.bitmap = decodeRegion(block.inSampleSize, block.sliceRect)
+                    val bitmap = decodeRegion(block.inSampleSize, block.sliceRect)
+                    if (bitmap != null) block.setBitmap(bitmap)
                     onUpdate()
                 }
             } catch (e: InterruptedException) {
@@ -314,6 +382,12 @@ fun ImageComposeCanvas(
                     imageDecoder.decoderHeight
                 )
             )
+        }
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            bitmap?.recycle()
+            bitmap = null
         }
     }
 
@@ -503,7 +577,7 @@ fun ImageComposeCanvas(
                     }
                 } else {
                     removeList.add(block)
-                    block.bitmap = null
+                    block.release()
                 }
             }
         }
@@ -611,14 +685,14 @@ fun ImageComposeCanvas(
                 drawImage(
                     image = bitmap!!.asImageBitmap(),
                     dstSize = IntSize(rSize.width, rSize.height),
-                    dstOffset = IntOffset(deltaX.toInt(), deltaY.toInt())
+                    dstOffset = IntOffset(deltaX.toInt(), deltaY.toInt()),
                 )
             }
             // 更新渲染队列
             if (renderUpdateTimeStamp >= 0) updateRenderList()
             if (renderHeightTexture && !calcMaxCountPending) {
                 imageDecoder.forEachBlock { block, _, _ ->
-                    block.bitmap?.let {
+                    block.getBitmap()?.let {
                         drawImage(
                             image = it.asImageBitmap(),
                             dstSize = block.renderSize,
