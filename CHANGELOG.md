@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file. 
 
+# 1.0.2-alpha.4
+- Fix: 修复imageDecoder release之后获取长宽导致崩溃的问题；
+- Fix: 解决TransformItem在LazyList中不及时刷新的问题；
+- Feat: 支持大图进行图片旋转；
+- Feat: 重构ComposeModel部分以支持手势操作；
+
 # 1.0.2-alpha.3
 - Fix: 移除TransformImageView中的movable，提高滚动性能；
 - Feat: Pager组件更新到官方的Pager；
