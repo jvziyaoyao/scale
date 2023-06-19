@@ -7,7 +7,7 @@ plugins {
 def GROUP_NAME = 'com.github.jvziyaoyao'
 def ARTIFACT_NAME = 'image-viewer'
 def VERSION_CODE = 7
-def VERSION_NAME = '1.0.2-alpha.4.2'
+def VERSION_NAME = '1.0.2-alpha.4.4'
 
 group GROUP_NAME
 version VERSION_NAME
@@ -60,7 +60,6 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
-        kotlinCompilerVersion '1.6.10'
     }
     packagingOptions {
         resources {

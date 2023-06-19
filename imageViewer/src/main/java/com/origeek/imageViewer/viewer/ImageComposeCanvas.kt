@@ -374,10 +374,6 @@ fun ImageComposeCanvas(
             val iss = if (needRenderHeightTexture) zeroInSampleSize else inSampleSize
             if (iss == backGroundInSample) return@launch
             backGroundInSample = iss
-            if (bitmap != null) {
-                bitmap?.recycle()
-                bitmap = null
-            }
             bitmap = imageDecoder.decodeRegion(
                 iss, Rect(
                     0,
