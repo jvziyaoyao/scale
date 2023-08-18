@@ -57,14 +57,8 @@ class GalleryLayerScope(
  * gallery状态
  */
 open class ImageGalleryState(
-    // 初始化的当前页码
-    @IntRange(from = 0) currentPage: Int = 0,
+    val pagerState: ImagePagerState,
 ) {
-
-    /**
-     * 记录pager状态
-     */
-    internal var pagerState: ImagePagerState = ImagePagerState(currentPage)
 
     /**
      * 当前viewer的状态
@@ -110,21 +104,6 @@ open class ImageGalleryState(
         @FloatRange(from = 0.0, to = 1.0) pageOffset: Float = 0f,
     ) = pagerState.animateScrollToPage(page, pageOffset)
 
-    companion object {
-        val Saver: Saver<ImageGalleryState, *> = listSaver(
-            save = {
-                listOf<Any>(
-                    it.currentPage,
-                )
-            },
-            restore = {
-                val imageGalleryState = ImageGalleryState()
-                imageGalleryState.pagerState = ImagePagerState(it[0] as Int)
-                imageGalleryState
-            }
-        )
-    }
-
 }
 
 /**
@@ -132,9 +111,11 @@ open class ImageGalleryState(
  */
 @Composable
 fun rememberImageGalleryState(
-    @IntRange(from = 0) currentPage: Int = 0,
+    @IntRange(from = 0) initialPage: Int = 0,
+    pageCount: () -> Int,
 ): ImageGalleryState {
-    return rememberSaveable(saver = ImageGalleryState.Saver) { ImageGalleryState(currentPage) }
+    val imagePagerState = rememberImagePagerState(initialPage, pageCount)
+    return remember { ImageGalleryState(imagePagerState) }
 }
 
 /**
@@ -144,10 +125,8 @@ fun rememberImageGalleryState(
 fun ImageGallery(
     // 编辑参数
     modifier: Modifier = Modifier,
-    // 总页数
-    count: Int,
     // gallery状态
-    state: ImageGalleryState = rememberImageGalleryState(),
+    state: ImageGalleryState,
     // 图片加载器
     imageLoader: @Composable (Int) -> Any?,
     // 每张图片之间的间隔
@@ -157,7 +136,7 @@ fun ImageGallery(
     // gallery图层
     galleryLayer: GalleryLayerScope.() -> Unit = {},
 ) {
-    require(count >= 0) { "imageCount must be >= 0" }
+//    require(count >= 0) { "imageCount must be >= 0" }
     val scope = rememberCoroutineScope()
     // 手势相关
     val galleryGestureScope = remember { GalleryGestureScope() }
@@ -166,20 +145,14 @@ fun ImageGallery(
     val galleryLayerScope = remember { GalleryLayerScope() }
     galleryLayer.invoke(galleryLayerScope)
     // 确保不会越界
-    val currentPage by remember(key1 = state.currentPage, key2 = state) {
-        derivedStateOf {
-            if (state.currentPage >= count) {
-                if (count > 0) count - 1 else 0
-            } else state.currentPage
-        }
-    }
+    val currentPage = state.currentPage
+
     Box(
         modifier = modifier
             .fillMaxSize()
     ) {
         galleryLayerScope.background(currentPage)
         ImageHorizonPager(
-            count = count,
             state = state.pagerState,
             modifier = Modifier
                 .fillMaxSize(),
@@ -197,7 +170,7 @@ fun ImageGallery(
                     modifier = Modifier
                         .fillMaxSize(),
                 ) {
-                    key(count, page) {
+                    key(page) {
                         ImageViewer(
                             modifier = Modifier.fillMaxSize(),
                             model = imageLoader(page),

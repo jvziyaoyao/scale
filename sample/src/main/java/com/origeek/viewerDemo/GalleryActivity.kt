@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.origeek.imageViewer.gallery.ImageGallery
+import com.origeek.imageViewer.gallery.rememberImageGalleryState
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.rememberCoilImagePainter
 
@@ -32,7 +33,7 @@ fun GalleryBody() {
     }
     ImageGallery(
         modifier = Modifier.fillMaxSize(),
-        count = images.size,
+        state = rememberImageGalleryState { images.size },
         imageLoader = { index ->
             val image = images[index]
             rememberCoilImagePainter(image = image)

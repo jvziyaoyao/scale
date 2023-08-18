@@ -48,9 +48,10 @@ fun EasyBody() {
     val scope = rememberCoroutineScope()
     // enableVerticalDrag 开启垂直方向的拖拽手势
     // getKey 指定getKey方法，否则转换效果不会生效
-    val previewerState = rememberPreviewerState(enableVerticalDrag = true) { index ->
-        images[index].key
-    }
+    val previewerState =
+        rememberPreviewerState(enableVerticalDrag = true, pageCount = { images.size }) { index ->
+            images[index].key
+        }
     Row(
         modifier = Modifier.fillMaxSize(),
         verticalAlignment = Alignment.CenterVertically,
@@ -82,7 +83,6 @@ fun EasyBody() {
     }
     ImagePreviewer(
         modifier = Modifier.fillMaxSize(),
-        count = images.size,
         state = previewerState,
         // 图片加载器
         imageLoader = { index ->

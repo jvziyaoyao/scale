@@ -123,6 +123,7 @@ fun TransformBody(
     val previewerState = rememberPreviewerState(
         animationSpec = tween(settingState.animationDuration),
         enableVerticalDrag = settingState.verticalDrag,
+        pageCount = { images.size }
     ) {
         images[it].id
     }
@@ -230,7 +231,6 @@ fun TransformBody(
         SettingSurface(settingState)
         ImagePreviewer(
             modifier = Modifier.fillMaxSize(),
-            count = images.size,
             state = previewerState,
             imageLoader = { index ->
                 if (settingState.loaderError && (index % 2 == 0)) {

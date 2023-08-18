@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputScope
+import com.origeek.imageViewer.gallery.ImageGalleryState
 import kotlinx.coroutines.*
 import kotlin.math.absoluteValue
 
@@ -36,7 +37,9 @@ open class PreviewerVerticalDragState(
     enableVerticalDrag: Boolean = false,
     // 下拉关闭的缩小的阈值
     scaleToCloseMinValue: Float = DEFAULT_SCALE_TO_CLOSE_MIN_VALUE,
-) : PreviewerTransformState(scope, defaultAnimationSpec) {
+    // 预览状态
+    galleryState: ImageGalleryState,
+) : PreviewerTransformState(scope, defaultAnimationSpec, galleryState) {
 
     /**
      * viewer容器缩小关闭
