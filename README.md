@@ -129,11 +129,11 @@ fun GalleryBody() {
     }
     ImageGallery(
         modifier = Modifier.fillMaxSize(),
-        count = images.size,
+        state = rememberImageGalleryState { images.size },
         imageLoader = { index ->
             val image = images[index]
             rememberCoilImagePainter(image = image)
-        }
+        },
     )
 }
 ```
@@ -145,9 +145,8 @@ val images = remember {
     R.drawable.img_02,
   )
 }
-val imageViewerState = rememberPreviewerState()
+val imageViewerState = rememberPreviewerState(pageCount = { images.size })
 ImagePreviewer(
-  count = images.size,
   state = imageViewerState,
   imageLoader = { index -> painterResource(id = images[index]) },
   onTap = {
@@ -173,7 +172,10 @@ fun TransformBody() {
     val scope = rememberCoroutineScope()
     // enableVerticalDrag 开启垂直方向的拖拽手势
     // getKey 指定getKey方法，否则转换效果不会生效
-    val previewerState = rememberPreviewerState(enableVerticalDrag = true) { index ->
+    val previewerState = rememberPreviewerState(
+      enableVerticalDrag = true,
+      pageCount = { images.size },
+    ) { index ->
         images[index].key
     }
     Row(
@@ -207,7 +209,6 @@ fun TransformBody() {
     }
     ImagePreviewer(
         modifier = Modifier.fillMaxSize(),
-        count = images.size,
         state = previewerState,
         // 图片加载器
         imageLoader = { index ->
@@ -302,8 +303,7 @@ state.reset()
 @Composable
 fun ImageGallery(
     modifier: Modifier = Modifier,
-    count: Int,
-    state: ImageGalleryState = rememberImageGalleryState(),
+    state: ImageGalleryState,
     imageLoader: @Composable (Int) -> Any?,
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     detectGesture: GalleryGestureScope.() -> Unit = {},
@@ -316,8 +316,7 @@ fun ImageGallery(
 | 名称 | 描述 | 默认值 |
 | --- | --- | :---: |
 | `modifier` | Composable修改参数 | `Modifier` |
-| `count` | 传入图片数组的长度 | `无` |
-| `state` | Gallery状态 | `ImageGalleryState` |
+| `state` | Gallery状态ImageGalleryState | `无` |
 | `imageLoader` | 图片加载器，入参为页码，须返回ImageViewer可接受的model | `无` |
 | `itemSpacing` | 图片间的间隔 | `12.dp` |
 | `detectGesture` | 监听手势事件 | `{}` |
@@ -351,7 +350,8 @@ ImageGallery(
 
 ## `ImageGalleryState`
 ```kotlin
-val state = rememberImageGalleryState()
+// 须指定图片列表的长度
+val state = rememberImageGalleryState { images.size }
 // 在gallery中使用
 ImageGallery(
   state = state,
@@ -382,8 +382,7 @@ state.animateScrollToPage(0)
 @Composable
 fun ImagePreviewer(
     modifier: Modifier = Modifier,
-    count: Int,
-    state: ImagePreviewerState = rememberPreviewerState(),
+    state: ImagePreviewerState,
     imageLoader: @Composable (Int) -> Any?,
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
@@ -398,8 +397,7 @@ fun ImagePreviewer(
 | 名称 | 描述 | 默认值 |
 | --- | --- | :---: |
 | `modifier` | Composable修改参数 | `Modifier` |
-| `count` | 传入图片数组的长度 | `无` |
-| `state` | 当前组件显示和图片浏览的状态 | `ImagePreviewerState` |
+| `state` | 当前组件显示和图片浏览的状态ImagePreviewerState | `无` |
 | `imageLoader` | 图片加载器，入参为页码，须返回ImageViewer可接受的model | `无` |
 | `itemSpacing` | 图片间的间隔 | `12.dp` |
 | `enter` | 组件的弹出动画 | `Default` |
@@ -441,7 +439,8 @@ ImagePreviewer(
 
 ## `ImagePreviewerState`
 ```kotlin
-val imageViewerState = rememberPreviewerState()
+// 须指定图片列表的长度
+val imageViewerState = rememberPreviewerState(pageCount = { images.size })
 // 组件中引用
 ImagePreviewer(
   state = imageViewerState,

@@ -4,13 +4,11 @@ import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.interaction.InteractionSource
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.listSaver
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -28,15 +26,9 @@ import androidx.compose.ui.unit.dp
 /**
  * 基于HorizonPager封装的pager组件
  */
-open class ImagePagerState(
-    @IntRange(from = 0) currentPage: Int = 0,
+open class ImagePagerState @OptIn(ExperimentalFoundationApi::class) constructor(
+    val pagerState: PagerState,
 ) {
-
-    /**
-     * pager状态
-     */
-    @OptIn(ExperimentalFoundationApi::class)
-    internal var pagerState: PagerState = PagerState(currentPage)
 
     /**
      * 当前页码
@@ -81,34 +73,21 @@ open class ImagePagerState(
         @FloatRange(from = 0.0, to = 1.0) pageOffset: Float = 0f,
     ) = pagerState.animateScrollToPage(page, pageOffset)
 
-    companion object {
-        @OptIn(ExperimentalFoundationApi::class)
-        val Saver: Saver<ImagePagerState, *> = listSaver(
-            save = {
-                listOf<Any>(
-                    it.currentPage,
-                )
-            },
-            restore = {
-                val imagePagerState = ImagePagerState()
-                imagePagerState.pagerState = PagerState(it[0] as Int)
-                imagePagerState
-            }
-        )
-    }
-
 }
 
 /**
  * 记录pager状态
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun rememberImagePagerState(
     // 默认显示的页码
-    @IntRange(from = 0) currentPage: Int = 0,
+    @IntRange(from = 0) initialPage: Int = 0,
+    pageCount: () -> Int,
 ): ImagePagerState {
-    return rememberSaveable(saver = ImagePagerState.Saver) {
-        ImagePagerState(currentPage)
+    val pageState = rememberPagerState(initialPage = initialPage, pageCount = pageCount)
+    return remember {
+        ImagePagerState(pageState)
     }
 }
 
@@ -120,17 +99,14 @@ fun rememberImagePagerState(
 fun ImageHorizonPager(
     // 编辑参数
     modifier: Modifier = Modifier,
-    // 总页数
-    count: Int,
     // pager状态
-    state: ImagePagerState = rememberImagePagerState(),
+    state: ImagePagerState,
     // 每个item之间的间隔
     itemSpacing: Dp = 0.dp,
     // 页面内容
     content: @Composable (page: Int) -> Unit,
 ) {
     HorizontalPager(
-        pageCount = count,
         state = state.pagerState,
         modifier = modifier,
         pageSpacing = itemSpacing,

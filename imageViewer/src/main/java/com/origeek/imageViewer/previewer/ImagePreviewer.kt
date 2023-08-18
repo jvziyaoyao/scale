@@ -1,10 +1,17 @@
 package com.origeek.imageViewer.previewer
 
-import androidx.compose.animation.*
+import androidx.annotation.IntRange
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -27,14 +34,17 @@ import androidx.compose.ui.unit.dp
 import com.origeek.imageViewer.gallery.GalleryGestureScope
 import com.origeek.imageViewer.gallery.ImageGallery
 import com.origeek.imageViewer.gallery.ImageGalleryState
+import com.origeek.imageViewer.gallery.rememberImageGalleryState
 import com.origeek.imageViewer.viewer.ImageViewerState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 
 // 预览的默认的背景颜色
 val DEEP_DARK_FANTASY = Color(0xFF000000)
+
 // 图片间的默认间隔
 val DEFAULT_ITEM_SPACE = 12.dp
+
 // 比较轻柔的动画窗格
 val DEFAULT_SOFT_ANIMATION_SPEC = tween<Float>(320)
 
@@ -57,29 +67,32 @@ class ImagePreviewerState(
     // 协程作用域
     scope: CoroutineScope = MainScope(),
     // 默认动画窗格
-    defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
-) : PreviewerVerticalDragState(scope, defaultAnimationSpec) {
+    defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
+    // 预览状态
+    galleryState: ImageGalleryState,
+) : PreviewerVerticalDragState(scope, defaultAnimationSpec, galleryState = galleryState) {
     companion object {
-        val Saver: Saver<ImagePreviewerState, *> = mapSaver(
-            save = {
-                mapOf<String, Any>(
-                    it::currentPage.name to it.currentPage,
-                    it::animateContainerVisibleState.name to it.animateContainerVisibleState.currentState,
-                    it::uiAlpha.name to it.uiAlpha.value,
-                    it::visible.name to it.visible,
-                )
-            },
-            restore = {
-                val previewerState = ImagePreviewerState()
-                previewerState.galleryState =
-                    ImageGalleryState(it[ImagePreviewerState::currentPage.name] as Int)
-                previewerState.animateContainerVisibleState =
-                    MutableTransitionState(it[ImagePreviewerState::animateContainerVisibleState.name] as Boolean)
-                previewerState.uiAlpha = Animatable(it[ImagePreviewerState::uiAlpha.name] as Float)
-                previewerState.visible = it[ImagePreviewerState::visible.name] as Boolean
-                previewerState
-            }
-        )
+        fun getSaver(galleryState: ImageGalleryState): Saver<ImagePreviewerState, *> {
+            return mapSaver(
+                save = {
+                    mapOf<String, Any>(
+                        it::currentPage.name to it.currentPage,
+                        it::animateContainerVisibleState.name to it.animateContainerVisibleState.currentState,
+                        it::uiAlpha.name to it.uiAlpha.value,
+                        it::visible.name to it.visible,
+                    )
+                },
+                restore = {
+                    val previewerState = ImagePreviewerState(galleryState = galleryState)
+                    previewerState.animateContainerVisibleState =
+                        MutableTransitionState(it[ImagePreviewerState::animateContainerVisibleState.name] as Boolean)
+                    previewerState.uiAlpha =
+                        Animatable(it[ImagePreviewerState::uiAlpha.name] as Float)
+                    previewerState.visible = it[ImagePreviewerState::visible.name] as Boolean
+                    previewerState
+                }
+            )
+        }
     }
 }
 
@@ -94,11 +107,16 @@ fun rememberPreviewerState(
     animationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
     // 是否开启下拉手势
     enableVerticalDrag: Boolean = false,
+    // 初始页码
+    @IntRange(from = 0) initialPage: Int = 0,
+    // 获取页数
+    pageCount: () -> Int,
     // 提供给组件用于获取key的方法
     getKey: ((Int) -> Any)? = null,
 ): ImagePreviewerState {
-    val imagePreviewerState = rememberSaveable(saver = ImagePreviewerState.Saver) {
-        ImagePreviewerState()
+    val galleryState = rememberImageGalleryState(initialPage, pageCount)
+    val imagePreviewerState = rememberSaveable(saver = ImagePreviewerState.getSaver(galleryState)) {
+        ImagePreviewerState(galleryState = galleryState)
     }
     imagePreviewerState.scope = scope
     imagePreviewerState.getKey = getKey
@@ -110,14 +128,12 @@ fun rememberPreviewerState(
 /**
  * 默认的弹出预览时的动画效果
  */
-@OptIn(ExperimentalAnimationApi::class)
 val DEFAULT_PREVIEWER_ENTER_TRANSITION =
     scaleIn(tween(180)) + fadeIn(tween(240))
 
 /**
  * 默认的关闭预览时的动画效果
  */
-@OptIn(ExperimentalAnimationApi::class)
 val DEFAULT_PREVIEWER_EXIT_TRANSITION =
     scaleOut(tween(320)) + fadeOut(tween(240))
 
@@ -126,6 +142,7 @@ val DEFAULT_CROSS_FADE_ANIMATE_SPEC: AnimationSpec<Float> = tween(80)
 
 // 加载占位默认的进入动画
 val DEFAULT_PLACEHOLDER_ENTER_TRANSITION = fadeIn(tween(200))
+
 // 加载占位默认的退出动画
 val DEFAULT_PLACEHOLDER_EXIT_TRANSITION = fadeOut(tween(200))
 
@@ -172,10 +189,8 @@ class PreviewerLayerScope(
 fun ImagePreviewer(
     // 编辑参数
     modifier: Modifier = Modifier,
-    // 总页数
-    count: Int,
     // 状态对象
-    state: ImagePreviewerState = rememberPreviewerState(),
+    state: ImagePreviewerState,
     // 图片加载器
     imageLoader: @Composable (Int) -> Any?,
     // 图片间的间隔
@@ -224,7 +239,6 @@ fun ImagePreviewer(
                 }
                 ImageGallery(
                     modifier = modifier.fillMaxSize(),
-                    count = count,
                     state = galleryState,
                     imageLoader = imageLoader,
                     itemSpacing = itemSpacing,

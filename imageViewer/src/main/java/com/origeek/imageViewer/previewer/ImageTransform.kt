@@ -7,10 +7,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -25,9 +34,13 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -54,7 +67,7 @@ fun TransformImageView(
     painter: Painter,
     key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
-    previewerState: ImagePreviewerState = rememberPreviewerState(),
+    previewerState: ImagePreviewerState,
 ) {
     TransformImageView(
         modifier = modifier,
@@ -84,7 +97,7 @@ fun TransformImageView(
     bitmap: ImageBitmap,
     key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
-    previewerState: ImagePreviewerState = rememberPreviewerState(),
+    previewerState: ImagePreviewerState,
 ) {
     TransformImageView(
         modifier = modifier,
@@ -111,7 +124,7 @@ fun TransformImageView(
     imageVector: ImageVector,
     key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
-    previewerState: ImagePreviewerState = rememberPreviewerState(),
+    previewerState: ImagePreviewerState,
 ) {
     TransformImageView(
         modifier = modifier,
@@ -139,7 +152,7 @@ fun TransformImageView(
     modifier: Modifier = Modifier,
     key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
-    previewerState: ImagePreviewerState = rememberPreviewerState(),
+    previewerState: ImagePreviewerState,
     content: @Composable (Any) -> Unit,
 ) = TransformImageView(modifier, key, itemState, previewerState.transformState, content)
 

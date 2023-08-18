@@ -32,8 +32,12 @@ open class PreviewerTransformState(
     // 协程作用域
     var scope: CoroutineScope = MainScope(),
     // 默认动画窗格
-    var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
-) : PreviewerPagerState() {
+    var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
+    // 预览状态
+    galleryState: ImageGalleryState,
+) : PreviewerPagerState(
+    galleryState = galleryState,
+) {
 
     /**
      *   +-------------------+
@@ -218,14 +222,14 @@ open class PreviewerTransformState(
             scope.launch {
                 // 标记开始
                 stateOpenStart()
-                // 跳转到index
-                galleryState = ImageGalleryState(index)
                 // 开启UI
                 uiAlpha.snapTo(1F)
                 // container动画立即设置为关闭
                 animateContainerVisibleState = MutableTransitionState(false)
                 // 开启container
                 animateContainerVisibleState.targetState = true
+                // 跳转到index
+                galleryState.scrollToPage(index)
                 // 等待下一帧之后viewerContainerState才会刷新出来
                 ticket.awaitNextTicket()
                 // 允许显示loading
@@ -298,14 +302,14 @@ open class PreviewerTransformState(
         }
         // 动画开始
         stateOpenStart()
-        // 跳转到index页
-        galleryState = ImageGalleryState(index)
         // 关闭UI
         uiAlpha.snapTo(0F)
         // 关闭viewer
         viewerAlpha.snapTo(0F)
         // 设置新的container状态立刻设置为true
         animateContainerVisibleState = MutableTransitionState(true)
+        // 跳转到index页
+        galleryState.scrollToPage(index)
         // 等待下一帧
         ticket.awaitNextTicket()
         // 关闭loading

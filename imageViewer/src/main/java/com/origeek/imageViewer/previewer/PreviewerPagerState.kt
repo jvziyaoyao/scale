@@ -15,14 +15,8 @@ import com.origeek.imageViewer.gallery.ImageGalleryState
  **/
 
 open class PreviewerPagerState(
-    @IntRange(from = 0) currentPage: Int = 0,
+    val galleryState: ImageGalleryState,
 ) {
-
-    /**
-     * pagerState
-     */
-    var galleryState: ImageGalleryState = ImageGalleryState(currentPage)
-        internal set
 
     /**
      * 当前页码

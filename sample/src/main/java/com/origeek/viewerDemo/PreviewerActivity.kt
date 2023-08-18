@@ -1,6 +1,7 @@
 package com.origeek.viewerDemo
 
 import android.os.Bundle
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -74,8 +75,12 @@ fun PreviewerBody(
         )
     }
 
-    val imageViewerState = rememberPreviewerState()
-
+    val imageViewerState = rememberPreviewerState(pageCount = { images.size })
+    if (imageViewerState.visible) BackHandler {
+        scope.launch {
+            imageViewerState.close()
+        }
+    }
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -118,7 +123,6 @@ fun PreviewerBody(
             onImageViewVisible(imageViewerState.visible)
         })
         ImagePreviewer(
-            count = images.size,
             state = imageViewerState,
             imageLoader = { index -> painterResource(id = images[index]) },
             detectGesture = {
