@@ -19,6 +19,7 @@ import com.origeek.imageViewer.viewer.ROTATION_0
 import com.origeek.imageViewer.viewer.ROTATION_180
 import com.origeek.imageViewer.viewer.ROTATION_270
 import com.origeek.imageViewer.viewer.ROTATION_90
+import com.origeek.ui.common.compose.DetectScaleGridGesture
 import com.origeek.ui.common.compose.ScaleGrid
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.rememberDecoderImagePainter
@@ -85,7 +86,7 @@ fun NetBody() {
                 Modifier.size(120.dp), contentAlignment = Alignment.Center
             ) {
                 ScaleGrid(
-                    detectGesture = {
+                    detectGesture = DetectScaleGridGesture(
                         onPress = {
                             scope.launch {
                                 if (transformEnable) {
@@ -95,7 +96,8 @@ fun NetBody() {
                                 }
                             }
                         }
-                    }) {
+                    )
+                ) {
                     TransformImageView(
                         painter = painter,
                         key = key,

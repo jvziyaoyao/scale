@@ -33,6 +33,7 @@ import com.origeek.imageViewer.previewer.ImagePreviewer
 import com.origeek.imageViewer.previewer.TransformImageView
 import com.origeek.imageViewer.previewer.rememberPreviewerState
 import com.origeek.imageViewer.previewer.rememberTransformItemState
+import com.origeek.ui.common.compose.DetectScaleGridGesture
 import com.origeek.ui.common.compose.ScaleGrid
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.rememberCoilImagePainter
@@ -130,6 +131,11 @@ fun TransformBody(
     LaunchedEffect(settingState.dataRepeat) {
         onRepeatChanged(settingState.dataRepeat)
     }
+    LaunchedEffect(images.size) {
+        if (images.isEmpty() && (previewerState.canClose || previewerState.animating)) {
+            previewerState.close()
+        }
+    }
     if (previewerState.canClose || previewerState.animating) BackHandler {
         if (previewerState.canClose) scope.launch {
             if (settingState.transformExit) {
@@ -177,7 +183,7 @@ fun TransformBody(
                                 contentAlignment = Alignment.Center
                             ) {
                                 ScaleGrid(
-                                    detectGesture = {
+                                    detectGesture = DetectScaleGridGesture(
                                         onPress = {
                                             scope.launch {
                                                 if (settingState.transformEnter) {
@@ -191,7 +197,7 @@ fun TransformBody(
 
                                             }
                                         }
-                                    }
+                                    )
                                 ) {
                                     TransformImageView(
                                         painter = painter,
