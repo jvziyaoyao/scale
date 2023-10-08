@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file. 
 
+# 1.0.2-alpha.6
+- Feat: 支持上下滑手势关闭图片预览；
+
 # 1.0.2-alpha.5
 - Feat: 适配到高版本的HorizontalPager；
 
