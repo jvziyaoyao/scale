@@ -66,7 +66,7 @@ fun HomeBody(
     ) {
         HomeLargeButton(title = "Sample", onClick = goSample)
         Spacer(modifier = Modifier.height(24.dp))
-        HomeLargeButton(title = "Huge image", onClick = goHuge)
+        HomeLargeButton(title = "HugeImage", onClick = goHuge)
         Spacer(modifier = Modifier.height(24.dp))
         HomeLargeButton(title = "ImageGallery", onClick = goGallery)
         Spacer(modifier = Modifier.height(24.dp))

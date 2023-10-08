@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.origeek.imageViewer.previewer.ImagePreviewer
 import com.origeek.imageViewer.previewer.TransformImageView
+import com.origeek.imageViewer.previewer.VerticalDragType
 import com.origeek.imageViewer.previewer.rememberPreviewerState
 import com.origeek.imageViewer.previewer.rememberTransformItemState
 import com.origeek.ui.common.compose.DetectScaleGridGesture
@@ -123,7 +124,7 @@ fun TransformBody(
     val scope = rememberCoroutineScope()
     val previewerState = rememberPreviewerState(
         animationSpec = tween(settingState.animationDuration),
-        enableVerticalDrag = settingState.verticalDrag,
+        verticalDragType = settingState.verticalDrag,
         pageCount = { images.size }
     ) {
         images[it].id
@@ -308,8 +309,10 @@ fun SettingItemSwitch(
     }
 }
 
+val VERTICAL_DRAG_ENABLE = VerticalDragType.UpAndDown
+val VERTICAL_DRAG_DISABLE = VerticalDragType.None
+val DEFAULT_VERTICAL_DRAG = VERTICAL_DRAG_ENABLE
 const val DEFAULT_LOADER_ERROR = false
-const val DEFAULT_VERTICAL_DRAG = true
 const val DEFAULT_TRANSFORM_ENTER = true
 const val DEFAULT_TRANSFORM_EXIT = true
 const val DEFAULT_ANIMATION_DURATION = 400
@@ -353,7 +356,7 @@ class TransformSettingState {
             restore = {
                 val state = TransformSettingState()
                 state.loaderError = it[state::loaderError.name] as Boolean
-                state.verticalDrag = it[state::verticalDrag.name] as Boolean
+                state.verticalDrag = it[state::verticalDrag.name] as VerticalDragType
                 state.transformEnter = it[state::transformEnter.name] as Boolean
                 state.transformExit = it[state::transformExit.name] as Boolean
                 state.animationDuration = it[state::animationDuration.name] as Int
@@ -389,9 +392,12 @@ fun SettingPanel(state: TransformSettingState, onClose: () -> Unit) {
             }
             Spacer(modifier = Modifier.height(pxs))
             SettingItem(label = "Vertical Drag") {
-                SettingItemSwitch(checked = state.verticalDrag, onCheckedChanged = {
-                    state.verticalDrag = it
-                })
+                SettingItemSwitch(
+                    checked = state.verticalDrag == VERTICAL_DRAG_ENABLE,
+                    onCheckedChanged = {
+                        state.verticalDrag =
+                            if (it) VERTICAL_DRAG_ENABLE else VERTICAL_DRAG_DISABLE
+                    })
             }
             Spacer(modifier = Modifier.height(pxs))
             SettingItem(label = "Transform Enter") {

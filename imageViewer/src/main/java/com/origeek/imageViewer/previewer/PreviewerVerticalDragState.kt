@@ -25,6 +25,18 @@ import kotlin.math.absoluteValue
 // 默认下拉关闭缩放阈值
 const val DEFAULT_SCALE_TO_CLOSE_MIN_VALUE = 0.9F
 
+enum class VerticalDragType {
+    // 不开启垂直手势
+    None,
+
+    // 仅开启下拉手势
+    Down,
+
+    // 支持上下拉手势
+    UpAndDown,
+    ;
+}
+
 /**
  * 增加垂直方向拖拽的能力
  */
@@ -33,8 +45,8 @@ open class PreviewerVerticalDragState(
     scope: CoroutineScope = MainScope(),
     // 默认动画窗格
     defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
-    // 是否默认开启垂直手势
-    enableVerticalDrag: Boolean = false,
+    // 开启垂直手势的类型
+    verticalDragType: VerticalDragType = VerticalDragType.None,
     // 下拉关闭的缩小的阈值
     scaleToCloseMinValue: Float = DEFAULT_SCALE_TO_CLOSE_MIN_VALUE,
     // 预览状态
@@ -106,7 +118,7 @@ open class PreviewerVerticalDragState(
             // 标记是否为下拉关闭
             var vOrientationDown by mutableStateOf<Boolean?>(null)
             // 如果getKay不为空才开始检测手势
-            if (enableVerticalDrag) detectVerticalDragGestures(
+            if (verticalDragType != VerticalDragType.None) detectVerticalDragGestures(
                 onDragStart = OnDragStart@{
                     // 如果imageViewerState不存在，无法进行下拉手势
                     if (imageViewerState == null) return@OnDragStart
@@ -175,7 +187,7 @@ open class PreviewerVerticalDragState(
                     if (viewerContainerState == null) return@OnVerticalDrag
                     if (vStartOffset == null) return@OnVerticalDrag
                     if (vOrientationDown == null) vOrientationDown = dragAmount > 0
-                    if (vOrientationDown == true) {
+                    if (vOrientationDown == true || verticalDragType == VerticalDragType.UpAndDown) {
                         val offsetY = change.position.y - vStartOffset!!.y
                         val offsetX = change.position.x - vStartOffset!!.x
                         val containerHeight = viewerContainerState!!.containerSize.height
@@ -198,9 +210,9 @@ open class PreviewerVerticalDragState(
     }
 
     /**
-     * 是否开启下拉关闭
+     * 开启垂直手势的类型
      */
-    var enableVerticalDrag by mutableStateOf(enableVerticalDrag)
+    var verticalDragType by mutableStateOf(verticalDragType)
 
     /**
      * 下拉关闭的缩放的阈值，当scale小于这个值，就关闭，否则还原
