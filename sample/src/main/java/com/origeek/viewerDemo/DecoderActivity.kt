@@ -13,6 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.origeek.imageViewer.previewer.ImagePreviewer
 import com.origeek.imageViewer.previewer.TransformImageView
+import com.origeek.imageViewer.previewer.VerticalDragType
 import com.origeek.imageViewer.previewer.rememberPreviewerState
 import com.origeek.imageViewer.previewer.rememberTransformItemState
 import com.origeek.imageViewer.viewer.ROTATION_0
@@ -57,7 +58,7 @@ fun NetBody() {
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
         val previewerState =
-            rememberPreviewerState(enableVerticalDrag = true, pageCount = { 1 }) { key }
+            rememberPreviewerState(verticalDragType = VerticalDragType.Down, pageCount = { 1 }) { key }
         val itemState = rememberTransformItemState()
         val inputStream = remember { context.assets.open("a350.jpg") }
         val painter = painterResource(R.drawable.a350_temp)

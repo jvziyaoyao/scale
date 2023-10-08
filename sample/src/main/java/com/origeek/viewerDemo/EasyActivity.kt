@@ -12,6 +12,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.origeek.imageViewer.previewer.ImagePreviewer
 import com.origeek.imageViewer.previewer.TransformImageView
+import com.origeek.imageViewer.previewer.VerticalDragType
 import com.origeek.imageViewer.previewer.rememberPreviewerState
 import com.origeek.viewerDemo.base.BaseActivity
 import kotlinx.coroutines.launch
@@ -49,7 +50,7 @@ fun EasyBody() {
     // enableVerticalDrag 开启垂直方向的拖拽手势
     // getKey 指定getKey方法，否则转换效果不会生效
     val previewerState =
-        rememberPreviewerState(enableVerticalDrag = true, pageCount = { images.size }) { index ->
+        rememberPreviewerState(verticalDragType = VerticalDragType.Down, pageCount = { images.size }) { index ->
             images[index].key
         }
     Row(

@@ -105,8 +105,8 @@ fun rememberPreviewerState(
     scope: CoroutineScope = rememberCoroutineScope(),
     // 动画窗格
     animationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
-    // 是否开启下拉手势
-    enableVerticalDrag: Boolean = false,
+    // 开启垂直手势的类型
+    verticalDragType: VerticalDragType = VerticalDragType.None,
     // 初始页码
     @IntRange(from = 0) initialPage: Int = 0,
     // 获取页数
@@ -121,7 +121,7 @@ fun rememberPreviewerState(
     imagePreviewerState.scope = scope
     imagePreviewerState.getKey = getKey
     imagePreviewerState.defaultAnimationSpec = animationSpec
-    imagePreviewerState.enableVerticalDrag = enableVerticalDrag
+    imagePreviewerState.verticalDragType = verticalDragType
     return imagePreviewerState
 }
 
