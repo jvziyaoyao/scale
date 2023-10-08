@@ -170,10 +170,10 @@ fun TransformBody() {
     ).entries.toList()
     // 协程作用域
     val scope = rememberCoroutineScope()
-    // enableVerticalDrag 开启垂直方向的拖拽手势
+    // verticalDragType 垂直方向的拖拽手势类型
     // getKey 指定getKey方法，否则转换效果不会生效
     val previewerState = rememberPreviewerState(
-      enableVerticalDrag = true,
+      verticalDragType = VerticalDragType.UpAndDown,
       pageCount = { images.size },
     ) { index ->
         images[index].key
@@ -465,7 +465,7 @@ imageViewerState.hide()
 | `canOpen` | 是否允许执行open操作 | `false` |
 | `canClose` | 是否允许执行close操作 | `false` |
 | `getKey` | 用户提供的获取当前页码所属的key的方法 | `null` |
-| `enableVerticalDrag` | 是否开启垂直下拉手势 | `false` |
+| `verticalDragType` | 垂直手势类型 | `VerticalDragType.None` |
 | `scaleToCloseMinValue` | 下拉手势结束的时，判断是否关闭的阈值 | `0.8F` |
 
 🛠 方法
