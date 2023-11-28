@@ -57,6 +57,10 @@
             android:name="com.origeek.viewerDemo.TransformActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
+        <activity
+            android:name="com.origeek.viewerDemo.ZoomableActivity"
+            android:exported="true"
+            android:theme="@style/Theme.ImageViewer.NoActionBar" />
     </application>
 
 </manifest>

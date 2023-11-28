@@ -53,6 +53,9 @@ dependencies {
         implementation 'com.github.jvziyaoyao:ImageViewer:1.0.2-alpha.4'
     }
 
+    // zoomable
+    implementation("net.engawapg.lib:zoomable:1.5.2")
+
     def nav_version = "2.7.0"
     implementation("androidx.navigation:navigation-compose:$nav_version")
 

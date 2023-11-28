@@ -20,22 +20,35 @@ class HomeActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBasicContent {
-            HomeBody(goSample = {
-                goActivity(NormalActivity::class.java)
-            }, goHuge = {
-                goActivity(HugeActivity::class.java)
-            }, goGallery = {
-                goActivity(GalleryActivity::class.java)
-            }, goPreviewer = {
-                goActivity(PreviewerActivity::class.java)
-            }, goTransform = {
-                goActivity(TransformActivity::class.java)
-            }, goDecoder = {
-                goActivity(DecoderActivity::class.java)
-            }, goCompose = {
-                goActivity(ComposeActivity::class.java)
-            })
+            HomeBody(
+                goZoomable = {
+                    goActivity(ZoomableActivity::class.java)
+                },
+                goSample = {
+                    goActivity(NormalActivity::class.java)
+                },
+                goHuge = {
+                    goActivity(HugeActivity::class.java)
+                },
+                goGallery = {
+                    goActivity(GalleryActivity::class.java)
+                },
+                goPreviewer = {
+                    goActivity(PreviewerActivity::class.java)
+                },
+                goTransform = {
+                    goActivity(TransformActivity::class.java)
+                },
+                goDecoder = {
+                    goActivity(DecoderActivity::class.java)
+                },
+                goCompose = {
+                    goActivity(ComposeActivity::class.java)
+                }
+            )
         }
+
+        goActivity(ZoomableActivity::class.java)
     }
 
     private fun goActivity(cls: Class<*>) {
@@ -47,6 +60,7 @@ class HomeActivity : BaseActivity() {
 
 @Composable
 fun HomeBody(
+    goZoomable: () -> Unit,
     goSample: () -> Unit,
     goHuge: () -> Unit,
     goGallery: () -> Unit,
@@ -62,22 +76,17 @@ fun HomeBody(
             .verticalScroll(state = state)
             .systemBarsPadding()
             .statusBarsPadding()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
+        HomeLargeButton(title = "Zoomable", onClick = goZoomable)
         HomeLargeButton(title = "Sample", onClick = goSample)
-        Spacer(modifier = Modifier.height(24.dp))
         HomeLargeButton(title = "HugeImage", onClick = goHuge)
-        Spacer(modifier = Modifier.height(24.dp))
         HomeLargeButton(title = "ImageGallery", onClick = goGallery)
-        Spacer(modifier = Modifier.height(24.dp))
         HomeLargeButton(title = "ImagePreviewer", onClick = goPreviewer)
-        Spacer(modifier = Modifier.height(24.dp))
         HomeLargeButton(title = "TransformPreviewer", onClick = goTransform)
-        Spacer(modifier = Modifier.height(24.dp))
         HomeLargeButton(title = "ImageDecoder", onClick = goDecoder)
-        Spacer(modifier = Modifier.height(24.dp))
         HomeLargeButton(title = "Compose", onClick = goCompose)
-        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 

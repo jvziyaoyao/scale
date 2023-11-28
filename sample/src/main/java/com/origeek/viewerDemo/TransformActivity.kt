@@ -40,6 +40,7 @@ import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.rememberCoilImagePainter
 import com.origeek.viewerDemo.ui.theme.*
 import kotlinx.coroutines.launch
+import net.engawapg.lib.zoomable.zoomable
 import java.util.*
 
 /**
