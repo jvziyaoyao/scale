@@ -1,6 +1,7 @@
 package com.origeek.viewerDemo
 
 import android.os.Bundle
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,7 @@ import com.origeek.imageViewer.zoomable.ZoomableViewState
 import com.origeek.viewerDemo.base.BaseActivity
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.rememberZoomState
+import net.engawapg.lib.zoomable.toggleScale
 import net.engawapg.lib.zoomable.zoomable
 
 /**
@@ -83,6 +85,9 @@ fun ZoomableThirdBody() {
             .background(Color.Blue.copy(0.2F))
             .zoomable(
                 zoomState = zoomableState,
+                onDoubleTap = {
+                    zoomableState.toggleScale(20F, it, tween(1000))
+                },
             ),
         painter = painter,
         contentDescription = null,

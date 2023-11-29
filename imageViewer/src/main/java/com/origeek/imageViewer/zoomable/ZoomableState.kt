@@ -1,13 +1,11 @@
 package com.origeek.imageViewer.zoomable
 
-import android.util.Log
 import androidx.annotation.FloatRange
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.generateDecayAnimationSpec
-import androidx.compose.animation.core.tween
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
@@ -21,8 +19,6 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
 
 /**
  * @program: ImageViewer
@@ -53,7 +49,7 @@ const val MIN_SCALE = 0.5F
 // 图片最大缩放率
 //const val MAX_SCALE_RATE = 8F
 //const val MAX_SCALE_RATE = 2F
-const val MAX_SCALE_RATE = 3.2F
+const val MAX_SCALE_RATE = 4F
 
 // 最小手指手势间距
 const val MIN_GESTURE_FINGER_DISTANCE = 200
@@ -79,7 +75,7 @@ class ZoomableViewState(
 ) : CoroutineScope by MainScope() {
 
     // 默认动画窗格
-    internal var defaultAnimateSpec: AnimationSpec<Float> = animationSpec ?: SpringSpec()
+    private var defaultAnimateSpec: AnimationSpec<Float> = animationSpec ?: SpringSpec()
 
     // x偏移
     val offsetX = Animatable(offsetX)
@@ -140,19 +136,6 @@ class ZoomableViewState(
     val displayHeight: Float
         get() = displaySize.height
 
-    // 在容器中的偏移量
-    private val displayOffsetInContainer: Offset
-        get() = Offset(
-            x = (containerSize.value.width - displaySize.width).div(2),
-            y = (containerSize.value.height - displaySize.height).div(2),
-        )
-
-    val displayOffsetInContainerX: Float
-        get() = displayOffsetInContainer.x
-
-    val displayOffsetInContainerY: Float
-        get() = displayOffsetInContainer.y
-
     // 手势的中心点
     val gestureCenter = mutableStateOf(Offset.Zero)
 
@@ -182,7 +165,7 @@ class ZoomableViewState(
     internal var fromSaver = false
 
     // 恢复的时间戳
-    internal var resetTimeStamp by mutableStateOf(0L)
+    private var resetTimeStamp by mutableStateOf(0L)
 
     /**
      * 判断是否有动画正在运行
@@ -214,44 +197,71 @@ class ZoomableViewState(
      */
     suspend fun reset(animationSpec: AnimationSpec<Float> = defaultAnimateSpec) {
         coroutineScope {
-            launch {
-                rotation.animateTo(DEFAULT_ROTATION, animationSpec)
-                resetTimeStamp = System.currentTimeMillis()
-            }
-            launch {
-                offsetX.animateTo(DEFAULT_OFFSET_X, animationSpec)
-                resetTimeStamp = System.currentTimeMillis()
-            }
-            launch {
-                offsetY.animateTo(DEFAULT_OFFSET_Y, animationSpec)
-                resetTimeStamp = System.currentTimeMillis()
-            }
-            launch {
-                scale.animateTo(DEFAULT_SCALE, animationSpec)
-                resetTimeStamp = System.currentTimeMillis()
-            }
+            listOf(
+                async {
+                    rotation.animateTo(DEFAULT_ROTATION, animationSpec)
+                },
+                async {
+                    offsetX.animateTo(DEFAULT_OFFSET_X, animationSpec)
+                },
+                async {
+                    offsetY.animateTo(DEFAULT_OFFSET_Y, animationSpec)
+                },
+                async {
+                    scale.animateTo(DEFAULT_SCALE, animationSpec)
+                },
+            ).awaitAll()
+            resetTimeStamp = System.currentTimeMillis()
         }
     }
 
     /**
      * 放大到最大
      */
-    suspend fun scaleToMax(
+    private suspend fun scaleToMax(
         offset: Offset,
         animationSpec: AnimationSpec<Float>? = null
     ) {
-        scaleTo(offset, maxScale, animationSpec)
+        val currentAnimateSpec = animationSpec ?: defaultAnimateSpec
+
+        var nextOffsetX = (containerWidth / 2 - offset.x) * maxScale
+        var nextOffsetY = (containerHeight / 2 - offset.y) * maxScale
+
+        val boundX = getBound(maxScale, containerWidth, displayWidth)
+        val boundY = getBound(maxScale, containerHeight, displayHeight)
+
+        nextOffsetX = limitToBound(nextOffsetX, boundX)
+        nextOffsetY = limitToBound(nextOffsetY, boundY)
+
+        // 启动
+        coroutineScope {
+            listOf(
+                async {
+//                    offsetX.updateBounds(boundX.first,boundX.second)
+                    offsetX.updateBounds(null,null)
+                    offsetX.animateTo(nextOffsetX, currentAnimateSpec)
+                    offsetX.updateBounds(boundX.first,boundX.second)
+                },
+                async {
+//                    offsetX.updateBounds(boundX.first,boundX.second)
+                    offsetY.updateBounds(null,null)
+                    offsetY.animateTo(nextOffsetY, currentAnimateSpec)
+                    offsetY.updateBounds(boundY.first,boundY.second)
+                },
+                async {
+                    scale.animateTo(maxScale, currentAnimateSpec)
+                },
+            ).awaitAll()
+        }
     }
 
     /**
      * 放大或缩小
      */
-    // TODO: 缩放过程中移动会导致出错
     suspend fun toggleScale(
         offset: Offset,
         animationSpec: AnimationSpec<Float> = defaultAnimateSpec
     ) {
-        if (isRunning()) return
         // 如果不等于1，就调回1
         if (scale.value != 1F) {
             reset(animationSpec)
