@@ -42,3 +42,10 @@ fun HugeBody() {
         },
     )
 }
+
+@Composable
+fun HugeZoomableBody() {
+//    ZoomableView(state = ) {
+//
+//    }
+}

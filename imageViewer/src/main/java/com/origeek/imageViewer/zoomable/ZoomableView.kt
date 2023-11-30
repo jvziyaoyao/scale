@@ -1,6 +1,6 @@
 package com.origeek.imageViewer.zoomable
 
-import androidx.compose.foundation.background
+import android.util.Log
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateCentroid
@@ -10,20 +10,15 @@ import androidx.compose.foundation.gestures.calculateRotation
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEvent
@@ -32,7 +27,6 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -69,9 +63,11 @@ class ZoomableGestureScope(
 
 @Composable
 fun ZoomableView(
+    modifier: Modifier = Modifier,
+    // 是否限制范围
+    boundClip: Boolean = true,
+    // 当前状态
     state: ZoomableViewState,
-    // 调试模式
-    debugMode: Boolean = false,
     // 检测手势
     detectGesture: ZoomableGestureScope = ZoomableGestureScope(),
     // 显示内容
@@ -80,9 +76,8 @@ fun ZoomableView(
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
     state.apply {
-        BoxWithConstraints(
-            modifier = Modifier
-                .fillMaxSize()
+        Box(
+            modifier = modifier
                 .onSizeChanged {
                     updateContainerSize(
                         Size(
@@ -91,77 +86,56 @@ fun ZoomableView(
                         )
                     )
                 }
+                .graphicsLayer {
+                    clip = boundClip
+                }
+                .pointerInput(state) {
+                    detectTapGestures(onLongPress = { detectGesture.onLongPress(it) })
+                }
+                .pointerInput(state) {
+                    detectTransformGestures(
+                        onTap = { detectGesture.onTap(it) },
+                        onDoubleTap = { detectGesture.onDoubleTap(it) },
+                        gestureStart = {
+                            onGestureStart()
+                        },
+                        gestureEnd = { transformOnly ->
+                            onGestureEnd(scope, transformOnly)
+                        },
+                        onGesture = { center, pan, zoom, rotate, event ->
+                            onGesture(scope, center, pan, zoom, rotate, event)
+                        },
+                    )
+                },
+            contentAlignment = Alignment.Center,
         ) {
+            // 确保在不指定容器大小的情况下充满外部容器大小
+            Box(modifier = Modifier.fillMaxSize())
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
                     .graphicsLayer {
-                        clip = false
+                        transformOrigin = TransformOrigin.Center
+                        scaleX = scale.value
+                        scaleY = scale.value
+                        translationX = offsetX.value
+                        translationY = offsetY.value
+                        rotationZ = rotation.value
                     }
-                    .pointerInput(state) {
-                        detectTapGestures(onLongPress = { detectGesture.onLongPress(it) })
-                    }
-                    .pointerInput(state) {
-                        detectTransformGestures(
-                            onTap = { detectGesture.onTap(it) },
-                            onDoubleTap = { detectGesture.onDoubleTap(it) },
-                            gestureStart = {
-                                onGestureStart()
-                            },
-                            gestureEnd = { transformOnly ->
-                                onGestureEnd(scope, transformOnly)
-                            },
-                            onGesture = { center, pan, zoom, rotate, event ->
-                                onGesture(scope, center, pan, zoom, rotate, event)
-                            },
-                        )
-                    },
-                contentAlignment = Alignment.Center,
+                    .width(density.run { displayWidth.toDp() })
+                    .height(density.run { displayHeight.toDp() })
             ) {
-                Box(
-                    modifier = Modifier
-                        .graphicsLayer {
-                            transformOrigin = TransformOrigin.Center
-                            scaleX = scale.value
-                            scaleY = scale.value
-                            translationX = offsetX.value
-                            translationY = offsetY.value
-                            rotationZ = rotation.value
-                            clip = false
-                        }
-                        .width(density.run { displayWidth.toDp() })
-                        .height(density.run { displayHeight.toDp() })
-                        .run {
-                            if (debugMode) {
-                                background(Color.Blue.copy(0.2F))
-                            } else this
-                        }
-
-                ) {
-                    content()
-                }
-            }
-            if (debugMode) {
-                Box(
-                    modifier = Modifier
-                        .graphicsLayer {
-                            translationX = gestureCenter.value.x - 6.dp.toPx()
-                            translationY = gestureCenter.value.y - 6.dp.toPx()
-                        }
-                        .clip(CircleShape)
-                        .background(Color.Red.copy(0.4f))
-                        .size(12.dp)
-                )
-                Box(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(Color.Cyan)
-                        .size(12.dp)
-                        .align(Alignment.Center)
-                )
+                content()
             }
         }
     }
+}
+
+fun reachSide(pan: Float, offset: Float, bound: Pair<Float, Float>): Boolean {
+    val reachRightSide = offset <= bound.first
+    val reachLeftSide = offset >= bound.second
+    return !(reachLeftSide && pan > 0)
+            && !(reachRightSide && pan < 0)
+            && !(reachLeftSide && reachRightSide)
 }
 
 /**

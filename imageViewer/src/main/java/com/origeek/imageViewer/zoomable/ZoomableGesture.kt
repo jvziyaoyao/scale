@@ -1,5 +1,6 @@
 package com.origeek.imageViewer.zoomable
 
+import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.positionChanged
@@ -207,12 +208,14 @@ fun ZoomableViewState.onGesture(
     }
 
     // 这里判断是否已运动到边界，如果到了边界，就不消费事件，让上层界面获取到事件
-    val onRight = nextOffsetX <= boundX.first
-    val onLeft = nextOffsetX >= boundX.second
-    val reachSide = !(onLeft && pan.x > 0)
-            && !(onRight && pan.x < 0)
-            && !(onLeft && onRight)
-    if (reachSide || scale.value < 1) {
+//    val onRight = nextOffsetX <= boundX.first
+//    val onLeft = nextOffsetX >= boundX.second
+//    val reachSide = !(onLeft && pan.x > 0)
+//            && !(onRight && pan.x < 0)
+//            && !(onLeft && onRight)
+    val canConsumeX = reachSide(pan.x, nextOffsetX, boundX)
+    val canConsumeY = reachSide(pan.y, nextOffsetY, boundY)
+    if ((canConsumeX && canConsumeY) || scale.value < 1) {
         event.changes.fastForEach {
             if (it.positionChanged()) {
                 it.consume()
