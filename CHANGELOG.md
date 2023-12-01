@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file. 
 
 # 1.0.2-alpha.7
-- fix: galleryState添加pageCount；
+- Feat: galleryState添加pageCount；
 
 # 1.0.2-alpha.6
 - Feat: 支持上下滑手势关闭图片预览；
