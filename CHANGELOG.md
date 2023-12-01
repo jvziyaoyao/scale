@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file. 
 
-# 1.0.2-alpha.7
+# 1.0.2-alpha.8
 - Feat: galleryState添加pageCount；
 
 # 1.0.2-alpha.6
