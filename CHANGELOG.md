@@ -1,6 +1,15 @@
 # Change Log
 All notable changes to this project will be documented in this file. 
 
+# 1.0.2-alpha.8
+- Feat: galleryState添加pageCount；
+
+# 1.0.2-alpha.6
+- Feat: 支持上下滑手势关闭图片预览；
+
+# 1.0.2-alpha.5
+- Feat: 适配到高版本的HorizontalPager；
+
 # 1.0.2-alpha.4
 - Fix: 修复imageDecoder release之后获取长宽导致崩溃的问题；
 - Fix: 解决TransformItem在LazyList中不及时刷新的问题；
