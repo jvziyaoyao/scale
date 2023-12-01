@@ -162,6 +162,12 @@ fun TransformBody(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(text = "🎈 Transform")
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "data size: ${previewerState.galleryState.pageCount}",
+                    color = LocalContentColor.current.copy(0.6F),
+                    fontSize = 12.sp,
+                )
             }
             Box(
                 modifier = Modifier
