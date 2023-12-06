@@ -57,7 +57,7 @@ fun ZoomableViewState.onGestureEnd(scope: CoroutineScope, transformOnly: Boolean
                 offsetX.animateDecay(vx, decay)
             } else {
                 val targetX = if (nextScale != maxScale) {
-                    limitToBound(offsetX.value, boundX)
+                    offsetX.value
                 } else {
                     panTransformAndScale(
                         offset = offsetX.value,
@@ -68,7 +68,7 @@ fun ZoomableViewState.onGestureEnd(scope: CoroutineScope, transformOnly: Boolean
                         toScale = nextScale
                     )
                 }
-                offsetX.animateTo(targetX)
+                offsetX.animateTo(limitToBound(targetX, boundX))
             }
         }
         launch {
@@ -78,7 +78,7 @@ fun ZoomableViewState.onGestureEnd(scope: CoroutineScope, transformOnly: Boolean
                 offsetY.animateDecay(vy, decay)
             } else {
                 val targetY = if (nextScale != maxScale) {
-                    limitToBound(offsetY.value, boundY)
+                    offsetY.value
                 } else {
                     panTransformAndScale(
                         offset = offsetY.value,
@@ -89,7 +89,7 @@ fun ZoomableViewState.onGestureEnd(scope: CoroutineScope, transformOnly: Boolean
                         toScale = nextScale
                     )
                 }
-                offsetY.animateTo(targetY)
+                offsetY.animateTo(limitToBound(targetY, boundY))
             }
         }
         launch {
@@ -165,6 +165,8 @@ fun ZoomableViewState.onGesture(
             containerHeight,
             displayHeight,
         )
+
+    Log.i("TAG", "onGesture: boundY $boundY")
 
     var nextOffsetX = panTransformAndScale(
         offset = currentOffsetX,

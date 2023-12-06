@@ -53,9 +53,9 @@ const val DEFAULT_ROTATION = 0F
 const val MIN_SCALE = 0.5F
 
 // 图片最大缩放率
-//const val MAX_SCALE_RATE = 8F
+const val MAX_SCALE_RATE = 8F
 //const val MAX_SCALE_RATE = 2F
-const val MAX_SCALE_RATE = 4F
+//const val MAX_SCALE_RATE = 4F
 
 // 最小手指手势间距
 const val MIN_GESTURE_FINGER_DISTANCE = 200
@@ -111,7 +111,7 @@ class ZoomableViewState(
         }
 
     // 容器大小
-    private var containerSize = mutableStateOf(Size.Zero)
+    var containerSize = mutableStateOf(Size.Zero)
 
     val containerWidth: Float
         get() = containerSize.value.width
@@ -134,13 +134,18 @@ class ZoomableViewState(
         get() = contentRatio > containerRatio
 
     // 1倍缩放率
-    internal val scale1x: Float
+    private val scale1x: Float
         get() {
             return if (widthFixed) {
                 containerSize.value.width.div(contentSize.width)
             } else {
                 containerSize.value.height.div(contentSize.height)
             }
+        }
+
+    val displaySize: Size
+        get() {
+            return Size(displayWidth, displayHeight)
         }
 
     val displayWidth: Float
@@ -151,6 +156,14 @@ class ZoomableViewState(
     val displayHeight: Float
         get() {
             return contentSize.height.times(scale1x)
+        }
+
+    val realSize: Size
+        get() {
+            return Size(
+                width = displayWidth.times(scale.value),
+                height = displayHeight.times(scale.value)
+            )
         }
 
     // 手势的中心点

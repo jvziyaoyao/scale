@@ -1,6 +1,7 @@
 package com.origeek.viewerDemo
 
 import android.os.Bundle
+import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -20,19 +20,27 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.origeek.imageViewer.viewer.ImageCanvas01
+import com.origeek.imageViewer.viewer.ImageCanvas01ViewPort
 import com.origeek.imageViewer.zoomable.ZoomableGestureScope
 import com.origeek.imageViewer.zoomable.ZoomableView
 import com.origeek.imageViewer.zoomable.rememberZoomableState
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.rememberCoilImagePainter
+import com.origeek.viewerDemo.ui.component.rememberDecoderImagePainter
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.toggleScale
 import net.engawapg.lib.zoomable.zoomable
+import java.lang.Float.max
+import java.lang.Float.min
 
 /**
  * @program: ImageViewer
@@ -49,12 +57,107 @@ class ZoomableActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setBasicContent {
 //            ZoomableBody()
-            ZoomablePagerBody()
+            ZoomableCanvasBody()
+//            ZoomablePagerBody()
 //            ZoomableThirdBody()
         }
     }
 
 }
+
+@Composable
+fun ZoomableCanvasBody() {
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val inputStream = remember { context.assets.open("a350.jpg") }
+    val imageDecoder = rememberDecoderImagePainter(inputStream = inputStream)
+    val zoomableState = rememberZoomableState(
+        contentSize = if (imageDecoder == null) Size.Zero else Size(
+            width = imageDecoder.decoderWidth.toFloat(),
+            height = imageDecoder.decoderHeight.toFloat()
+        )
+    )
+    Box(
+        modifier = Modifier.padding(
+            horizontal = 60.dp,
+            vertical = 120.dp,
+        )
+    ) {
+        ZoomableView(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Blue.copy(0.2F)),
+            state = zoomableState,
+            boundClip = false,
+            detectGesture = ZoomableGestureScope(
+                onTap = {
+
+                },
+                onDoubleTap = {
+                    scope.launch {
+                        zoomableState.toggleScale(it)
+                    }
+                },
+                onLongPress = {
+
+                },
+            ),
+        ) {
+            if (imageDecoder != null) {
+                zoomableState.apply {
+//                    val left = (max(0F, realSize.width - containerWidth)).div(2) - offsetX.value
+//                    val top = (max(0F, realSize.height - containerHeight)).div(2) - offsetY.value
+
+                    val realWidth = realSize.width
+                    val realHeight = realSize.height
+                    val containerCenterX = containerWidth.div(2)
+                    val containerCenterY = containerHeight.div(2)
+                    val displayLeft = containerCenterX - realWidth.div(2)
+                    val displayTop = containerCenterY - realHeight.div(2)
+                    val left = displayLeft + offsetX.value
+                    val top = displayTop + offsetY.value
+                    val right = left + realWidth
+                    val bottom = top + realHeight
+                    val realRect = Rect(left, top, right, bottom)
+                    val containerRect = Rect(0F, 0F, containerWidth, containerHeight)
+                    val intersectRect = intersectRect(realRect, containerRect)
+                    val rectInViewPort = Rect(
+                        left = (intersectRect.left - realRect.left).div(realWidth),
+                        top = (intersectRect.top - realRect.top).div(realHeight),
+                        right = (intersectRect.right - realRect.left).div(realWidth),
+                        bottom = (intersectRect.bottom - realRect.top).div(realHeight),
+                    )
+
+                    val viewPort = ImageCanvas01ViewPort(
+                        size = containerSize.value,
+//                        defaultSize = displaySize,
+//                        realSize = realSize,
+                        scale = scale.value,
+                        rectInViewPort = rectInViewPort,
+                    )
+                    ImageCanvas01(
+                        imageDecoder = imageDecoder,
+                        viewPort = viewPort,
+                    )
+                }
+            }
+        }
+    }
+}
+
+fun intersectRect(rect1: Rect, rect2: Rect): Rect {
+    val left = max(rect1.left, rect2.left)
+    val top = max(rect1.top, rect2.top)
+    val right = min(rect1.right, rect2.right)
+    val bottom = min(rect1.bottom, rect2.bottom)
+
+    return if (left < right && top < bottom) {
+        Rect(left, top, right, bottom)
+    } else {
+        Rect(0F, 0F, 0F, 0F)
+    }
+}
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

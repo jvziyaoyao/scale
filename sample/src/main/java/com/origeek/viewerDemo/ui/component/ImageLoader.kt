@@ -31,7 +31,7 @@ fun rememberDecoderImagePainter(
     inputStream: InputStream,
     rotation: Int = ROTATION_0,
     delay: Long? = null,
-): Any? {
+): ImageDecoder? {
     var imageDecoder by remember { mutableStateOf<ImageDecoder?>(null) }
     LaunchedEffect(inputStream) {
         launch(Dispatchers.IO) {
