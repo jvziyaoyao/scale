@@ -29,7 +29,7 @@ import kotlin.coroutines.suspendCoroutine
  **/
 
 open class PreviewerTransformState(
-    // 协程作用域
+    // 协程作用域/
     var scope: CoroutineScope = MainScope(),
     // 默认动画窗格
     var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
@@ -397,7 +397,7 @@ open class PreviewerTransformState(
         }
         // 允许使用loading
         viewerContainerState?.allowLoading = true
-        // 标记结束
+        // 标记结束；
         stateCloseEnd()
     }
 

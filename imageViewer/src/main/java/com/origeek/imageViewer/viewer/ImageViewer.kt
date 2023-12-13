@@ -140,22 +140,24 @@ class ImageViewerState(
      */
     suspend fun reset(animationSpec: AnimationSpec<Float> = defaultAnimateSpec) {
         coroutineScope {
-            launch {
-                rotation.animateTo(DEFAULT_ROTATION, animationSpec)
-                resetTimeStamp = System.currentTimeMillis()
-            }
-            launch {
-                offsetX.animateTo(DEFAULT_OFFSET_X, animationSpec)
-                resetTimeStamp = System.currentTimeMillis()
-            }
-            launch {
-                offsetY.animateTo(DEFAULT_OFFSET_Y, animationSpec)
-                resetTimeStamp = System.currentTimeMillis()
-            }
-            launch {
-                scale.animateTo(DEFAULT_SCALE, animationSpec)
-                resetTimeStamp = System.currentTimeMillis()
-            }
+            listOf(
+                async {
+                    rotation.animateTo(DEFAULT_ROTATION, animationSpec)
+                    resetTimeStamp = System.currentTimeMillis()
+                },
+                async {
+                    offsetX.animateTo(DEFAULT_OFFSET_X, animationSpec)
+                    resetTimeStamp = System.currentTimeMillis()
+                },
+                async {
+                    offsetY.animateTo(DEFAULT_OFFSET_Y, animationSpec)
+                    resetTimeStamp = System.currentTimeMillis()
+                },
+                async {
+                    scale.animateTo(DEFAULT_SCALE, animationSpec)
+                    resetTimeStamp = System.currentTimeMillis()
+                },
+            ).awaitAll()
         }
     }
 
@@ -393,6 +395,7 @@ fun ImageViewer(
                             velocity = null
                             maxDisplayScale
                         }
+
                         else -> null
                     }
                     // 如果此时位移超出范围，就动画回范围内
@@ -583,6 +586,7 @@ fun ImageViewer(
                     crossfadeAnimationSpec = state.crossfadeAnimationSpec,
                 )
             }
+
             is ImageDecoder -> {
                 ImageComposeCanvas(
                     imageDecoder = model,
@@ -785,9 +789,11 @@ fun limitToBound(offset: Float, bound: Float): Float {
         offset > bound -> {
             bound
         }
+
         offset < -bound -> {
             -bound
         }
+
         else -> {
             offset
         }
@@ -814,10 +820,12 @@ fun panTransformAndScale(
             val upy = (uh * fromScale - uh).div(2)
             (upy - offset + center) / (fromScale * uh)
         }
+
         srcH > bh || bh > uh -> {
             val upy = (srcH - uh).div(2)
             (upy - gapH - offset + center) / (fromScale * uh)
         }
+
         else -> {
             val upy = -(bh - srcH).div(2)
             (upy - offset + center) / (fromScale * uh)
@@ -828,10 +836,12 @@ fun panTransformAndScale(
             val upy = (uh * toScale - uh).div(2)
             upy + center - py * toScale * uh
         }
+
         desH > bh -> {
             val upy = (desH - uh).div(2)
             upy - gapH + center - py * toScale * uh
         }
+
         else -> {
             val upy = -(bh - desH).div(2)
             upy + center - py * desH

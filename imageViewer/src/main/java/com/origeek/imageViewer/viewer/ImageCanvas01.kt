@@ -1,19 +1,10 @@
 package com.origeek.imageViewer.viewer
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -24,19 +15,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.withTransform
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import com.origeek.imageViewer.zoomable.ZoomableViewState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -53,10 +40,48 @@ import java.math.RoundingMode
  **/
 
 data class ImageCanvas01ViewPort(
-    val size: Size,
     val scale: Float,
-    val rectInViewPort: Rect,
+    val visualRect: Rect,
 )
+
+fun ZoomableViewState.getViewPort(): ImageCanvas01ViewPort {
+    val realWidth = realSize.width
+    val realHeight = realSize.height
+    val containerCenterX = containerWidth.div(2)
+    val containerCenterY = containerHeight.div(2)
+    val displayLeft = containerCenterX - realWidth.div(2)
+    val displayTop = containerCenterY - realHeight.div(2)
+    val left = displayLeft + offsetX.value
+    val top = displayTop + offsetY.value
+    val right = left + realWidth
+    val bottom = top + realHeight
+    val realRect = Rect(left, top, right, bottom)
+    val containerRect = Rect(0F, 0F, containerWidth, containerHeight)
+    val intersectRect = intersectRect(realRect, containerRect)
+    val rectInViewPort = Rect(
+        left = (intersectRect.left - realRect.left).div(realWidth),
+        top = (intersectRect.top - realRect.top).div(realHeight),
+        right = (intersectRect.right - realRect.left).div(realWidth),
+        bottom = (intersectRect.bottom - realRect.top).div(realHeight),
+    )
+    return ImageCanvas01ViewPort(
+        scale = scale.value,
+        visualRect = rectInViewPort,
+    )
+}
+
+fun intersectRect(rect1: Rect, rect2: Rect): Rect {
+    val left = java.lang.Float.max(rect1.left, rect2.left)
+    val top = java.lang.Float.max(rect1.top, rect2.top)
+    val right = java.lang.Float.min(rect1.right, rect2.right)
+    val bottom = java.lang.Float.min(rect1.bottom, rect2.bottom)
+
+    return if (left < right && top < bottom) {
+        Rect(left, top, right, bottom)
+    } else {
+        Rect(0F, 0F, 0F, 0F)
+    }
+}
 
 infix fun Rect.same(other: Rect): Boolean {
     return this.left == other.left
@@ -75,7 +100,6 @@ fun ImageCanvas01(
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Cyan.copy(0.4F))
     ) {
         val maxWidthPx = density.run { maxWidth.toPx() }
         val maxHeightPx = density.run { maxHeight.toPx() }
@@ -104,15 +128,14 @@ fun ImageCanvas01(
             }
         }
         // 最小图的采样率
-        val zeroInSampleSize = 8
-//        val zeroInSampleSize by remember {
-//            derivedStateOf {
-//                calculateInSampleSize(
-//                    srcWidth = imageDecoder.decoderWidth,
-//                    reqWidth = maxWidthPx.toInt(),
-//                )
-//            }
-//        }
+        val zeroInSampleSize by remember {
+            derivedStateOf {
+                calculateInSampleSize(
+                    srcWidth = imageDecoder.decoderWidth,
+                    reqWidth = maxWidthPx.toInt(),
+                )
+            }
+        }
         // 底图的采样率
         var backGroundInSample by remember { mutableStateOf(0) }
         // 底图bitmap
@@ -129,7 +152,6 @@ fun ImageCanvas01(
                 val iss = if (needRenderHeightTexture) zeroInSampleSize else inSampleSize
                 if (iss == backGroundInSample) return@launch
                 backGroundInSample = iss
-                Log.i("TAG", "ImageCanvas01: backGroundInSample ${backGroundInSample}")
                 bitmap = imageDecoder.decodeRegion(
                     iss, android.graphics.Rect(
                         0,
@@ -171,22 +193,20 @@ fun ImageCanvas01(
         // 先前的缩放比
         var previousScale by remember { mutableStateOf<Float?>(null) }
         // 先前的偏移量
-        var previousRectInViewPort by remember { mutableStateOf<Rect?>(null) }
+        var previousVisualRect by remember { mutableStateOf<Rect?>(null) }
 
         // 记录最长边的最大方块数
         var blockDividerCount by remember { mutableStateOf(1) }
         // 用来标识这个参数是否有改变
         var preBlockDividerCount by remember { mutableStateOf(blockDividerCount) }
 
-        val stX = realWidth.times(viewPort.rectInViewPort.left)
-        val stY = realHeight.times(viewPort.rectInViewPort.top)
-        val edX = realWidth.times(viewPort.rectInViewPort.right)
-        val edY = realHeight.times(viewPort.rectInViewPort.bottom)
+        val stX = realWidth.times(viewPort.visualRect.left)
+        val stY = realHeight.times(viewPort.visualRect.top)
+        val edX = realWidth.times(viewPort.visualRect.right)
+        val edY = realHeight.times(viewPort.visualRect.bottom)
 
-        val rectInViewPortOffsetX = maxWidth.times(viewPort.rectInViewPort.left)
-        val rectInViewPortOffsetY = maxHeight.times(viewPort.rectInViewPort.top)
-        val rectInViewPortWidth = maxWidth.times(viewPort.rectInViewPort.width)
-        val rectInViewPortHeight = maxHeight.times(viewPort.rectInViewPort.height)
+        val visualRectWidth = maxWidth.times(viewPort.visualRect.width)
+        val visualRectHeight = maxHeight.times(viewPort.visualRect.height)
 
         // 更新渲染方块的信息
         fun updateRenderList() {
@@ -194,11 +214,11 @@ fun ImageCanvas01(
             if (calcMaxCountPending) return
             // 更新的时候如果缩放和偏移量没有变化，方块数量也没变，就没有必要计算了
             if (
-                previousRectInViewPort?.same(viewPort.rectInViewPort) == true
+                previousVisualRect?.same(viewPort.visualRect) == true
                 && previousScale == viewPort.scale
                 && preBlockDividerCount == blockDividerCount
             ) return
-            previousRectInViewPort = viewPort.rectInViewPort
+            previousVisualRect = viewPort.visualRect
             previousScale = viewPort.scale
             // 计算当前渲染方块大小
             val renderBlockSize =
@@ -293,10 +313,10 @@ fun ImageCanvas01(
             }
         }
 
-        LaunchedEffect(realWidth, realHeight, viewPort.rectInViewPort) {
+        LaunchedEffect(realWidth, realHeight, viewPort.visualRect) {
             // 可视区域面积
-            val rectArea = BigDecimal(rectInViewPortWidth.value.toDouble())
-                .multiply(BigDecimal(rectInViewPortHeight.value.toDouble()))
+            val rectArea = BigDecimal(visualRectWidth.value.toDouble())
+                .multiply(BigDecimal(visualRectHeight.value.toDouble()))
             // 实际大小面积
             val realArea =
                 BigDecimal(realWidth.toDouble()).multiply(BigDecimal(realHeight.toDouble()))
@@ -358,28 +378,5 @@ fun ImageCanvas01(
                 }
             }
         }
-
-        Column(modifier = Modifier.fillMaxSize()) {
-            Text(text = "needRenderHeightTexture -> $needRenderHeightTexture")
-            Text(text = "renderHeightTexture -> $renderHeightTexture")
-            Text(text = "inSampleSize -> $inSampleSize")
-            Text(text = "zeroInSampleSize -> $zeroInSampleSize")
-            Text(text = "realWidth,realHeight -> $realWidth,$realHeight")
-        }
-
-        // 视口与图片的交集区域
-//        Box(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .background(Color.Cyan.copy(0.4F))
-//        )
-
-        // 视口与图片的交集区域
-        Box(
-            modifier = Modifier
-                .size(rectInViewPortWidth, rectInViewPortHeight)
-                .offset(rectInViewPortOffsetX, rectInViewPortOffsetY)
-                .background(Color.Black.copy(0.2F))
-        )
     }
 }

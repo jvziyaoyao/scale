@@ -1,6 +1,5 @@
 package com.origeek.imageViewer.zoomable
 
-import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.positionChanged
@@ -21,18 +20,22 @@ import kotlin.math.absoluteValue
  * @create: 2023-11-24 16:58
  **/
 
-fun ZoomableViewState.onGestureStart() {
+fun ZoomableViewState.onGestureStart(scope: CoroutineScope) {
     if (allowGestureInput) {
         eventChangeCount = 0
         velocityTracker = VelocityTracker()
-        offsetX.updateBounds(null, null)
-        offsetY.updateBounds(null, null)
+        scope.launch {
+            offsetX.stop()
+            offsetY.stop()
+            offsetX.updateBounds(null, null)
+            offsetY.updateBounds(null, null)
+        }
     }
 }
 
 fun ZoomableViewState.onGestureEnd(scope: CoroutineScope, transformOnly: Boolean) {
     scope.apply {
-        if (!transformOnly || !allowGestureInput) return
+        if (!transformOnly || !allowGestureInput || isRunning()) return
         var velocity = try {
             velocityTracker.calculateVelocity()
         } catch (e: Exception) {
@@ -111,7 +114,7 @@ fun ZoomableViewState.onGesture(
     rotate: Float,
     event: PointerEvent
 ): Boolean {
-    if (!allowGestureInput) return false
+    if (!allowGestureInput) return true
     // 这里只记录最大手指数
     if (eventChangeCount <= event.changes.size) {
         eventChangeCount = event.changes.size
@@ -166,8 +169,6 @@ fun ZoomableViewState.onGesture(
             displayHeight,
         )
 
-    Log.i("TAG", "onGesture: boundY $boundY")
-
     var nextOffsetX = panTransformAndScale(
         offset = currentOffsetX,
         center = center.x,
@@ -202,7 +203,7 @@ fun ZoomableViewState.onGesture(
         Offset(nextOffsetX, nextOffsetY),
     )
 
-    scope.launch {
+    if (!isRunning()) scope.launch {
         scale.snapTo(nextScale)
         offsetX.snapTo(nextOffsetX)
         offsetY.snapTo(nextOffsetY)

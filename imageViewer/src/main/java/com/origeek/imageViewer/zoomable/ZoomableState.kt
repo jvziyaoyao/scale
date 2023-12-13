@@ -1,6 +1,5 @@
 package com.origeek.imageViewer.zoomable
 
-import android.util.Log
 import androidx.annotation.FloatRange
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
@@ -8,13 +7,11 @@ import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.generateDecayAnimationSpec
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
@@ -76,7 +73,7 @@ class ZoomableViewState(
     rotation: Float = DEFAULT_ROTATION,
     // 动画窗格
     animationSpec: AnimationSpec<Float>? = null,
-) {
+) : CoroutineScope by MainScope() {
 
     // 默认动画窗格
     private var defaultAnimateSpec: AnimationSpec<Float> = animationSpec ?: SpringSpec()
@@ -253,6 +250,18 @@ class ZoomableViewState(
      */
     suspend fun reset(animationSpec: AnimationSpec<Float> = defaultAnimateSpec) {
         coroutineScope {
+//            launch {
+//                rotation.animateTo(DEFAULT_ROTATION, animationSpec)
+//            }
+//            launch {
+//                offsetX.animateTo(DEFAULT_OFFSET_X, animationSpec)
+//            }
+//            launch {
+//                offsetY.animateTo(DEFAULT_OFFSET_Y, animationSpec)
+//            }
+//            launch {
+//                scale.animateTo(DEFAULT_SCALE, animationSpec)
+//            }
             listOf(
                 async {
                     rotation.animateTo(DEFAULT_ROTATION, animationSpec)
@@ -267,7 +276,6 @@ class ZoomableViewState(
                     scale.animateTo(DEFAULT_SCALE, animationSpec)
                 },
             ).awaitAll()
-//            resetTimeStamp = System.currentTimeMillis()
         }
     }
 

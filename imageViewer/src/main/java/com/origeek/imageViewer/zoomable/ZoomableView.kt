@@ -96,7 +96,7 @@ fun ZoomableView(
                         onTap = { detectGesture.onTap(it) },
                         onDoubleTap = { detectGesture.onDoubleTap(it) },
                         gestureStart = {
-                            onGestureStart()
+                            onGestureStart(scope)
                         },
                         gestureEnd = { transformOnly ->
                             onGestureEnd(scope, transformOnly)
