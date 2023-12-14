@@ -22,6 +22,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
  * @program: ImageViewer
@@ -250,18 +251,6 @@ class ZoomableViewState(
      */
     suspend fun reset(animationSpec: AnimationSpec<Float> = defaultAnimateSpec) {
         coroutineScope {
-//            launch {
-//                rotation.animateTo(DEFAULT_ROTATION, animationSpec)
-//            }
-//            launch {
-//                offsetX.animateTo(DEFAULT_OFFSET_X, animationSpec)
-//            }
-//            launch {
-//                offsetY.animateTo(DEFAULT_OFFSET_Y, animationSpec)
-//            }
-//            launch {
-//                scale.animateTo(DEFAULT_SCALE, animationSpec)
-//            }
             listOf(
                 async {
                     rotation.animateTo(DEFAULT_ROTATION, animationSpec)

@@ -2,11 +2,14 @@ package com.origeek.viewerDemo
 
 import android.os.Bundle
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.origeek.imageViewer.gallery.ImageGallery
 import com.origeek.imageViewer.gallery.ImageGallery01
 import com.origeek.imageViewer.gallery.rememberImageGalleryState
@@ -58,12 +61,21 @@ fun GalleryBody01() {
     ImageGallery01(state = galleryState) { page ->
         val image = images[page]
         val painter = rememberCoilImagePainter(image)
-        ZoomablePolicy(intrinsicSize = painter.intrinsicSize) {
-            Image(
-                modifier = Modifier.fillMaxSize(),
-                painter = painter,
-                contentDescription = null,
-            )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    if (page % 2 == 0)
+                        Color.Red.copy(0.2F) else Color.Blue.copy(0.2F)
+                )
+        ) {
+            ZoomablePolicy(intrinsicSize = painter.intrinsicSize) {
+                Image(
+                    modifier = Modifier.fillMaxSize(),
+                    painter = painter,
+                    contentDescription = null,
+                )
+            }
         }
     }
 }

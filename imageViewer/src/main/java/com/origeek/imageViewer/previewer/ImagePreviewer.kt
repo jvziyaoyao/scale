@@ -45,6 +45,9 @@ val DEEP_DARK_FANTASY = Color(0xFF000000)
 // 图片间的默认间隔
 val DEFAULT_ITEM_SPACE = 12.dp
 
+// 页面外缓存个数
+const val DEFAULT_BEYOND_BOUNDS_ITEM_COUNT = 1
+
 // 比较轻柔的动画窗格
 val DEFAULT_SOFT_ANIMATION_SPEC = tween<Float>(320)
 

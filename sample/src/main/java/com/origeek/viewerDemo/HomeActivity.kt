@@ -48,6 +48,7 @@ class HomeActivity : BaseActivity() {
             )
         }
 
+//        goActivity(GalleryActivity::class.java)
         goActivity(ZoomableActivity::class.java)
     }
 

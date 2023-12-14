@@ -103,6 +103,8 @@ fun ImageHorizonPager(
     state: ImagePagerState,
     // 每个item之间的间隔
     itemSpacing: Dp = 0.dp,
+    // 页面外缓存个数
+    beyondBoundsItemCount: Int = 0,
     // 页面内容
     content: @Composable (page: Int) -> Unit,
 ) {
@@ -110,6 +112,7 @@ fun ImageHorizonPager(
         state = state.pagerState,
         modifier = modifier,
         pageSpacing = itemSpacing,
+        beyondBoundsPageCount = beyondBoundsItemCount,
     ) { page ->
         content(page)
     }

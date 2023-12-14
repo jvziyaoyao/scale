@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.Dp
+import com.origeek.imageViewer.previewer.DEFAULT_BEYOND_BOUNDS_ITEM_COUNT
 import com.origeek.imageViewer.previewer.DEFAULT_ITEM_SPACE
 import com.origeek.imageViewer.zoomable.ZoomableGestureScope
 import com.origeek.imageViewer.zoomable.ZoomableView
@@ -115,6 +116,8 @@ fun ImageGallery01(
     state: ImageGalleryState01,
     // 每张图片之间的间隔
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
+    // 页面外缓存个数
+    beyondBoundsItemCount: Int = DEFAULT_BEYOND_BOUNDS_ITEM_COUNT,
     // 检测手势
     detectGesture: GalleryGestureScope = GalleryGestureScope(),
     // 图层本体
@@ -128,18 +131,15 @@ fun ImageGallery01(
         modifier = modifier
             .fillMaxSize(),
         itemSpacing = itemSpacing,
+        beyondBoundsItemCount = beyondBoundsItemCount,
     ) { page ->
         GalleryZoomablePolicyScope { intrinsicSize, image ->
             val zoomableState = rememberZoomableState(contentSize = intrinsicSize)
             LaunchedEffect(key1 = state.currentPage) {
                 if (state.currentPage != page) {
-                    scope.launch {
-                        zoomableState.reset()
-                    }
+                    zoomableState.reset()
                 }
-                if (currentPage == page) {
-                    state.zoomableViewState = zoomableState
-                }
+                if (currentPage == page) state.zoomableViewState = zoomableState
             }
             ZoomableView(
                 state = zoomableState,

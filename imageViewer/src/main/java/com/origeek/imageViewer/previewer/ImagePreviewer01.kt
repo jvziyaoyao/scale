@@ -137,6 +137,8 @@ fun ImagePreviewer01(
     state: ImagePreviewerState01,
     // 图片间的间隔
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
+    // 页面外缓存个数
+    beyondBoundsItemCount: Int = DEFAULT_BEYOND_BOUNDS_ITEM_COUNT,
     // 进入动画
     enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
     // 退出动画
@@ -165,6 +167,7 @@ fun ImagePreviewer01(
                     modifier = modifier.fillMaxSize(),
                     state = galleryState,
                     itemSpacing = itemSpacing,
+                    beyondBoundsItemCount = beyondBoundsItemCount,
                     detectGesture = detectGesture,
                     zoomablePolicy = zoomablePolicy,
                 )
