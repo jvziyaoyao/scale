@@ -58,8 +58,10 @@ import kotlin.coroutines.suspendCoroutine
 // 用于操作transformItemStateMap的锁对象
 internal val imageTransformMutex = Mutex()
 
+// TODO: 暂时开放
 // 用于缓存界面上的transformItemState
-internal val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>()
+//internal val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>()
+val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>()
 
 @Composable
 fun TransformImageView(
@@ -182,6 +184,23 @@ fun TransformItemView(
     contentState: TransformContentState?,
     content: @Composable (Any) -> Unit,
 ) {
+    TransformItemView(
+        modifier = modifier,
+        key = key,
+        itemState = itemState,
+        itemVisible = contentState?.itemState != itemState || !contentState.onAction,
+        content = content,
+    )
+}
+
+@Composable
+fun TransformItemView(
+    modifier: Modifier = Modifier,
+    key: Any,
+    itemState: TransformItemState = rememberTransformItemState(),
+    itemVisible: Boolean,
+    content: @Composable (Any) -> Unit,
+) {
     val scope = rememberCoroutineScope()
     itemState.key = key
     itemState.blockCompose = content
@@ -205,9 +224,7 @@ fun TransformItemView(
             }
             .fillMaxSize()
     ) {
-        if (
-            contentState?.itemState != itemState || !contentState.onAction
-        ) {
+        if (itemVisible) {
             itemState.blockCompose(key)
         }
     }

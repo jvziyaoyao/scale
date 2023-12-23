@@ -2,9 +2,14 @@ package com.origeek.imageViewer.gallery
 
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.snapping.SnapFlingBehavior
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -91,6 +96,16 @@ fun rememberImagePagerState(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun defaultFlingBehavior(pagerState: ImagePagerState): SnapFlingBehavior {
+    return PagerDefaults.flingBehavior(
+        state = pagerState.pagerState,
+        lowVelocityAnimationSpec = tween(durationMillis = 1000, easing = LinearOutSlowInEasing),
+        highVelocityAnimationSpec = rememberSplineBasedDecay(),
+    )
+}
+
 /**
  * pager组件
  */
@@ -113,6 +128,7 @@ fun ImageHorizonPager(
         modifier = modifier,
         pageSpacing = itemSpacing,
         beyondBoundsPageCount = beyondBoundsItemCount,
+        flingBehavior = defaultFlingBehavior(pagerState = state),
     ) { page ->
         content(page)
     }

@@ -5,15 +5,12 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import com.origeek.imageViewer.gallery.GalleryGestureScope
 import com.origeek.imageViewer.gallery.GalleryZoomablePolicyScope
@@ -34,7 +31,7 @@ import kotlinx.coroutines.sync.withLock
  * @create: 2023-12-13 11:45
  **/
 
-class ImagePreviewerState01(
+open class ImagePreviewerState01(
     // 协程作用域
     scope: CoroutineScope = MainScope(),
     // 默认动画窗格
@@ -46,8 +43,9 @@ class ImagePreviewerState01(
     // 锁对象
     private var mutex = Mutex()
 
+    // TODO: internal
     // 最外侧animateVisibleState
-    internal var animateContainerVisibleState by mutableStateOf(MutableTransitionState(false))
+    var animateContainerVisibleState by mutableStateOf(MutableTransitionState(false))
 
     // 进入转换动画
     internal var enterTransition: EnterTransition? = null
@@ -145,23 +143,19 @@ fun ImagePreviewer01(
     exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,
     // 检测手势
     detectGesture: GalleryGestureScope = GalleryGestureScope(),
+    // 图层装饰
+    previewerDecoration: @Composable (innerBox: @Composable () -> Unit) -> Unit =
+        @Composable { innerBox -> innerBox() },
     // 图层本体
     zoomablePolicy: @Composable GalleryZoomablePolicyScope.(page: Int) -> Unit,
 ) {
     state.apply {
-        AnimatedVisibility(
-            modifier = Modifier.fillMaxSize(),
-            visibleState = animateContainerVisibleState,
-            enter = enterTransition ?: enter,
-            exit = exitTransition ?: exit,
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(0.6F))
-//                    .pointerInput(getKey) {
-//                        verticalDrag(this)
-//                    }
+        previewerDecoration {
+            AnimatedVisibility(
+                modifier = Modifier.fillMaxSize(),
+                visibleState = animateContainerVisibleState,
+                enter = enterTransition ?: enter,
+                exit = exitTransition ?: exit,
             ) {
                 ImageGallery01(
                     modifier = modifier.fillMaxSize(),
@@ -174,9 +168,4 @@ fun ImagePreviewer01(
             }
         }
     }
-}
-
-@Composable
-fun ImageTransformPreviewer01() {
-
 }

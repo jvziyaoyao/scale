@@ -22,7 +22,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
  * @program: ImageViewer
@@ -188,6 +187,23 @@ class ZoomableViewState(
 
     // 触摸时中心位置
     var centroid = Offset.Zero
+
+//    // 挂载状态
+//    val mountedFlow = MutableStateFlow(false)
+//
+//    // 等待挂载
+//    suspend fun awaitMounted() {
+//        mountedFlow.apply {
+//            withContext(Dispatchers.Default) {
+//                takeWhile { !it }.collect()
+//            }
+//        }
+//    }
+//
+//    // 标记挂载
+//    suspend fun onMounted() {
+//        mountedFlow.emit(true)
+//    }
 
     // 标识是否来自saver，旋转屏幕后会变成true
 //    internal var fromSaver = false
