@@ -1,14 +1,34 @@
 package com.origeek.imageViewer.previewer
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.toSize
+import com.origeek.imageViewer.gallery.GalleryGestureScope
+import com.origeek.imageViewer.gallery.GalleryZoomablePolicyScope
 import com.origeek.imageViewer.gallery.ImageGalleryState01
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,9 +47,9 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @create: 2023-12-11 20:21
  **/
-class ImageTransformPreviewerState01(
+open class ImageTransformPreviewerState01(
     // 协程作用域
-    private val scope: CoroutineScope = MainScope(),
+    private val scope: CoroutineScope,
     // 默认动画窗格
     defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
     // 预览状态
@@ -67,6 +87,8 @@ class ImageTransformPreviewerState01(
 
     val decorationAlpha = Animatable(0F)
 
+    val previewerAlpha = Animatable(0F)
+
     suspend fun awaitMounted() = suspendCoroutine<Unit> { c ->
         var notConsumed = true
         scope.launch {
@@ -97,6 +119,12 @@ class ImageTransformPreviewerState01(
                 displayOffsetY.snapTo(blockPosition.y)
                 itemContentVisible.value = true
 
+                // 关闭修饰图层
+                decorationAlpha.snapTo(0F)
+                previewerAlpha.snapTo(0F)
+                // 开启viewer图层
+                animateContainerVisibleState = MutableTransitionState(true)
+
                 // TODO: intrinsicSize为空的情况
                 val displaySize = getDisplaySize(intrinsicSize ?: Size.Zero, containerSize.value)
                 val targetX = (containerSize.value.width - displaySize.width).div(2)
@@ -120,8 +148,7 @@ class ImageTransformPreviewerState01(
                     },
                 ).awaitAll()
 
-                // 开启viewer图层
-                animateContainerVisibleState = MutableTransitionState(true)
+                previewerAlpha.snapTo(1F)
                 // 切换页面到index
                 galleryState.scrollToPage(index)
                 // 等待挂载成功
@@ -154,32 +181,8 @@ class ImageTransformPreviewerState01(
                 displayOffsetX.snapTo(targetX)
                 displayOffsetY.snapTo(targetY)
 
-                // 动画结束，开启预览
-                itemContentVisible.value = true
-                // 关闭viewer图层
-                animateContainerVisibleState = MutableTransitionState(false)
-
-                // 运动到原来位置
-                val animationSpec = tween<Float>(600)
-                listOf(
-                    scope.async {
-                        decorationAlpha.animateTo(0F, animationSpec)
-                    },
-                    scope.async {
-                        displayWidth.animateTo(blockSize.width.toFloat(), animationSpec)
-                    },
-                    scope.async {
-                        displayHeight.animateTo(blockSize.height.toFloat(), animationSpec)
-                    },
-                    scope.async {
-                        displayOffsetX.animateTo(blockPosition.x, animationSpec)
-                    },
-                    scope.async {
-                        displayOffsetY.animateTo(blockPosition.y, animationSpec)
-                    },
-                ).awaitAll()
-                // 关闭图层
-                itemContentVisible.value = false
+                // 启动关闭
+                exitFromCurrentState(itemState)
 
                 stateCloseEnd()
             }
@@ -187,6 +190,52 @@ class ImageTransformPreviewerState01(
             close()
         }
     }
+
+    internal suspend fun exitFromCurrentState(itemState: TransformItemState) {
+        // 动画结束，开启预览
+        itemContentVisible.value = true
+        // 关闭viewer图层
+        previewerAlpha.snapTo(0F)
+
+        // 运动到原来位置
+        val animationSpec = tween<Float>(600)
+
+        itemState.apply {
+            listOf(
+                scope.async {
+                    decorationAlpha.animateTo(0F, animationSpec)
+                },
+                scope.async {
+                    displayWidth.animateTo(blockSize.width.toFloat(), animationSpec)
+                },
+                scope.async {
+                    displayHeight.animateTo(blockSize.height.toFloat(), animationSpec)
+                },
+                scope.async {
+                    displayOffsetX.animateTo(blockPosition.x, animationSpec)
+                },
+                scope.async {
+                    displayOffsetY.animateTo(blockPosition.y, animationSpec)
+                },
+            ).awaitAll()
+        }
+
+        // 关闭viewer图层
+        animateContainerVisibleState = MutableTransitionState(false)
+        // 关闭图层
+        itemContentVisible.value = false
+    }
+
+    override suspend fun openAction(
+        index: Int,
+        enterTransition: EnterTransition?,
+    ) {
+        // 显示修饰图层
+        decorationAlpha.snapTo(1F)
+        previewerAlpha.snapTo(1F)
+        super.openAction(index, enterTransition)
+    }
+
 }
 
 fun getDisplaySize(contentSize: Size, containerSize: Size): Size {
@@ -206,4 +255,122 @@ fun getDisplaySize(contentSize: Size, containerSize: Size): Size {
         width = contentSize.width.times(scale1x),
         height = contentSize.height.times(scale1x),
     )
+}
+
+@Composable
+fun TransformContent01(
+    state: ImageTransformPreviewerState01,
+) {
+    val density = LocalDensity.current
+    state.apply {
+        Box(
+            modifier = Modifier
+                .size(
+                    width = density.run { displayWidth.value.toDp() },
+                    height = density.run { displayHeight.value.toDp() }
+                )
+                .offset(
+                    x = density.run { displayOffsetX.value.toDp() },
+                    y = density.run { displayOffsetY.value.toDp() },
+                )
+                .background(Color.Red.copy(0.2F))
+        ) {
+            val item = findTransformItemByIndex(enterIndex.value ?: currentPage)
+            item?.blockCompose?.invoke(item.key)
+            Text(text = "Transform")
+        }
+    }
+}
+
+class TransformLayerScope01(
+    // 图层修饰
+    var previewerDecoration: @Composable (innerBox: @Composable () -> Unit) -> Unit =
+        @Composable { innerBox -> innerBox() },
+    // 背景图层
+    var background: @Composable () -> Unit = {},
+    // 前景图层
+    var foreground: @Composable () -> Unit = {},
+)
+
+@Composable
+fun ImageTransformPreviewer01(
+    // 编辑参数
+    modifier: Modifier = Modifier,
+    // 状态对象
+    state: ImageTransformPreviewerState01,
+    // 图片间的间隔
+    itemSpacing: Dp = DEFAULT_ITEM_SPACE,
+    // 页面外缓存个数
+    beyondBoundsItemCount: Int = DEFAULT_BEYOND_BOUNDS_ITEM_COUNT,
+    // 进入动画
+    enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
+    // 退出动画
+    exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,
+    // 检测手势
+    detectGesture: GalleryGestureScope = GalleryGestureScope(),
+    // 图层修饰
+    previewerLayer: TransformLayerScope01 = TransformLayerScope01(),
+    // 缩放图层
+    zoomablePolicy: @Composable GalleryZoomablePolicyScope.(page: Int) -> Boolean,
+) {
+    state.apply {
+        Box(modifier = modifier
+            .fillMaxSize()
+            .onSizeChanged {
+                containerSize.value = it.toSize()
+            }) {
+            val transformContent = remember {
+                movableContentOf {
+                    TransformContent01(state)
+                }
+            }
+            ImagePreviewer01(
+                modifier = modifier.fillMaxSize(),
+                state = this@apply,
+                detectGesture = detectGesture,
+                enter = enter,
+                exit = exit,
+                itemSpacing = itemSpacing,
+                beyondBoundsItemCount = beyondBoundsItemCount,
+                zoomablePolicy = { page ->
+                    val zoomableMounted = zoomablePolicy(page)
+                    LaunchedEffect(zoomableMounted) {
+                        if (enterIndex.value == page && zoomableMounted) {
+                            mounted.emit(true)
+                        }
+                    }
+                },
+                previewerDecoration = { innerBox ->
+                    @Composable
+                    fun capsuleLayer(content: @Composable () -> Unit) {
+                        Box(
+                            modifier = Modifier
+                                .alpha(decorationAlpha.value)
+                        ) { content() }
+                    }
+                    previewerLayer.apply {
+                        capsuleLayer { background() }
+                        previewerDecoration {
+                            if (itemContentVisible.value && previewerAlpha.value == 1F) {
+                                transformContent()
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .alpha(previewerAlpha.value)
+                            ) {
+                                innerBox()
+                            }
+                        }
+                        capsuleLayer { foreground() }
+                    }
+                }
+            )
+
+            if (itemContentVisible.value && previewerAlpha.value != 1F) {
+                transformContent()
+            }
+        }
+    }
+
 }

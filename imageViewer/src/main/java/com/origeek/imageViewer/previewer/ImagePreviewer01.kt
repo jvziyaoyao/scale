@@ -16,8 +16,8 @@ import com.origeek.imageViewer.gallery.GalleryGestureScope
 import com.origeek.imageViewer.gallery.GalleryZoomablePolicyScope
 import com.origeek.imageViewer.gallery.ImageGallery01
 import com.origeek.imageViewer.gallery.ImageGalleryState01
+import com.origeek.imageViewer.zoomable.ZoomableViewState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -33,12 +33,15 @@ import kotlinx.coroutines.sync.withLock
 
 open class ImagePreviewerState01(
     // 协程作用域
-    scope: CoroutineScope = MainScope(),
+    scope: CoroutineScope,
     // 默认动画窗格
     defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
     // 预览状态
     galleryState: ImageGalleryState01,
 ) : PreviewerPager01State(galleryState) {
+
+    val zoomableViewState: ZoomableViewState?
+        get() = galleryState.zoomableViewState
 
     // 锁对象
     private var mutex = Mutex()
@@ -95,12 +98,10 @@ open class ImagePreviewerState01(
         }
     }
 
-    suspend fun open(
+    open suspend fun openAction(
         index: Int = 0,
-        enterTransition: EnterTransition? = null
+        enterTransition: EnterTransition? = null,
     ) {
-        // 标记状态
-        stateOpenStart()
         // 设置当前转换动画
         this.enterTransition = enterTransition
         // container动画立即设置为关闭
@@ -109,19 +110,38 @@ open class ImagePreviewerState01(
         animateContainerVisibleState.targetState = true
         // 滚动到指定页面
         galleryState.scrollToPage(index)
+    }
+
+    suspend fun open(
+        index: Int = 0,
+        enterTransition: EnterTransition? = null,
+    ) {
+        // 标记状态
+        stateOpenStart()
+        // 实际业务发生
+        openAction(index, enterTransition)
         // 标记状态
         stateOpenEnd()
     }
 
-    suspend fun close(exitTransition: ExitTransition? = null) {
-        // 标记状态
-        stateCloseStart()
+    open suspend fun closeAction(
+        exitTransition: ExitTransition? = null,
+    ) {
         // 设置当前转换动画
         this.exitTransition = exitTransition
         // 这里创建一个全新的state是为了让exitTransition的设置得到响应
         animateContainerVisibleState = MutableTransitionState(true)
         // 开启container关闭动画
         animateContainerVisibleState.targetState = false
+    }
+
+    suspend fun close(
+        exitTransition: ExitTransition? = null,
+    ) {
+        // 标记状态
+        stateCloseStart()
+        // 实际业务发生
+        closeAction(exitTransition)
         // 标记状态
         stateCloseEnd()
     }
@@ -143,20 +163,20 @@ fun ImagePreviewer01(
     exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,
     // 检测手势
     detectGesture: GalleryGestureScope = GalleryGestureScope(),
-    // 图层装饰
+    // 图层修饰
     previewerDecoration: @Composable (innerBox: @Composable () -> Unit) -> Unit =
         @Composable { innerBox -> innerBox() },
     // 图层本体
     zoomablePolicy: @Composable GalleryZoomablePolicyScope.(page: Int) -> Unit,
 ) {
     state.apply {
-        previewerDecoration {
-            AnimatedVisibility(
-                modifier = Modifier.fillMaxSize(),
-                visibleState = animateContainerVisibleState,
-                enter = enterTransition ?: enter,
-                exit = exitTransition ?: exit,
-            ) {
+        AnimatedVisibility(
+            modifier = Modifier.fillMaxSize(),
+            visibleState = animateContainerVisibleState,
+            enter = enterTransition ?: enter,
+            exit = exitTransition ?: exit,
+        ) {
+            previewerDecoration {
                 ImageGallery01(
                     modifier = modifier.fillMaxSize(),
                     state = galleryState,

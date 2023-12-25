@@ -2,7 +2,10 @@ package com.origeek.viewerDemo
 
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,37 +16,40 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
 import coil.compose.rememberAsyncImagePainter
 import com.origeek.imageViewer.gallery.ImageGallery01
 import com.origeek.imageViewer.gallery.rememberImageGalleryState01
 import com.origeek.imageViewer.previewer.ImagePreviewer01
+import com.origeek.imageViewer.previewer.ImagePreviewerState01
+import com.origeek.imageViewer.previewer.ImageTransformPreviewer01
 import com.origeek.imageViewer.previewer.ImageTransformPreviewerState01
+import com.origeek.imageViewer.previewer.ImageVerticalPreviewerState01
 import com.origeek.imageViewer.previewer.TransformItemView
+import com.origeek.imageViewer.previewer.TransformLayerScope01
+import com.origeek.imageViewer.previewer.VerticalDragType
 import com.origeek.imageViewer.previewer.rememberTransformItemState
 import com.origeek.imageViewer.viewer.ImageCanvas01
 import com.origeek.imageViewer.viewer.getViewPort
@@ -53,6 +59,7 @@ import com.origeek.imageViewer.zoomable.rememberZoomableState
 import com.origeek.viewerDemo.base.BaseActivity
 import com.origeek.viewerDemo.ui.component.rememberCoilImagePainter
 import com.origeek.viewerDemo.ui.component.rememberDecoderImagePainter
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.toggleScale
@@ -77,16 +84,17 @@ class ZoomableActivity : BaseActivity() {
 //            ZoomablePagerBody()
 //            ZoomableThirdBody()
 //            ZoomableTransformBody()
-            ZoomablePreviewerBody()
+//            ZoomablePreviewerBody()
+//            ZoomableTransformPreviewerBody()
+            ZoomableVertical()
         }
     }
 
 }
 
 @Composable
-fun ZoomablePreviewerBody() {
+fun ZoomableVertical() {
     val scope = rememberCoroutineScope()
-    val density = LocalDensity.current
     val images = remember {
         mutableStateListOf(
             R.drawable.light_01,
@@ -95,27 +103,30 @@ fun ZoomablePreviewerBody() {
         )
     }
     val galleryState = rememberImageGalleryState01 { images.size }
-//    val previewerState = remember { ImagePreviewerState01(galleryState = galleryState) }
-    val transformPreviewerState =
+    val verticalPreviewerState =
         remember {
-            ImageTransformPreviewerState01(
+            ImageVerticalPreviewerState01(
+                scope = scope,
                 getKey = { images[it] },
+                verticalDragType = VerticalDragType.Down,
                 galleryState = galleryState
             )
         }
 
-    transformPreviewerState.apply {
-        galleryState.zoomableViewState?.apply {
-            if (scale.value != 1F) {
-                BackHandler {
-                    scope.launch {
-                        reset()
+    verticalPreviewerState.apply {
+        if (visible) {
+            if (galleryState.zoomableViewState != null) {
+                if (galleryState.zoomableViewState?.scale?.value != 1F) {
+                    BackHandler {
+                        scope.launch {
+                            galleryState.zoomableViewState?.reset()
+                        }
                     }
-                }
-            } else if (visible) {
-                BackHandler {
-                    scope.launch {
-                        close()
+                } else {
+                    BackHandler {
+                        scope.launch {
+                            close()
+                        }
                     }
                 }
             }
@@ -144,12 +155,13 @@ fun ZoomablePreviewerBody() {
                                 .size(100.dp)
                                 .clickable {
                                     scope.launch {
+//                                        open(index)
                                         enterTransform(index)
                                     }
                                 },
                             key = getKey(index),
                             itemState = itemState,
-                            itemVisible = (!itemContentVisible.value && !animateContainerVisibleState.currentState)
+                            itemVisible = (!itemContentVisible.value)
                                     || if (enterIndex.value != null) enterIndex.value != index else currentPage != index,
                             content = {
                                 Image(
@@ -164,21 +176,45 @@ fun ZoomablePreviewerBody() {
                 Spacer(modifier = Modifier.weight(3F))
             }
 
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .onSizeChanged {
-                    containerSize.value = it.toSize()
-                }) {
-                ImagePreviewer01(
-                    state = this@apply,
-                    zoomablePolicy = { page ->
-                        val image = images[page]
-                        val painter = rememberCoilImagePainter(image)
-                        LaunchedEffect(painter.intrinsicSize.isSpecified) {
-                            if (painter.intrinsicSize.isSpecified && enterIndex.value == page) {
-                                mounted.emit(true)
-                            }
+            ImageTransformPreviewer01(
+                state = verticalPreviewerState,
+                previewerLayer = TransformLayerScope01(
+                    previewerDecoration = { innerBox ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .pointerInput(getKey) {
+                                    verticalDrag(this)
+                                }
+                                .graphicsLayer {
+                                    translationX = verticalDragTransformState.offsetX.value
+                                    translationY = verticalDragTransformState.offsetY.value
+                                    scaleX = verticalDragTransformState.scale.value
+                                    scaleY = verticalDragTransformState.scale.value
+                                }
+                        ) {
+                            innerBox()
                         }
+                    },
+                    background = {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Black.copy(0.8F))
+                        )
+                    }
+                ),
+                zoomablePolicy = { page ->
+                    val image = images[page]
+                    val painter = rememberCoilImagePainter(image)
+                    val mounted = remember { mutableStateOf(false) }
+                    LaunchedEffect(painter.intrinsicSize.isSpecified) {
+                        if (painter.intrinsicSize.isSpecified) {
+//                            delay(4000)
+                            mounted.value = true
+                        }
+                    }
+                    if (mounted.value) {
                         ZoomablePolicy(intrinsicSize = painter.intrinsicSize) {
                             Image(
                                 modifier = Modifier.fillMaxSize(),
@@ -186,36 +222,16 @@ fun ZoomablePreviewerBody() {
                                 contentDescription = null,
                             )
                         }
-                    },
-                    previewerDecoration = { innerBox ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .alpha(decorationAlpha.value)
-                        ) {
-                            // TODO: 这里设置背景
-                            innerBox()
+                    } else {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                         }
                     }
-                )
-                if (itemContentVisible.value) {
-                    Box(
-                        modifier = Modifier
-                            .size(
-                                width = density.run { displayWidth.value.toDp() },
-                                height = density.run { displayHeight.value.toDp() }
-                            )
-                            .offset(
-                                x = density.run { displayOffsetX.value.toDp() },
-                                y = density.run { displayOffsetY.value.toDp() },
-                            )
-                            .background(Color.Red.copy(0.2F))
-                    ) {
-                        val item = findTransformItemByIndex(enterIndex.value ?: currentPage)
-                        item?.blockCompose?.invoke(item.key)
-                    }
+
+//                    painter.intrinsicSize.isSpecified
+                    mounted.value
                 }
-            }
+            )
 
             Box(
                 modifier = Modifier.fillMaxSize()
@@ -223,9 +239,264 @@ fun ZoomablePreviewerBody() {
                 Button(onClick = {
                     scope.launch {
                         exitTransform()
+//                        close()
+                    }
+                }) {
+                    Text(text = "复位-$visibleTarget")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ZoomablePreviewerBody() {
+    val scope = rememberCoroutineScope()
+    val images = remember {
+        mutableStateListOf(
+            R.drawable.light_01,
+            R.drawable.light_02,
+            R.drawable.light_03,
+        )
+    }
+    val galleryState = rememberImageGalleryState01 { images.size }
+    val previewerState =
+        remember { ImagePreviewerState01(scope = scope, galleryState = galleryState) }
+
+    previewerState.apply {
+        BoxWithConstraints(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Spacer(modifier = Modifier.weight(7F))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    images.forEachIndexed { index, image ->
+                        val painter = rememberCoilImagePainter(image)
+                        val itemState = rememberTransformItemState()
+                        LaunchedEffect(painter.intrinsicSize) {
+                            itemState.intrinsicSize = painter.intrinsicSize
+                        }
+                        Box(
+                            modifier = Modifier
+                                .size(100.dp)
+                                .clickable {
+                                    scope.launch {
+                                        open(index)
+                                    }
+                                },
+                        ) {
+                            Image(
+                                painter = painter,
+                                contentScale = ContentScale.Crop,
+                                contentDescription = null,
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.weight(3F))
+            }
+
+            ImagePreviewer01(
+                state = previewerState,
+                previewerDecoration = { innerBox ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(0.8F))
+                    ) {
+                        innerBox()
+                    }
+                },
+                zoomablePolicy = { page ->
+                    val image = images[page]
+                    val painter = rememberCoilImagePainter(image)
+                    val mounted = remember { mutableStateOf(false) }
+                    val isSpecified = painter.intrinsicSize.isSpecified
+                    LaunchedEffect(isSpecified) {
+                        if (isSpecified) {
+                            delay(2000)
+                            mounted.value = true
+                        }
+                    }
+                    AnimatedVisibility(
+                        modifier = Modifier.fillMaxSize(),
+                        visible = mounted.value,
+                        enter = fadeIn(),
+                        exit = fadeOut(),
+                    ) {
+                        ZoomablePolicy(intrinsicSize = painter.intrinsicSize) {
+                            Image(
+                                modifier = Modifier.fillMaxSize(),
+                                painter = painter,
+                                contentDescription = null,
+                            )
+                        }
+                    }
+                    if (!mounted.value) {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                        }
+                    }
+                },
+            )
+
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Button(onClick = {
+                    scope.launch {
+                        close()
                     }
                 }) {
                     Text(text = "复位")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ZoomableTransformPreviewerBody() {
+    val scope = rememberCoroutineScope()
+    val images = remember {
+        mutableStateListOf(
+            R.drawable.light_01,
+            R.drawable.light_02,
+            R.drawable.light_03,
+        )
+    }
+    val galleryState = rememberImageGalleryState01 { images.size }
+//    val previewerState = remember { ImagePreviewerState01(galleryState = galleryState) }
+    val transformPreviewerState =
+        remember {
+            ImageTransformPreviewerState01(
+                scope = scope,
+                getKey = { images[it] },
+                galleryState = galleryState
+            )
+        }
+
+    transformPreviewerState.apply {
+        if (visible) {
+            if (galleryState.zoomableViewState != null) {
+                if (galleryState.zoomableViewState?.scale?.value != 1F) {
+                    BackHandler {
+                        scope.launch {
+                            galleryState.zoomableViewState?.reset()
+                        }
+                    }
+                } else {
+                    BackHandler {
+                        scope.launch {
+                            close()
+                        }
+                    }
+                }
+            }
+        }
+
+        BoxWithConstraints(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Spacer(modifier = Modifier.weight(7F))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    images.forEachIndexed { index, image ->
+                        val painter = rememberCoilImagePainter(image)
+                        val itemState = rememberTransformItemState()
+                        LaunchedEffect(painter.intrinsicSize) {
+                            itemState.intrinsicSize = painter.intrinsicSize
+                        }
+                        TransformItemView(
+                            modifier = Modifier
+                                .size(100.dp)
+                                .clickable {
+                                    scope.launch {
+//                                        open(index)
+                                        enterTransform(index)
+                                    }
+                                },
+                            key = getKey(index),
+                            itemState = itemState,
+                            itemVisible = (!itemContentVisible.value)
+                                    || if (enterIndex.value != null) enterIndex.value != index else currentPage != index,
+                            content = {
+                                Image(
+                                    painter = painter,
+                                    contentScale = ContentScale.Crop,
+                                    contentDescription = null,
+                                )
+                            }
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.weight(3F))
+            }
+
+            ImageTransformPreviewer01(
+                state = transformPreviewerState,
+                previewerLayer = TransformLayerScope01(
+                    previewerDecoration = { innerBox ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Black.copy(0.8F))
+                        ) {
+                            innerBox()
+                        }
+                    }
+                ),
+                zoomablePolicy = { page ->
+                    val image = images[page]
+                    val painter = rememberCoilImagePainter(image)
+                    val mounted = remember { mutableStateOf(false) }
+                    LaunchedEffect(painter.intrinsicSize.isSpecified) {
+                        if (painter.intrinsicSize.isSpecified) {
+                            delay(2000)
+                            mounted.value = true
+                        }
+                    }
+                    if (mounted.value) {
+                        ZoomablePolicy(intrinsicSize = painter.intrinsicSize) {
+                            Image(
+                                modifier = Modifier.fillMaxSize(),
+                                painter = painter,
+                                contentDescription = null,
+                            )
+                        }
+                    } else {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                        }
+                    }
+
+//                    painter.intrinsicSize.isSpecified
+                    mounted.value
+                }
+            )
+
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Button(onClick = {
+                    scope.launch {
+                        exitTransform()
+//                        close()
+                    }
+                }) {
+                    Text(text = "复位-$visibleTarget")
                 }
             }
         }
