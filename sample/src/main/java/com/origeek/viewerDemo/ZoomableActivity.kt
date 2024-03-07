@@ -210,7 +210,7 @@ fun ZoomableVertical() {
                     val mounted = remember { mutableStateOf(false) }
                     LaunchedEffect(painter.intrinsicSize.isSpecified) {
                         if (painter.intrinsicSize.isSpecified) {
-//                            delay(4000)
+                            delay(14000)
                             mounted.value = true
                         }
                     }

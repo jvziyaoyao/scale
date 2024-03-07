@@ -1,21 +1,41 @@
 package com.origeek.imageViewer.previewer
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.Dp
+import com.origeek.imageViewer.gallery.GalleryGestureScope
+import com.origeek.imageViewer.gallery.GalleryZoomablePolicyScope
 import com.origeek.imageViewer.gallery.ImageGalleryState01
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
@@ -242,4 +262,62 @@ class VerticalContainerState(
         offsetY.snapTo(0F)
         scale.snapTo(1F)
     }
+}
+
+@Composable
+fun ImageVerticalPreviewer(
+    // 编辑参数
+    modifier: Modifier = Modifier,
+    // 状态对象
+    state: ImageVerticalPreviewerState01,
+    // 图片间的间隔
+    itemSpacing: Dp = DEFAULT_ITEM_SPACE,
+    // 页面外缓存个数
+    beyondBoundsItemCount: Int = DEFAULT_BEYOND_BOUNDS_ITEM_COUNT,
+    // 进入动画
+    enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
+    // 退出动画
+    exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,
+    // 检测手势
+    detectGesture: GalleryGestureScope = GalleryGestureScope(),
+    // 图层修饰
+    previewerLayer: TransformLayerScope01 = TransformLayerScope01(),
+    // 缩放图层
+    zoomablePolicy: @Composable GalleryZoomablePolicyScope.(page: Int) -> Boolean,
+) {
+    ImageTransformPreviewer01(
+        modifier = modifier,
+        state = state,
+        itemSpacing = itemSpacing,
+        beyondBoundsItemCount = beyondBoundsItemCount,
+        enter = enter,
+        exit = exit,
+        detectGesture = detectGesture,
+        previewerLayer = TransformLayerScope01(
+            previewerDecoration = { innerBox ->
+                state.apply {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .pointerInput(getKey) {
+                                verticalDrag(this)
+                            }
+                            .graphicsLayer {
+                                translationX = verticalDragTransformState.offsetX.value
+                                translationY = verticalDragTransformState.offsetY.value
+                                scaleX = verticalDragTransformState.scale.value
+                                scaleY = verticalDragTransformState.scale.value
+                            }
+                    ) {
+                        previewerLayer.previewerDecoration {
+                            innerBox()
+                        }
+                    }
+                }
+            },
+            background = previewerLayer.background,
+            foreground = previewerLayer.foreground,
+        ),
+        zoomablePolicy = zoomablePolicy,
+    )
 }
