@@ -8,15 +8,16 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Size
@@ -29,14 +30,12 @@ import com.origeek.imageViewer.gallery.GalleryGestureScope
 import com.origeek.imageViewer.gallery.GalleryZoomablePolicyScope
 import com.origeek.imageViewer.gallery.ImageGalleryState01
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * @program: ImageViewer
@@ -83,33 +82,23 @@ open class ImageTransformPreviewerState01(
 
     val enterIndex = mutableStateOf<Int?>(null)
 
-    val mounted = MutableStateFlow(false)
+    val mountedFlow = MutableStateFlow(false)
 
     val decorationAlpha = Animatable(0F)
 
     val previewerAlpha = Animatable(0F)
 
-    suspend fun awaitMounted() = suspendCoroutine<Unit> { c ->
-        var notConsumed = true
-        scope.launch {
-            mounted
-                .takeWhile { notConsumed }
-                .collectLatest {
-                    if (it) {
-                        notConsumed = false
-                        c.resume(Unit)
-                    }
-                }
-        }
+    private suspend fun awaitMounted() {
+        mountedFlow.takeWhile { !it }.collect { }
     }
 
-    suspend fun enterTransform(index: Int) {
+    private suspend fun enterTransformInternal(index: Int) {
         val itemState = findTransformItemByIndex(index)
         if (itemState != null) {
             itemState.apply {
                 stateOpenStart()
 
-                mounted.value = false
+                mountedFlow.value = false
 
                 enterIndex.value = index
                 // 设置动画开始的位置
@@ -165,7 +154,24 @@ open class ImageTransformPreviewerState01(
         }
     }
 
+    private var enterTransformJob: Job? = null
+
+    suspend fun enterTransform(index: Int) {
+        enterTransformJob = scope.launch {
+            enterTransformInternal(index)
+        }
+        enterTransformJob?.join()
+    }
+
+    internal fun cancelEnterTransform() {
+        enterTransformJob?.cancel()
+        enterIndex.value = null
+    }
+
     suspend fun exitTransform() {
+        // 取消开启动画
+        cancelEnterTransform()
+        // 获取当前页码
         val index = currentPage
         // 同步动画开始的位置
         val itemState = findTransformItemByIndex(index)
@@ -282,6 +288,47 @@ fun TransformContent01(
     }
 }
 
+@Composable
+fun TransformContentForPage01(
+    page: Int,
+    state: ImageTransformPreviewerState01,
+) {
+    state.apply {
+        val density = LocalDensity.current
+        val item = findTransformItemByIndex(page)
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            item?.apply {
+                intrinsicSize?.run { Size(width, height) }?.let { contentSize ->
+                    density.apply {
+                        val displaySize = getDisplaySize(
+                            containerSize = Size(
+                                maxWidth.toPx(),
+                                maxHeight.toPx(),
+                            ),
+                            contentSize = contentSize,
+                        )
+                        Box(
+                            modifier = Modifier
+                                .size(
+                                    width = displaySize.width.toDp(),
+                                    height = displaySize.height.toDp(),
+                                )
+                                .background(Color.Blue.copy(0.2F))
+                                .align(Alignment.Center),
+                        ) {
+                            blockCompose.invoke(item.key)
+                            Text(text = "TransformForPage")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 class TransformLayerScope01(
     // 图层修饰
     var previewerDecoration: @Composable (innerBox: @Composable () -> Unit) -> Unit =
@@ -319,11 +366,11 @@ fun ImageTransformPreviewer01(
             .onSizeChanged {
                 containerSize.value = it.toSize()
             }) {
-            val transformContent = remember {
-                movableContentOf {
-                    TransformContent01(state)
-                }
-            }
+//            val transformContent = remember {
+//                movableContentOf {
+//                    TransformContent01(state = state)
+//                }
+//            }
             ImagePreviewer01(
                 modifier = modifier.fillMaxSize(),
                 state = this@apply,
@@ -333,10 +380,16 @@ fun ImageTransformPreviewer01(
                 itemSpacing = itemSpacing,
                 beyondBoundsItemCount = beyondBoundsItemCount,
                 zoomablePolicy = { page ->
-                    val zoomableMounted = zoomablePolicy(page)
-                    LaunchedEffect(zoomableMounted) {
-                        if (enterIndex.value == page && zoomableMounted) {
-                            mounted.emit(true)
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        val zoomableMounted = remember { mutableStateOf(false) }
+                        if (!zoomableMounted.value) {
+                            TransformContentForPage01(page = page, state = state)
+                        }
+                        zoomableMounted.value = zoomablePolicy(page)
+                        LaunchedEffect(zoomableMounted.value) {
+                            if (enterIndex.value == page && zoomableMounted.value) {
+                                mountedFlow.emit(true)
+                            }
                         }
                     }
                 },
@@ -351,9 +404,6 @@ fun ImageTransformPreviewer01(
                     previewerLayer.apply {
                         capsuleLayer { background() }
                         previewerDecoration {
-                            if (itemContentVisible.value && previewerAlpha.value == 1F) {
-                                transformContent()
-                            }
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -368,9 +418,42 @@ fun ImageTransformPreviewer01(
             )
 
             if (itemContentVisible.value && previewerAlpha.value != 1F) {
-                transformContent()
+                TransformContent01(state = state)
             }
         }
     }
 
+}
+
+@Composable
+fun TransformItemView01(
+    modifier: Modifier = Modifier,
+    key: Any,
+    itemState: TransformItemState = rememberTransformItemState(),
+    transformState: ImageTransformPreviewerState01,
+    content: @Composable (Any) -> Unit,
+) {
+    transformState.apply {
+        val currentPageKey = getKey(currentPage)
+        val isCurrentPage = currentPageKey != key
+        TransformItemView(
+            modifier = modifier,
+            key = key,
+            itemState = itemState,
+            itemVisible = if (!itemContentVisible.value) {
+                if (previewerAlpha.value == 1F) {
+                    isCurrentPage
+                } else true
+            } else {
+                if (previewerAlpha.value == 1F) {
+                    isCurrentPage
+                } else {
+                    if (enterIndex.value != null) {
+                        getKey(enterIndex.value!!) != key
+                    } else isCurrentPage
+                }
+            },
+            content = content,
+        )
+    }
 }

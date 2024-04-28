@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -16,8 +17,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
@@ -46,8 +49,9 @@ import com.origeek.imageViewer.previewer.ImagePreviewer01
 import com.origeek.imageViewer.previewer.ImagePreviewerState01
 import com.origeek.imageViewer.previewer.ImageTransformPreviewer01
 import com.origeek.imageViewer.previewer.ImageTransformPreviewerState01
+import com.origeek.imageViewer.previewer.ImageVerticalPreviewer01
 import com.origeek.imageViewer.previewer.ImageVerticalPreviewerState01
-import com.origeek.imageViewer.previewer.TransformItemView
+import com.origeek.imageViewer.previewer.TransformItemView01
 import com.origeek.imageViewer.previewer.TransformLayerScope01
 import com.origeek.imageViewer.previewer.VerticalDragType
 import com.origeek.imageViewer.previewer.rememberTransformItemState
@@ -150,50 +154,38 @@ fun ZoomableVertical() {
                         LaunchedEffect(painter.intrinsicSize) {
                             itemState.intrinsicSize = painter.intrinsicSize
                         }
-                        TransformItemView(
+                        TransformItemView01(
                             modifier = Modifier
                                 .size(100.dp)
-                                .clickable {
-                                    scope.launch {
-//                                        open(index)
-                                        enterTransform(index)
+                                .pointerInput(Unit) {
+                                    detectTapGestures {
+                                        scope.launch {
+                                            enterTransform(index)
+                                        }
                                     }
                                 },
                             key = getKey(index),
                             itemState = itemState,
-                            itemVisible = (!itemContentVisible.value)
-                                    || if (enterIndex.value != null) enterIndex.value != index else currentPage != index,
-                            content = {
-                                Image(
-                                    painter = painter,
-                                    contentScale = ContentScale.Crop,
-                                    contentDescription = null,
-                                )
-                            }
-                        )
+                            transformState = this@apply,
+                        ) {
+                            Image(
+                                painter = painter,
+                                contentScale = ContentScale.Crop,
+                                contentDescription = null,
+                            )
+                        }
                     }
                 }
                 Spacer(modifier = Modifier.weight(3F))
             }
 
-            ImageTransformPreviewer01(
+            ImageVerticalPreviewer01(
                 state = verticalPreviewerState,
                 previewerLayer = TransformLayerScope01(
                     previewerDecoration = { innerBox ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .pointerInput(getKey) {
-                                    verticalDrag(this)
-                                }
-                                .graphicsLayer {
-                                    translationX = verticalDragTransformState.offsetX.value
-                                    translationY = verticalDragTransformState.offsetY.value
-                                    scaleX = verticalDragTransformState.scale.value
-                                    scaleY = verticalDragTransformState.scale.value
-                                }
-                        ) {
+                        Box {
                             innerBox()
+                            Text(text = "好家伙111", color = Color.White)
                         }
                     },
                     background = {
@@ -210,7 +202,7 @@ fun ZoomableVertical() {
                     val mounted = remember { mutableStateOf(false) }
                     LaunchedEffect(painter.intrinsicSize.isSpecified) {
                         if (painter.intrinsicSize.isSpecified) {
-                            delay(14000)
+                            delay(12000)
                             mounted.value = true
                         }
                     }
@@ -228,20 +220,23 @@ fun ZoomableVertical() {
                         }
                     }
 
-//                    painter.intrinsicSize.isSpecified
                     mounted.value
                 }
             )
 
             Box(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
             ) {
-                Button(onClick = {
-                    scope.launch {
-                        exitTransform()
-//                        close()
-                    }
-                }) {
+                Button(
+                    modifier = Modifier.align(Alignment.BottomStart),
+                    onClick = {
+                        scope.launch {
+                            exitTransform()
+                        }
+                    }) {
                     Text(text = "复位-$visibleTarget")
                 }
             }
@@ -419,27 +414,26 @@ fun ZoomableTransformPreviewerBody() {
                         LaunchedEffect(painter.intrinsicSize) {
                             itemState.intrinsicSize = painter.intrinsicSize
                         }
-                        TransformItemView(
+                        TransformItemView01(
                             modifier = Modifier
                                 .size(100.dp)
-                                .clickable {
-                                    scope.launch {
-//                                        open(index)
-                                        enterTransform(index)
+                                .pointerInput(Unit) {
+                                    detectTapGestures {
+                                        scope.launch {
+                                            enterTransform(index)
+                                        }
                                     }
                                 },
                             key = getKey(index),
                             itemState = itemState,
-                            itemVisible = (!itemContentVisible.value)
-                                    || if (enterIndex.value != null) enterIndex.value != index else currentPage != index,
-                            content = {
-                                Image(
-                                    painter = painter,
-                                    contentScale = ContentScale.Crop,
-                                    contentDescription = null,
-                                )
-                            }
-                        )
+                            transformState = this@apply,
+                        ) {
+                            Image(
+                                painter = painter,
+                                contentScale = ContentScale.Crop,
+                                contentDescription = null,
+                            )
+                        }
                     }
                 }
                 Spacer(modifier = Modifier.weight(3F))
@@ -464,7 +458,8 @@ fun ZoomableTransformPreviewerBody() {
                     val mounted = remember { mutableStateOf(false) }
                     LaunchedEffect(painter.intrinsicSize.isSpecified) {
                         if (painter.intrinsicSize.isSpecified) {
-                            delay(2000)
+//                            delay(12000)
+                            delay(1000)
                             mounted.value = true
                         }
                     }
@@ -488,14 +483,18 @@ fun ZoomableTransformPreviewerBody() {
             )
 
             Box(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
             ) {
-                Button(onClick = {
-                    scope.launch {
-                        exitTransform()
-//                        close()
-                    }
-                }) {
+                Button(
+                    modifier = Modifier.align(Alignment.BottomStart),
+                    onClick = {
+                        scope.launch {
+                            exitTransform()
+                        }
+                    }) {
                     Text(text = "复位-$visibleTarget")
                 }
             }

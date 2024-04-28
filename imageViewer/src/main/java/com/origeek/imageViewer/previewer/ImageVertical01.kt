@@ -91,12 +91,18 @@ class ImageVerticalPreviewerState01(
             // 如果getKay不为空才开始检测手势
             if (verticalDragType != VerticalDragType.None) detectVerticalDragGestures(
                 onDragStart = OnDragStart@{
-                    if (zoomableViewState == null) return@OnDragStart
-                    // 只有viewer的缩放率为1时才允许下拉手势
-                    if (zoomableViewState!!.scale.value == 1F) {
-                        startOffset = it
-                        // 进入下拉手势时禁用viewer的手势
-                        zoomableViewState!!.allowGestureInput = false
+                    if (zoomableViewState != null) {
+                        // 只有viewer的缩放率为1时才允许下拉手势
+                        if (zoomableViewState!!.scale.value == 1F) {
+                            startOffset = it
+                            // 进入下拉手势时禁用viewer的手势
+                            zoomableViewState!!.allowGestureInput = false
+                        }
+                    } else {
+                        // 需要在预览图层正常显示的时候才允许手势
+                        if (previewerAlpha.value == 1F) {
+                            startOffset = it
+                        }
                     }
                 },
                 onDragEnd = OnDragEnd@{
@@ -127,7 +133,6 @@ class ImageVerticalPreviewerState01(
                     }
                 },
                 onVerticalDrag = OnVerticalDrag@{ change, dragAmount ->
-                    if (zoomableViewState == null) return@OnVerticalDrag
                     if (startOffset == null) return@OnVerticalDrag
                     if (orientationDown == null) orientationDown = dragAmount > 0
                     if (orientationDown == true || verticalDragType == VerticalDragType.UpAndDown) {
@@ -156,6 +161,8 @@ class ImageVerticalPreviewerState01(
      * 响应下拉关闭
      */
     private suspend fun dragDownClose(itemState: TransformItemState) {
+        // 取消开启动画
+        cancelEnterTransform()
         // 标记动作开始
         stateCloseStart()
 
@@ -265,7 +272,7 @@ class VerticalContainerState(
 }
 
 @Composable
-fun ImageVerticalPreviewer(
+fun ImageVerticalPreviewer01(
     // 编辑参数
     modifier: Modifier = Modifier,
     // 状态对象
@@ -285,17 +292,17 @@ fun ImageVerticalPreviewer(
     // 缩放图层
     zoomablePolicy: @Composable GalleryZoomablePolicyScope.(page: Int) -> Boolean,
 ) {
-    ImageTransformPreviewer01(
-        modifier = modifier,
-        state = state,
-        itemSpacing = itemSpacing,
-        beyondBoundsItemCount = beyondBoundsItemCount,
-        enter = enter,
-        exit = exit,
-        detectGesture = detectGesture,
-        previewerLayer = TransformLayerScope01(
-            previewerDecoration = { innerBox ->
-                state.apply {
+    state.apply {
+        ImageTransformPreviewer01(
+            modifier = modifier,
+            state = state,
+            itemSpacing = itemSpacing,
+            beyondBoundsItemCount = beyondBoundsItemCount,
+            enter = enter,
+            exit = exit,
+            detectGesture = detectGesture,
+            previewerLayer = TransformLayerScope01(
+                previewerDecoration = { innerBox ->
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -313,11 +320,11 @@ fun ImageVerticalPreviewer(
                             innerBox()
                         }
                     }
-                }
-            },
-            background = previewerLayer.background,
-            foreground = previewerLayer.foreground,
-        ),
-        zoomablePolicy = zoomablePolicy,
-    )
+                },
+                background = previewerLayer.background,
+                foreground = previewerLayer.foreground,
+            ),
+            zoomablePolicy = zoomablePolicy
+        )
+    }
 }
