@@ -9,6 +9,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.statusBarsPadding
@@ -20,36 +21,12 @@ class HomeActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBasicContent {
-            HomeBody(
-                goZoomable = {
-                    goActivity(ZoomableActivity::class.java)
-                },
-                goSample = {
-                    goActivity(NormalActivity::class.java)
-                },
-                goHuge = {
-                    goActivity(HugeActivity::class.java)
-                },
-                goGallery = {
-                    goActivity(GalleryActivity::class.java)
-                },
-                goPreviewer = {
-                    goActivity(PreviewerActivity::class.java)
-                },
-                goTransform = {
-                    goActivity(TransformActivity::class.java)
-                },
-                goDecoder = {
-                    goActivity(DecoderActivity::class.java)
-                },
-                goCompose = {
-                    goActivity(ComposeActivity::class.java)
-                }
-            )
+            HomeBody()
         }
 
 //        goActivity(GalleryActivity::class.java)
-        goActivity(ZoomableActivity::class.java)
+//        goActivity(ZoomableActivity::class.java)
+//        goActivity(TransformActivity::class.java)
     }
 
     private fun goActivity(cls: Class<*>) {
@@ -59,17 +36,20 @@ class HomeActivity : BaseActivity() {
 
 }
 
+val activityList = listOf(
+    ZoomableActivity::class.java,
+    NormalActivity::class.java,
+    HugeActivity::class.java,
+    GalleryActivity::class.java,
+    PreviewerActivity::class.java,
+    TransformActivity::class.java,
+    DecoderActivity::class.java,
+//    ComposeActivity::class.java,
+)
+
 @Composable
-fun HomeBody(
-    goZoomable: () -> Unit,
-    goSample: () -> Unit,
-    goHuge: () -> Unit,
-    goGallery: () -> Unit,
-    goPreviewer: () -> Unit,
-    goTransform: () -> Unit,
-    goDecoder: () -> Unit,
-    goCompose: () -> Unit,
-) {
+fun HomeBody() {
+    val context = LocalContext.current
     val state = rememberScrollState()
     Column(
         modifier = Modifier
@@ -80,14 +60,15 @@ fun HomeBody(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        HomeLargeButton(title = "Zoomable", onClick = goZoomable)
-        HomeLargeButton(title = "Sample", onClick = goSample)
-        HomeLargeButton(title = "HugeImage", onClick = goHuge)
-        HomeLargeButton(title = "ImageGallery", onClick = goGallery)
-        HomeLargeButton(title = "ImagePreviewer", onClick = goPreviewer)
-        HomeLargeButton(title = "TransformPreviewer", onClick = goTransform)
-        HomeLargeButton(title = "ImageDecoder", onClick = goDecoder)
-        HomeLargeButton(title = "Compose", onClick = goCompose)
+        activityList.forEach { activity ->
+            HomeLargeButton(
+                title = activity.simpleName,
+                onClick = {
+                    val intent = Intent(context, activity)
+                    context.startActivity(intent)
+                },
+            )
+        }
     }
 }
 

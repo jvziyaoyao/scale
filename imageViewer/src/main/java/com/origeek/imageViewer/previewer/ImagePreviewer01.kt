@@ -1,5 +1,6 @@
 package com.origeek.imageViewer.previewer
 
+import androidx.annotation.IntRange
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
@@ -16,6 +18,7 @@ import com.origeek.imageViewer.gallery.GalleryGestureScope
 import com.origeek.imageViewer.gallery.GalleryZoomablePolicyScope
 import com.origeek.imageViewer.gallery.ImageGallery01
 import com.origeek.imageViewer.gallery.ImageGalleryState01
+import com.origeek.imageViewer.gallery.rememberImageGalleryState01
 import com.origeek.imageViewer.zoomable.ZoomableViewState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.sync.Mutex
@@ -31,12 +34,19 @@ import kotlinx.coroutines.sync.withLock
  * @create: 2023-12-13 11:45
  **/
 
+@Composable
+fun rememberImagePreviewerState01(
+    @IntRange(from = 0) initialPage: Int = 0,
+    pageCount: () -> Int,
+): ImagePreviewerState01 {
+    val galleryState = rememberImageGalleryState01(initialPage = initialPage, pageCount = pageCount)
+    val previewerState = remember {
+        ImagePreviewerState01(galleryState = galleryState)
+    }
+    return previewerState
+}
+
 open class ImagePreviewerState01(
-    // 协程作用域
-    scope: CoroutineScope,
-    // 默认动画窗格
-    defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
-    // 预览状态
     galleryState: ImageGalleryState01,
 ) : PreviewerPager01State(galleryState) {
 
@@ -83,6 +93,14 @@ open class ImagePreviewerState01(
     // 是否可见的目标值
     var visibleTarget by mutableStateOf<Boolean?>(null)
         internal set
+
+    // 是否允许执行open操作
+    val canOpen: Boolean
+        get() = !visible && visibleTarget == null && !animating
+
+    // 是否允许执行close操作
+    val canClose: Boolean
+        get() = visible && visibleTarget == null && !animating
 
     /**
      * 更新当前的标记状态

@@ -23,17 +23,24 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.origeek.imageViewer.previewer.ImagePreviewer
+import com.origeek.imageViewer.previewer.ImageVerticalPreviewer01
 import com.origeek.imageViewer.previewer.TransformImageView
+import com.origeek.imageViewer.previewer.TransformItemView01
+import com.origeek.imageViewer.previewer.TransformLayerScope01
 import com.origeek.imageViewer.previewer.VerticalDragType
 import com.origeek.imageViewer.previewer.rememberPreviewerState
 import com.origeek.imageViewer.previewer.rememberTransformItemState
+import com.origeek.imageViewer.previewer.rememberVerticalState01
 import com.origeek.ui.common.compose.DetectScaleGridGesture
 import com.origeek.ui.common.compose.ScaleGrid
 import com.origeek.viewerDemo.base.BaseActivity
@@ -91,7 +98,7 @@ class TransformActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBasicContent {
-            TransformBody(
+            TransformBody01(
                 images = images,
                 onRepeatChanged = { repeat ->
                     syncImages(repeat)
@@ -111,6 +118,193 @@ data class DrawableItem(
 )
 
 val drawableItemTempIdMap = mutableMapOf<Int, String>()
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun TransformBody01(
+    images: List<DrawableItem>,
+    onRepeatChanged: (Int) -> Unit = {},
+    onDeleteItem: (DrawableItem) -> Unit = {},
+) {
+    val settingState = rememberSettingState()
+    val scope = rememberCoroutineScope()
+    val verticalState01 = rememberVerticalState01(
+        scope = scope,
+        defaultAnimationSpec = tween(settingState.animationDuration),
+        verticalDragType = VerticalDragType.Down,
+        pageCount = { images.size },
+        getKey = { images[it].id },
+    )
+    LaunchedEffect(settingState.dataRepeat) {
+        onRepeatChanged(settingState.dataRepeat)
+    }
+    LaunchedEffect(images.size) {
+        if (images.isEmpty() && (verticalState01.canClose || verticalState01.animating)) {
+            verticalState01.close()
+        }
+    }
+    if (verticalState01.canClose || verticalState01.animating) BackHandler {
+        if (verticalState01.canClose) scope.launch {
+            if (settingState.transformExit) {
+                verticalState01.exitTransform()
+            } else {
+                verticalState01.close()
+            }
+        }
+    }
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val horizontal = maxWidth > maxHeight
+        val lineCount = if (horizontal) 6 else 3
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(3F),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text(text = "🎈 Transform")
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = pxxl, end = pxxl, bottom = pxxl)
+                    .weight(if (horizontal) 6F else 7F)
+            ) {
+                LazyVerticalGrid(columns = GridCells.Fixed(lineCount)) {
+                    images.forEachIndexed { index, item ->
+                        item(key = item.id) {
+                            val needStart = index % lineCount != 0
+                            val painter = painterResource(id = item.res)
+                            val itemState = rememberTransformItemState()
+                            // TODO 待优化
+                            LaunchedEffect(painter.intrinsicSize) {
+                                itemState.intrinsicSize = painter.intrinsicSize
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(1F)
+                                    .animateItemPlacement()
+                                    .padding(start = if (needStart) 2.dp else 0.dp, bottom = 2.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                ScaleGrid(
+                                    detectGesture = DetectScaleGridGesture(
+                                        onPress = {
+                                            scope.launch {
+                                                if (settingState.transformEnter) {
+                                                    verticalState01.enterTransform(index)
+                                                } else {
+                                                    verticalState01.open(index)
+                                                }
+                                            }
+                                        }
+                                    )
+                                ) {
+                                    TransformItemView01(
+                                        key = item.id,
+                                        itemState = itemState,
+                                        transformState = verticalState01,
+                                    ) {
+                                        Image(
+                                            modifier = Modifier.fillMaxSize(),
+                                            painter = painter,
+                                            contentScale = ContentScale.Crop,
+                                            contentDescription = null,
+                                        )
+                                    }
+                                }
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.BottomCenter
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(MaterialTheme.colors.onBackground.copy(0.4F))
+                                            .padding(vertical = pxs)
+                                            .clickable {
+                                                onDeleteItem(item)
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            modifier = Modifier.size(16.dp),
+                                            imageVector = Icons.Filled.Delete,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colors.surface.copy(0.6F)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        SettingSurface(settingState)
+        ImageVerticalPreviewer01(
+            state = verticalState01,
+            previewerLayer = TransformLayerScope01(
+                foreground = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = 60.dp, end = pl),
+                        contentAlignment = Alignment.BottomEnd
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colors.surface.copy(0.2F))
+                                .clickable {
+                                    onDeleteItem(images[verticalState01.currentPage])
+                                }
+                                .padding(pl)
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(22.dp),
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = null,
+                                tint = MaterialTheme.colors.surface
+                            )
+                        }
+                    }
+                },
+                background = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(0.8F))
+                    )
+                }
+            ),
+            zoomablePolicy = { index ->
+                val painter = if (settingState.loaderError && (index % 2 == 0)) null
+                else rememberCoilImagePainter(image = images[index].res)
+                if (painter?.intrinsicSize?.isSpecified == true) {
+                    ZoomablePolicy(intrinsicSize = painter.intrinsicSize) {
+                        Image(
+                            modifier = Modifier.fillMaxSize(),
+                            painter = painter,
+                            contentDescription = null,
+                        )
+                    }
+                } else {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
+                }
+                painter?.intrinsicSize?.isSpecified == true
+            }
+        )
+    }
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

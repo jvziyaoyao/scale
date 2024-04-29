@@ -5,7 +5,6 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -50,12 +49,12 @@ open class ImageTransformPreviewerState01(
     // 协程作用域
     private val scope: CoroutineScope,
     // 默认动画窗格
-    defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
+    var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
     // 预览状态
     galleryState: ImageGalleryState01,
     // 获取当前key
     val getKey: (Int) -> Any,
-) : ImagePreviewerState01(scope, defaultAnimationSpec, galleryState) {
+) : ImagePreviewerState01(galleryState) {
 
     val itemContentVisible = mutableStateOf(false)
 
@@ -70,7 +69,7 @@ open class ImageTransformPreviewerState01(
     val displayOffsetY = Animatable(0F)
 
     // 查找key关联的transformItem
-    fun findTransformItem(key: Any): TransformItemState? {
+    private fun findTransformItem(key: Any): TransformItemState? {
         return transformItemStateMap[key]
     }
 
@@ -92,7 +91,11 @@ open class ImageTransformPreviewerState01(
         mountedFlow.takeWhile { !it }.collect { }
     }
 
-    private suspend fun enterTransformInternal(index: Int) {
+    private suspend fun enterTransformInternal(
+        index: Int,
+        animationSpec: AnimationSpec<Float>? = null
+    ) {
+        val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
         val itemState = findTransformItemByIndex(index)
         if (itemState != null) {
             itemState.apply {
@@ -118,22 +121,22 @@ open class ImageTransformPreviewerState01(
                 val displaySize = getDisplaySize(intrinsicSize ?: Size.Zero, containerSize.value)
                 val targetX = (containerSize.value.width - displaySize.width).div(2)
                 val targetY = (containerSize.value.height - displaySize.height).div(2)
-                val animationSpec = tween<Float>(600)
+//                val animationSpec = tween<Float>(600)f
                 listOf(
                     scope.async {
-                        decorationAlpha.animateTo(1F, animationSpec)
+                        decorationAlpha.animateTo(1F, currentAnimationSpec)
                     },
                     scope.async {
-                        displayWidth.animateTo(displaySize.width, animationSpec)
+                        displayWidth.animateTo(displaySize.width, currentAnimationSpec)
                     },
                     scope.async {
-                        displayHeight.animateTo(displaySize.height, animationSpec)
+                        displayHeight.animateTo(displaySize.height, currentAnimationSpec)
                     },
                     scope.async {
-                        displayOffsetX.animateTo(targetX, animationSpec)
+                        displayOffsetX.animateTo(targetX, currentAnimationSpec)
                     },
                     scope.async {
-                        displayOffsetY.animateTo(targetY, animationSpec)
+                        displayOffsetY.animateTo(targetY, currentAnimationSpec)
                     },
                 ).awaitAll()
 
@@ -156,9 +159,12 @@ open class ImageTransformPreviewerState01(
 
     private var enterTransformJob: Job? = null
 
-    suspend fun enterTransform(index: Int) {
+    suspend fun enterTransform(
+        index: Int,
+        animationSpec: AnimationSpec<Float>? = null,
+    ) {
         enterTransformJob = scope.launch {
-            enterTransformInternal(index)
+            enterTransformInternal(index, animationSpec)
         }
         enterTransformJob?.join()
     }
@@ -168,7 +174,7 @@ open class ImageTransformPreviewerState01(
         enterIndex.value = null
     }
 
-    suspend fun exitTransform() {
+    suspend fun exitTransform(animationSpec: AnimationSpec<Float>? = null) {
         // 取消开启动画
         cancelEnterTransform()
         // 获取当前页码
@@ -188,7 +194,7 @@ open class ImageTransformPreviewerState01(
                 displayOffsetY.snapTo(targetY)
 
                 // 启动关闭
-                exitFromCurrentState(itemState)
+                exitFromCurrentState(itemState, animationSpec)
 
                 stateCloseEnd()
             }
@@ -197,31 +203,32 @@ open class ImageTransformPreviewerState01(
         }
     }
 
-    internal suspend fun exitFromCurrentState(itemState: TransformItemState) {
+    internal suspend fun exitFromCurrentState(
+        itemState: TransformItemState,
+        animationSpec: AnimationSpec<Float>? = null,
+    ) {
+        val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
         // 动画结束，开启预览
         itemContentVisible.value = true
         // 关闭viewer图层
         previewerAlpha.snapTo(0F)
 
-        // 运动到原来位置
-        val animationSpec = tween<Float>(600)
-
         itemState.apply {
             listOf(
                 scope.async {
-                    decorationAlpha.animateTo(0F, animationSpec)
+                    decorationAlpha.animateTo(0F, currentAnimationSpec)
                 },
                 scope.async {
-                    displayWidth.animateTo(blockSize.width.toFloat(), animationSpec)
+                    displayWidth.animateTo(blockSize.width.toFloat(), currentAnimationSpec)
                 },
                 scope.async {
-                    displayHeight.animateTo(blockSize.height.toFloat(), animationSpec)
+                    displayHeight.animateTo(blockSize.height.toFloat(), currentAnimationSpec)
                 },
                 scope.async {
-                    displayOffsetX.animateTo(blockPosition.x, animationSpec)
+                    displayOffsetX.animateTo(blockPosition.x, currentAnimationSpec)
                 },
                 scope.async {
-                    displayOffsetY.animateTo(blockPosition.y, animationSpec)
+                    displayOffsetY.animateTo(blockPosition.y, currentAnimationSpec)
                 },
             ).awaitAll()
         }
@@ -269,21 +276,23 @@ fun TransformContent01(
 ) {
     val density = LocalDensity.current
     state.apply {
-        Box(
-            modifier = Modifier
-                .size(
-                    width = density.run { displayWidth.value.toDp() },
-                    height = density.run { displayHeight.value.toDp() }
-                )
-                .offset(
-                    x = density.run { displayOffsetX.value.toDp() },
-                    y = density.run { displayOffsetY.value.toDp() },
-                )
-                .background(Color.Red.copy(0.2F))
-        ) {
-            val item = findTransformItemByIndex(enterIndex.value ?: currentPage)
-            item?.blockCompose?.invoke(item.key)
-            Text(text = "Transform")
+        Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .size(
+                        width = density.run { displayWidth.value.toDp() },
+                        height = density.run { displayHeight.value.toDp() }
+                    )
+                    .offset(
+                        x = density.run { displayOffsetX.value.toDp() },
+                        y = density.run { displayOffsetY.value.toDp() },
+                    )
+                    .background(Color.Green.copy(0.2F))
+            ) {
+                val item = findTransformItemByIndex(enterIndex.value ?: currentPage)
+                item?.blockCompose?.invoke(item.key)
+                Text(text = "Transform", color = Color.Cyan)
+            }
         }
     }
 }
@@ -300,9 +309,9 @@ fun TransformContentForPage01(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            item?.apply {
-                intrinsicSize?.run { Size(width, height) }?.let { contentSize ->
-                    density.apply {
+            density.apply {
+                item?.apply {
+                    intrinsicSize?.run { Size(width, height) }?.let { contentSize ->
                         val displaySize = getDisplaySize(
                             containerSize = Size(
                                 maxWidth.toPx(),
@@ -366,11 +375,6 @@ fun ImageTransformPreviewer01(
             .onSizeChanged {
                 containerSize.value = it.toSize()
             }) {
-//            val transformContent = remember {
-//                movableContentOf {
-//                    TransformContent01(state = state)
-//                }
-//            }
             ImagePreviewer01(
                 modifier = modifier.fillMaxSize(),
                 state = this@apply,
@@ -434,7 +438,11 @@ fun TransformItemView01(
     content: @Composable (Any) -> Unit,
 ) {
     transformState.apply {
-        val currentPageKey = getKey(currentPage)
+        val currentPageKey = try {
+            getKey(currentPage)
+        } catch (e: Exception) {
+            null
+        }
         val isCurrentPage = currentPageKey != key
         TransformItemView(
             modifier = modifier,

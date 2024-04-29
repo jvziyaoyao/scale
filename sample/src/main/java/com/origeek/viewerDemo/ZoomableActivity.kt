@@ -256,7 +256,7 @@ fun ZoomablePreviewerBody() {
     }
     val galleryState = rememberImageGalleryState01 { images.size }
     val previewerState =
-        remember { ImagePreviewerState01(scope = scope, galleryState = galleryState) }
+        remember { ImagePreviewerState01(galleryState = galleryState) }
 
     previewerState.apply {
         BoxWithConstraints(

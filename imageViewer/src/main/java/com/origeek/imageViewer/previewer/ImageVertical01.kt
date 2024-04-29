@@ -1,5 +1,6 @@
 package com.origeek.imageViewer.previewer
 
+import androidx.annotation.IntRange
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
@@ -17,6 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +33,7 @@ import androidx.compose.ui.unit.Dp
 import com.origeek.imageViewer.gallery.GalleryGestureScope
 import com.origeek.imageViewer.gallery.GalleryZoomablePolicyScope
 import com.origeek.imageViewer.gallery.ImageGalleryState01
+import com.origeek.imageViewer.gallery.rememberImageGalleryState01
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -48,6 +51,29 @@ import kotlin.math.absoluteValue
  *
  * @create: 2023-12-25 10:29
  **/
+
+@Composable
+fun rememberVerticalState01(
+    scope: CoroutineScope = rememberCoroutineScope(),
+    defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
+    @IntRange(from = 0) initialPage: Int = 0,
+    verticalDragType: VerticalDragType = VerticalDragType.None,
+    pageCount: () -> Int,
+    getKey: (Int) -> Any,
+): ImageVerticalPreviewerState01 {
+    val galleryState = rememberImageGalleryState01(initialPage = initialPage, pageCount = pageCount)
+    val previewerState = remember {
+        ImageVerticalPreviewerState01(
+            scope = scope,
+            verticalDragType = verticalDragType,
+            galleryState = galleryState,
+            getKey = getKey,
+        )
+    }
+    previewerState.defaultAnimationSpec = defaultAnimationSpec
+    return previewerState
+}
+
 class ImageVerticalPreviewerState01(
     // 协程作用域
     private val scope: CoroutineScope,
@@ -196,22 +222,22 @@ class ImageVerticalPreviewerState01(
     /**
      * viewer容器缩小关闭
      */
-    private suspend fun viewerContainerShrinkDown() {
+    private suspend fun viewerContainerShrinkDown(
+        animationSpec: AnimationSpec<Float>? = null
+    ) {
+        val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
         // 标记动作开始
         stateCloseStart()
-
-        // TODO: defaultAnimationSpec
-        val animationSpec = tween<Float>(320)
 
         coroutineScope {
             listOf(
                 // 缩小容器
                 async {
-                    verticalDragTransformState.scale.animateTo(0F, animationSpec = animationSpec)
+                    verticalDragTransformState.scale.animateTo(0F, animationSpec = currentAnimationSpec)
                 },
                 // 关闭UI
                 async {
-                    decorationAlpha.animateTo(0F, animationSpec = animationSpec)
+                    decorationAlpha.animateTo(0F, animationSpec = currentAnimationSpec)
                 }
             ).awaitAll()
 
