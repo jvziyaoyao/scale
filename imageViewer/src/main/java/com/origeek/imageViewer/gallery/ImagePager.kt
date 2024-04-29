@@ -50,6 +50,13 @@ open class ImagePagerState @OptIn(ExperimentalFoundationApi::class) constructor(
         get() = pagerState.targetPage
 
     /**
+     * 当前页数
+     */
+    @OptIn(ExperimentalFoundationApi::class)
+    val pageCount: Int
+        get() = pagerState.pageCount
+
+    /**
      * interactionSource
      */
     @OptIn(ExperimentalFoundationApi::class)

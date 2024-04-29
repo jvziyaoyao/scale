@@ -83,6 +83,12 @@ open class ImageGalleryState(
         get() = pagerState.targetPage
 
     /**
+     * 总页数
+     */
+    val pageCount: Int
+        get() = pagerState.pageCount
+
+    /**
      * interactionSource
      */
     val interactionSource: InteractionSource
