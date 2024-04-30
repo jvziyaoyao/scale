@@ -23,14 +23,18 @@ internal val imageTransformMutex = Mutex()
 // TODO: 暂时开放
 // 用于缓存界面上的transformItemState
 //internal val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>()
-val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>()
+internal val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>()
 
 @Composable
 fun rememberTransformItemState(
     scope: CoroutineScope = rememberCoroutineScope(),
     checkInBound: (TransformItemState.() -> Boolean)? = null,
+    intrinsicSize: Size? = null,
 ): TransformItemState {
-    return remember { TransformItemState(scope = scope, checkInBound = checkInBound) }
+    val transformItemState =
+        remember { TransformItemState(scope = scope, checkInBound = checkInBound) }
+    transformItemState.intrinsicSize = intrinsicSize
+    return transformItemState
 }
 
 class TransformItemState(
