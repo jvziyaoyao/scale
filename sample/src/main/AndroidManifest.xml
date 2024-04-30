@@ -14,7 +14,7 @@
         android:theme="@style/Theme.ImageViewer"
         tools:targetApi="tiramisu">
         <activity
-            android:name="com.origeek.viewerDemo.HomeActivity"
+            android:name="com.jvziyaoyao.viewer.sample.HomeActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar">
             <intent-filter>
@@ -24,43 +24,31 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.origeek.viewerDemo.NavigationActivity"
+            android:name="com.jvziyaoyao.viewer.sample.PreviewerActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.origeek.viewerDemo.PreviewerActivity"
+            android:name="com.jvziyaoyao.viewer.sample.GalleryActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.origeek.viewerDemo.GalleryActivity"
+            android:name="com.jvziyaoyao.viewer.sample.HugeActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.origeek.viewerDemo.HugeActivity"
+            android:name="com.jvziyaoyao.viewer.sample.NormalActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.origeek.viewerDemo.NormalActivity"
+            android:name="com.jvziyaoyao.viewer.sample.DecoderActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.origeek.viewerDemo.EasyActivity"
+            android:name="com.jvziyaoyao.viewer.sample.TransformActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.origeek.viewerDemo.DecoderActivity"
-            android:exported="true"
-            android:theme="@style/Theme.ImageViewer.NoActionBar" />
-        <activity
-            android:name="com.origeek.viewerDemo.ComposeActivity"
-            android:exported="true"
-            android:theme="@style/Theme.ImageViewer.NoActionBar" />
-        <activity
-            android:name="com.origeek.viewerDemo.TransformActivity"
-            android:exported="true"
-            android:theme="@style/Theme.ImageViewer.NoActionBar" />
-        <activity
-            android:name="com.origeek.viewerDemo.ZoomableActivity"
+            android:name="com.jvziyaoyao.viewer.sample.ZoomableActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
     </application>

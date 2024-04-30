@@ -9,6 +9,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.jvziyaoyao.zoomable.previewer.DEFAULT_SOFT_ANIMATION_SPEC
+import com.jvziyaoyao.zoomable.previewer.TransformItemState
+import com.jvziyaoyao.zoomable.previewer.transformItemStateMap
 import com.origeek.imageViewer.gallery.ImageGalleryState
 import com.origeek.imageViewer.util.Ticket
 import com.origeek.imageViewer.viewer.ImageViewerState

@@ -8,8 +8,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputScope
+import com.jvziyaoyao.zoomable.previewer.DEFAULT_SCALE_TO_CLOSE_MIN_VALUE
+import com.jvziyaoyao.zoomable.previewer.DEFAULT_SOFT_ANIMATION_SPEC
+import com.jvziyaoyao.zoomable.previewer.TransformItemState
+import com.jvziyaoyao.zoomable.previewer.VerticalDragType
 import com.origeek.imageViewer.gallery.ImageGalleryState
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 /**
@@ -22,20 +30,7 @@ import kotlin.math.absoluteValue
  * @create: 2022-10-17 14:42
  **/
 
-// 默认下拉关闭缩放阈值
-const val DEFAULT_SCALE_TO_CLOSE_MIN_VALUE = 0.9F
 
-enum class VerticalDragType {
-    // 不开启垂直手势
-    None,
-
-    // 仅开启下拉手势
-    Down,
-
-    // 支持上下拉手势
-    UpAndDown,
-    ;
-}
 
 /**
  * 增加垂直方向拖拽的能力

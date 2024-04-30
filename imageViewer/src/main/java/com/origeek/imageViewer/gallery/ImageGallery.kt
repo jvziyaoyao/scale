@@ -15,7 +15,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import com.origeek.imageViewer.previewer.DEFAULT_ITEM_SPACE
+import com.jvziyaoyao.zoomable.pager.DEFAULT_ITEM_SPACE
+import com.jvziyaoyao.zoomable.pager.SupportedHorizonPager
+import com.jvziyaoyao.zoomable.pager.SupportedPagerState
+import com.jvziyaoyao.zoomable.pager.rememberSupportedPagerState
 import com.origeek.imageViewer.viewer.ImageViewer
 import com.origeek.imageViewer.viewer.ImageViewerState
 import com.origeek.imageViewer.viewer.rememberViewerState
@@ -61,7 +64,7 @@ class GalleryLayerScope(
  * gallery状态
  */
 open class ImageGalleryState(
-    val pagerState: ImagePagerState,
+    val pagerState: SupportedPagerState,
 ) {
 
     /**
@@ -124,7 +127,7 @@ fun rememberImageGalleryState(
     @IntRange(from = 0) initialPage: Int = 0,
     pageCount: () -> Int,
 ): ImageGalleryState {
-    val imagePagerState = rememberImagePagerState(initialPage, pageCount)
+    val imagePagerState = rememberSupportedPagerState(initialPage, pageCount)
     return remember { ImageGalleryState(imagePagerState) }
 }
 
@@ -162,7 +165,7 @@ fun ImageGallery(
             .fillMaxSize()
     ) {
         galleryLayerScope.background(currentPage)
-        ImageHorizonPager(
+        SupportedHorizonPager(
             state = state.pagerState,
             modifier = Modifier
                 .fillMaxSize(),

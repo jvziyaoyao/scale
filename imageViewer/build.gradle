@@ -70,7 +70,7 @@ android {
             withJavadocJar()
         }
     }
-    namespace 'com.origeek.imageViewer'
+    namespace 'com.jvziyaoyao.image.viewer'
 }
 
 dependencies {

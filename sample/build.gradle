@@ -7,11 +7,11 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.origeek.imageviewer"
+        applicationId "com.jvziyaoyao.image.viewer"
         minSdk 24
         targetSdk 34
         versionCode 1
-        versionName "1.0"
+        versionName "1.1.0-alpha.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -43,7 +43,7 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
-    namespace 'com.origeek.viewerDemo'
+    namespace "com.jvziyaoyao.image.viewer"
 }
 
 dependencies {
