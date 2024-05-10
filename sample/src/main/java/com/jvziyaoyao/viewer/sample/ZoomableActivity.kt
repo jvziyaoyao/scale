@@ -39,8 +39,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.jvziyaoyao.image.viewer.ImageCanvas
-import com.jvziyaoyao.image.viewer.R
 import com.jvziyaoyao.image.viewer.getViewPort
+import com.jvziyaoyao.image.viewer.sample.R
 import com.jvziyaoyao.viewer.sample.base.BaseActivity
 import com.jvziyaoyao.viewer.sample.ui.component.rememberCoilImagePainter
 import com.jvziyaoyao.viewer.sample.ui.component.rememberDecoderImagePainter

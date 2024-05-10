@@ -1,18 +1,28 @@
 package com.jvziyaoyao.viewer.sample.ui.component
 
+import android.content.Context
 import android.graphics.BitmapRegionDecoder
+import android.graphics.drawable.Drawable
 import android.os.Build
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.rememberAsyncImagePainter
+import coil.imageLoader
 import coil.request.ImageRequest
 import com.jvziyaoyao.image.viewer.ImageDecoder
-import com.jvziyaoyao.image.viewer.ROTATION_0
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.InputStream
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @Composable
 fun rememberCoilImagePainter(image: Any): Painter {
@@ -25,10 +35,43 @@ fun rememberCoilImagePainter(image: Any): Painter {
     return rememberAsyncImagePainter(imageRequest)
 }
 
+suspend fun loadPainter(context: Context, data: Any) = suspendCoroutine<Drawable?> { c ->
+    val imageRequest = ImageRequest.Builder(context)
+        .data(data)
+        .size(coil.size.Size.ORIGINAL)
+        .target(
+            onSuccess = {
+                c.resume(it)
+            },
+            onError = {
+                c.resume(null)
+            }
+        )
+        .build()
+    context.imageLoader.enqueue(imageRequest)
+}
+
+@Composable
+fun rememberBitmapRegionDecoder(
+    inputStream: InputStream,
+): BitmapRegionDecoder? {
+    val decoder = remember { mutableStateOf<BitmapRegionDecoder?>(null) }
+    LaunchedEffect(inputStream) {
+        launch(Dispatchers.IO) {
+            decoder.value = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                BitmapRegionDecoder.newInstance(inputStream)
+            } else {
+                BitmapRegionDecoder.newInstance(inputStream,false)
+            }
+        }
+    }
+    return decoder.value
+}
+
 @Composable
 fun rememberDecoderImagePainter(
     inputStream: InputStream,
-    rotation: Int = ROTATION_0,
+    rotation: Int = 0,
     delay: Long? = null,
 ): ImageDecoder? {
     var imageDecoder by remember { mutableStateOf<ImageDecoder?>(null) }
@@ -44,7 +87,13 @@ fun rememberDecoderImagePainter(
                 if (decoder == null) {
                     null
                 } else {
-                    ImageDecoder(decoder = decoder, rotation = rotation)
+                    val decoderRotation = when(rotation) {
+                        ImageDecoder.Rotation.ROTATION_90.radius -> ImageDecoder.Rotation.ROTATION_90
+                        ImageDecoder.Rotation.ROTATION_180.radius -> ImageDecoder.Rotation.ROTATION_180
+                        ImageDecoder.Rotation.ROTATION_270.radius -> ImageDecoder.Rotation.ROTATION_270
+                        else -> ImageDecoder.Rotation.ROTATION_0
+                    }
+                    ImageDecoder(decoder = decoder, rotation = decoderRotation)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

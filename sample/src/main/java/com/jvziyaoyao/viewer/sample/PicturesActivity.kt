@@ -1,0 +1,341 @@
+package com.jvziyaoyao.viewer.sample
+
+import android.Manifest
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
+import com.jvziyaoyao.image.viewer.ImageCanvas
+import com.jvziyaoyao.image.viewer.ImageDecoder
+import com.jvziyaoyao.image.viewer.createImageDecoder
+import com.jvziyaoyao.image.viewer.getViewPort
+import com.jvziyaoyao.viewer.sample.base.BaseActivity
+import com.jvziyaoyao.viewer.sample.base.CommonPermissions
+import com.jvziyaoyao.viewer.sample.ui.component.loadPainter
+import com.jvziyaoyao.zoomable.previewer.Previewer
+import com.jvziyaoyao.zoomable.previewer.PreviewerState
+import com.jvziyaoyao.zoomable.previewer.TransformItemView
+import com.jvziyaoyao.zoomable.previewer.rememberPreviewerState
+import com.jvziyaoyao.zoomable.previewer.rememberTransformItemState
+import com.origeek.ui.common.compose.DetectScaleGridGesture
+import com.origeek.ui.common.compose.ScaleGrid
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.File
+
+val requirePermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    listOf(
+        Manifest.permission.READ_MEDIA_IMAGES,
+        Manifest.permission.READ_MEDIA_AUDIO,
+        Manifest.permission.READ_MEDIA_VIDEO,
+    )
+} else {
+    listOf(
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    )
+}
+
+class PicturesActivity : BaseActivity() {
+
+    private val imagesFileList = mutableStateListOf<File>()
+
+    // TODO 这里需要换一个更通用的路径
+    private fun getStoragePath(): File {
+        val picturesFile =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absoluteFile
+        val storageFile = File(picturesFile, "yao")
+        if (!storageFile.exists()) storageFile.mkdirs()
+        return storageFile
+    }
+
+    private fun fetchImages() {
+        val yaoDirectory = getStoragePath()
+        val fileList = yaoDirectory.listFiles()
+            ?.filter { it.isFile }
+//            ?.filter { it.length() > 0 }
+            ?.toList()?.reversed() ?: emptyList()
+        imagesFileList.clear()
+        imagesFileList.addAll(fileList)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setBasicContent {
+            CommonPermissions(
+                permissions = requirePermissions,
+                onPermissionChange = {
+                    if (it) launch(Dispatchers.IO) {
+                        fetchImages()
+                    }
+                }
+            ) {
+                PicturesBody(
+                    images = imagesFileList,
+                )
+            }
+        }
+    }
+
+}
+
+@Composable
+fun PicturesBody(
+    images: List<File>,
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        val previewerState = rememberPreviewerState(
+            pageCount = { images.size },
+            getKey = { images[it].absolutePath },
+        )
+        PicturesGridLayer(
+            images = images,
+            previewerState = previewerState,
+        )
+        PicturesDecoderPreviewLayer(
+            images = images,
+            previewerState = previewerState,
+        )
+    }
+}
+
+@Composable
+fun PicturesDecoderPreviewLayer(
+    images: List<File>,
+    previewerState: PreviewerState,
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    Previewer(
+        state = previewerState,
+        debugMode = true,
+        zoomablePolicy = { page ->
+            val file = images[page]
+            val imageDecoder = remember { mutableStateOf<ImageDecoder?>(null) }
+            val painter = remember { mutableStateOf<Painter?>(null) }
+            val error = remember { mutableStateOf(false) }
+            LaunchedEffect(Unit) {
+                scope.launch(Dispatchers.IO) {
+                    try {
+                        imageDecoder.value = createImageDecoder(file)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                    if (imageDecoder.value != null) return@launch
+                    painter.value = loadPainter(context, file)?.let {
+                        BitmapPainter(it.toBitmap().asImageBitmap())
+                    }
+                    if (painter.value != null) return@launch
+                    error.value = true
+                }
+            }
+            DisposableEffect(Unit) {
+                onDispose {
+                    imageDecoder.value?.release()
+                }
+            }
+            imageDecoder.value?.let { decoder ->
+                ZoomablePolicy(intrinsicSize = decoder.intrinsicSize) {
+                    val viewPort = it.getViewPort()
+                    ImageCanvas(
+                        imageDecoder = decoder,
+                        viewPort = viewPort,
+                    )
+                    Text(text = "ImageCanvas")
+                }
+            }
+            painter.value?.let { p ->
+                if (p.intrinsicSize.isSpecified) {
+                    ZoomablePolicy(intrinsicSize = p.intrinsicSize) {
+                        Image(
+                            modifier = Modifier.fillMaxSize(),
+                            painter = p,
+                            contentDescription = null
+                        )
+                        Text(text = "Image")
+                    }
+                }
+            }
+            if (imageDecoder.value == null && painter.value == null) {
+                if (!error.value) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center),
+                            color = Color.Cyan,
+                        )
+                    }
+                }
+            }
+            if (error.value) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colors.background)
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .size(30.dp)
+                            .align(Alignment.Center),
+                        imageVector = Icons.Filled.Error,
+                        tint = LocalContentColor.current.copy(0.04F),
+                        contentDescription = null
+                    )
+                }
+            }
+            imageDecoder.value != null || painter.value?.intrinsicSize?.isSpecified == true || error.value
+        }
+    )
+}
+
+@Composable
+fun PicturesGridLayer(
+    images: List<File>,
+    previewerState: PreviewerState,
+) {
+    val scope = rememberCoroutineScope()
+    val lineCount = 4
+    LazyVerticalGrid(
+        modifier = Modifier.statusBarsPadding(),
+        columns = GridCells.Fixed(lineCount)
+    ) {
+        images.forEachIndexed { index, item ->
+            item(key = item.absolutePath) {
+                val needStart = index % lineCount != 0
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1F)
+                        .padding(start = if (needStart) 2.dp else 0.dp, bottom = 2.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ScaleGrid(
+                        detectGesture = DetectScaleGridGesture(
+                            onPress = {
+                                scope.launch {
+                                    previewerState.enterTransform(index)
+                                }
+                            }
+                        )
+                    ) {
+                        val painter = rememberAsyncImagePainter(item)
+                        val itemState = rememberTransformItemState(
+                            intrinsicSize = painter.intrinsicSize
+                        )
+                        TransformItemView(
+                            key = item.absolutePath,
+                            itemState = itemState,
+                            transformState = previewerState,
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(MaterialTheme.colors.background)
+                            ) {
+                                Image(
+                                    modifier = Modifier.fillMaxSize(),
+                                    painter = painter,
+                                    contentScale = ContentScale.Crop,
+                                    contentDescription = null,
+                                )
+                                if (painter.state is AsyncImagePainter.State.Error) {
+                                    Icon(
+                                        modifier = Modifier
+                                            .size(30.dp)
+                                            .align(Alignment.Center),
+                                        imageVector = Icons.Filled.Error,
+                                        tint = LocalContentColor.current.copy(0.04F),
+                                        contentDescription = null
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+//                    ScaleGrid(
+//                        detectGesture = DetectScaleGridGesture(
+//                            onPress = {
+//                                scope.launch {
+//                                    previewerState.enterTransform(index)
+//                                }
+//                            }
+//                        )
+//                    ) {
+//                        val painter = rememberAsyncImagePainter(item)
+//                        val itemState = rememberTransformItemState(
+//                            intrinsicSize = painter.intrinsicSize
+//                        )
+//                        TransformItemView(
+//                            key = item.absolutePath,
+//                            itemState = itemState,
+//                            transformState = previewerState,
+//                        ) {
+//                            Box(
+//                                modifier = Modifier
+//                                    .fillMaxSize()
+//                                    .background(Color.Gray.copy(0.2F))
+//                            ) {
+//                                Image(
+//                                    modifier = Modifier.fillMaxSize(),
+//                                    painter = painter,
+//                                    contentScale = ContentScale.Crop,
+//                                    contentDescription = null,
+//                                )
+//                                if (painter.state is AsyncImagePainter.State.Loading) {
+//                                    CircularProgressIndicator(
+//                                        modifier = Modifier
+//                                            .size(40.dp)
+//                                            .align(Alignment.Center)
+//                                    )
+//                                } else if (painter.state is AsyncImagePainter.State.Error) {
+//                                    Icon(
+//                                        modifier = Modifier.align(Alignment.Center),
+//                                        imageVector = Icons.Filled.Error,
+//                                        tint = LocalContentColor.current.copy(0.1F),
+//                                        contentDescription = null
+//                                    )
+//                                }
+//                            }
+//                        }
+//                    }
+                }
+            }
+        }
+    }
+}

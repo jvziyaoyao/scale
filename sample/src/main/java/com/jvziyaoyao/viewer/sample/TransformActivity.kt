@@ -69,7 +69,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.jvziyaoyao.image.viewer.R
+import com.jvziyaoyao.image.viewer.sample.R
 import com.jvziyaoyao.viewer.sample.base.BaseActivity
 import com.jvziyaoyao.viewer.sample.ui.component.rememberCoilImagePainter
 import com.jvziyaoyao.viewer.sample.ui.theme.pgl
@@ -220,11 +220,9 @@ fun TransformBody(
                         item(key = item.id) {
                             val needStart = index % lineCount != 0
                             val painter = painterResource(id = item.res)
-                            val itemState = rememberTransformItemState()
-                            // TODO 待优化
-                            LaunchedEffect(painter.intrinsicSize) {
-                                itemState.intrinsicSize = painter.intrinsicSize
-                            }
+                            val itemState = rememberTransformItemState(
+                                intrinsicSize = painter.intrinsicSize
+                            )
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()

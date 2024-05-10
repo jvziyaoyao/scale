@@ -19,21 +19,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.jvziyaoyao.image.viewer.R
+import com.jvziyaoyao.image.pager.ImagePager
+import com.jvziyaoyao.image.viewer.sample.R
 import com.jvziyaoyao.viewer.sample.base.BaseActivity
 import com.jvziyaoyao.viewer.sample.ui.component.rememberCoilImagePainter
 import com.jvziyaoyao.zoomable.pager.ZoomablePager
 import com.jvziyaoyao.zoomable.pager.rememberZoomablePagerState
-import com.origeek.imageViewer.gallery.ImageGallery
-import com.origeek.imageViewer.gallery.rememberImageGalleryState
 
 class GalleryActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBasicContent {
-//            GalleryBody()
-            GalleryBody01()
+            GalleryBody()
+//            GalleryBody01()
 //            GalleryBody02()
         }
     }
@@ -49,13 +48,22 @@ fun GalleryBody() {
             R.drawable.light_03,
         )
     }
-    ImageGallery(
+//    ImageGallery(
+//        modifier = Modifier.fillMaxSize(),
+//        state = rememberImageGalleryState { images.size },
+//        imageLoader = { index ->
+//            val image = images[index]
+//            rememberCoilImagePainter(image = image)
+//        },
+//    )
+
+    ImagePager(
         modifier = Modifier.fillMaxSize(),
-        state = rememberImageGalleryState { images.size },
+        pagerState = rememberZoomablePagerState { images.size },
         imageLoader = { index ->
             val image = images[index]
             rememberCoilImagePainter(image = image)
-        },
+        }
     )
 }
 

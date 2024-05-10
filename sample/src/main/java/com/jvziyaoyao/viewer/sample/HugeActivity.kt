@@ -9,14 +9,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalContext
 import com.jvziyaoyao.image.viewer.ImageCanvas
+import com.jvziyaoyao.image.viewer.ImageViewer
 import com.jvziyaoyao.image.viewer.getViewPort
+import com.jvziyaoyao.image.viewer.rememberImageDecoder
 import com.jvziyaoyao.viewer.sample.base.BaseActivity
 import com.jvziyaoyao.viewer.sample.ui.component.rememberDecoderImagePainter
 import com.jvziyaoyao.zoomable.zoomable.ZoomableGestureScope
 import com.jvziyaoyao.zoomable.zoomable.ZoomableView
 import com.jvziyaoyao.zoomable.zoomable.rememberZoomableState
-import com.origeek.imageViewer.viewer.ImageViewer
-import com.origeek.imageViewer.viewer.rememberViewerState
 import kotlinx.coroutines.launch
 
 class HugeActivity : BaseActivity() {
@@ -24,8 +24,8 @@ class HugeActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBasicContent {
-//            HugeBody()
-            HugeBody01()
+            HugeBody()
+//            HugeBody01()
         }
     }
 
@@ -34,22 +34,21 @@ class HugeActivity : BaseActivity() {
 @Composable
 fun HugeBody() {
     val context = LocalContext.current
-    val inputStream = remember { context.assets.open("a350.jpg") }
-    val imageDecoder = rememberDecoderImagePainter(inputStream = inputStream)
     val scope = rememberCoroutineScope()
-    val state = rememberViewerState()
-    ImageViewer(
-        model = imageDecoder,
-        state = state,
-        boundClip = false,
-        detectGesture = {
-            onDoubleTap = {
+    val inputStream = remember { context.assets.open("a350.jpg") }
+    val imageDecoder = rememberImageDecoder(inputStream = inputStream)
+    if (imageDecoder != null) {
+        val state = rememberZoomableState(contentSize = imageDecoder.intrinsicSize)
+        ImageViewer(
+            imageDecoder = imageDecoder,
+            state = state,
+            detectGesture = ZoomableGestureScope(onDoubleTap = {
                 scope.launch {
                     state.toggleScale(it)
                 }
-            }
-        },
-    )
+            })
+        )
+    }
 }
 
 @Composable

@@ -4,6 +4,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -49,6 +53,10 @@
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
             android:name="com.jvziyaoyao.viewer.sample.ZoomableActivity"
+            android:exported="true"
+            android:theme="@style/Theme.ImageViewer.NoActionBar" />
+        <activity
+            android:name="com.jvziyaoyao.viewer.sample.PicturesActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
     </application>

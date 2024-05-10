@@ -61,7 +61,7 @@ const val MIN_GESTURE_FINGER_DISTANCE = 200
 /**
  * viewer状态对象，用于记录compose组件状态
  */
-class ZoomableViewState(
+open class ZoomableViewState(
     // 最大缩放率
     @FloatRange(from = 1.0) val maxScale: Float = MAX_SCALE_RATE,
     // X轴偏移量

@@ -1,13 +1,12 @@
 package com.jvziyaoyao.zoomable.previewer
 
-import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,15 +17,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.jvziyaoyao.zoomable.pager.DEFAULT_BEYOND_BOUNDS_ITEM_COUNT
 import com.jvziyaoyao.zoomable.pager.DEFAULT_ITEM_SPACE
@@ -35,17 +35,14 @@ import com.jvziyaoyao.zoomable.pager.PagerZoomablePolicyScope
 import com.jvziyaoyao.zoomable.pager.SupportedPagerState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 // 比较轻柔的动画窗格
-val DEFAULT_SOFT_ANIMATION_SPEC = tween<Float>(320)
+val DEFAULT_SOFT_ANIMATION_SPEC = tween<Float>(400)
 
 /**
  * @program: TransformPreviewer
@@ -129,7 +126,12 @@ open class TransformPreviewerState(
                 animateContainerVisibleState = MutableTransitionState(true)
 
                 // TODO: intrinsicSize为空的情况
-                val displaySize = getDisplaySize(intrinsicSize ?: Size.Zero, containerSize.value)
+                val displaySize = if (intrinsicSize != null && intrinsicSize!!.isSpecified) {
+                    getDisplaySize(intrinsicSize!!, containerSize.value)
+                } else {
+                    getDisplaySize(containerSize.value, containerSize.value)
+                }
+//                val displaySize = getDisplaySize(intrinsicSize ?: Size.Zero, containerSize.value)
                 val targetX = (containerSize.value.width - displaySize.width).div(2)
                 val targetY = (containerSize.value.height - displaySize.height).div(2)
 //                val animationSpec = tween<Float>(600)f
@@ -284,10 +286,12 @@ fun getDisplaySize(contentSize: Size, containerSize: Size): Size {
 @Composable
 fun TransformContentLayer(
     state: TransformPreviewerState,
+    debugMode: Boolean = false,
 ) {
     val density = LocalDensity.current
     state.apply {
         Box(modifier = Modifier.fillMaxSize()) {
+            val actionColor = Color.Green
             Box(
                 modifier = Modifier
                     .size(
@@ -298,11 +302,13 @@ fun TransformContentLayer(
                         x = density.run { displayOffsetX.value.toDp() },
                         y = density.run { displayOffsetY.value.toDp() },
                     )
-                    .background(Color.Green.copy(0.2F))
+                    .run {
+                        if (debugMode) border(width = 2.dp, color = actionColor) else this
+                    }
             ) {
                 val item = findTransformItemByIndex(enterIndex.value ?: currentPage)
                 item?.blockCompose?.invoke(item.key)
-                Text(text = "Transform", color = Color.Cyan)
+                if (debugMode) Text(text = "Transform", color = actionColor)
             }
         }
     }
@@ -312,6 +318,7 @@ fun TransformContentLayer(
 fun TransformContentForPage(
     page: Int,
     state: TransformPreviewerState,
+    debugMode: Boolean = false,
 ) {
     state.apply {
         val density = LocalDensity.current
@@ -322,25 +329,31 @@ fun TransformContentForPage(
         ) {
             density.apply {
                 item?.apply {
-                    intrinsicSize?.run { Size(width, height) }?.let { contentSize ->
+                    val containerSize = Size(maxWidth.toPx(), maxHeight.toPx())
+                    intrinsicSize?.run {
+                        if (isSpecified) Size(width, height) else containerSize
+                    }?.let { contentSize ->
                         val displaySize = getDisplaySize(
-                            containerSize = Size(
-                                maxWidth.toPx(),
-                                maxHeight.toPx(),
-                            ),
+                            containerSize = containerSize,
                             contentSize = contentSize,
                         )
+                        val actionColor = Color.Cyan
                         Box(
                             modifier = Modifier
                                 .size(
                                     width = displaySize.width.toDp(),
                                     height = displaySize.height.toDp(),
                                 )
-                                .background(Color.Blue.copy(0.2F))
+                                .run {
+                                    if (debugMode) border(
+                                        width = 2.dp,
+                                        color = actionColor
+                                    ) else this
+                                }
                                 .align(Alignment.Center),
                         ) {
                             blockCompose.invoke(item.key)
-                            Text(text = "TransformForPage")
+                            if (debugMode) Text(text = "TransformForPage", color = actionColor)
                         }
                     }
                 }
@@ -373,6 +386,8 @@ fun TransformPreviewer(
     enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
     // 退出动画
     exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,
+    // 调试模式
+    debugMode: Boolean = false,
     // 检测手势
     detectGesture: PagerGestureScope = PagerGestureScope(),
     // 图层修饰
@@ -380,7 +395,6 @@ fun TransformPreviewer(
     // 缩放图层
     zoomablePolicy: @Composable PagerZoomablePolicyScope.(page: Int) -> Boolean,
 ) {
-    val scope = rememberCoroutineScope()
     state.apply {
         Box(modifier = modifier
             .fillMaxSize()
@@ -400,7 +414,7 @@ fun TransformPreviewer(
                         // TODO 优化闪烁的问题
                         val zoomableMounted = remember { mutableStateOf(false) }
                         if (!zoomableMounted.value) {
-                            TransformContentForPage(page = page, state = state)
+                            TransformContentForPage(page = page, state = state, debugMode = debugMode)
                         }
                         zoomableMounted.value = zoomablePolicy(page)
                         LaunchedEffect(zoomableMounted.value) {
@@ -435,7 +449,7 @@ fun TransformPreviewer(
             )
 
             if (itemContentVisible.value && previewerAlpha.value != 1F) {
-                TransformContentLayer(state = state)
+                TransformContentLayer(state = state, debugMode = debugMode)
             }
         }
     }

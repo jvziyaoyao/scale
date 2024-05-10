@@ -1,7 +1,5 @@
 package com.jvziyaoyao.image.viewer
 
-import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
@@ -63,7 +61,6 @@ fun ZoomableViewState.getViewPort(): ImageCanvasViewPort {
         right = (intersectRect.right - realRect.left).div(realWidth),
         bottom = (intersectRect.bottom - realRect.top).div(realHeight),
     )
-    Log.i("TAG", "contentSize: DecoderBody $containerSize ~ $contentSize")
     return ImageCanvasViewPort(
         scale = scale.value,
         visualRect = rectInViewPort,
@@ -118,7 +115,6 @@ infix fun Rect.same(other: Rect): Boolean {
 fun ImageCanvas(
     imageDecoder: ImageDecoder,
     viewPort: ImageCanvasViewPort,
-    thumbnail: Bitmap? = null,
 ) {
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
@@ -171,7 +167,7 @@ fun ImageCanvas(
                 if (needRenderHeightTexture) zeroInSampleSize else inSampleSize
             }
         }
-        var bitmap by remember { mutableStateOf(thumbnail) }
+        var bitmap by remember { mutableStateOf(imageDecoder.thumbnail) }
         LaunchedEffect(backgroundInputSample) {
             scope.launch(Dispatchers.IO) {
                 bitmap = imageDecoder.decodeRegion(
@@ -184,48 +180,7 @@ fun ImageCanvas(
                 )
             }
         }
-//        val bitmap by remember(backgroundInputSample) {
-//            derivedStateOf {
-//                imageDecoder.decodeRegion(
-//                    backgroundInputSample, android.graphics.Rect(
-//                        0,
-//                        0,
-//                        imageDecoder.decoderWidth,
-//                        imageDecoder.decoderHeight
-//                    )
-//                )
-//            }
-//        }
 
-//        // 底图的采样率
-//        var backGroundInSample by remember { mutableStateOf(0) }
-//        // 底图bitmap
-//        var bitmap by remember { mutableStateOf<Bitmap?>(null) }
-//        // 根据采样率变化，实时更新底图
-//        LaunchedEffect(
-//            key1 = zeroInSampleSize,
-//            key2 = inSampleSize,
-//            key3 = needRenderHeightTexture
-//        ) {
-//            Log.i(
-//                "TAG",
-//                "ImageCanvas: LaunchedEffect $zeroInSampleSize $inSampleSize $needRenderHeightTexture"
-//            )
-//            scope.launch(Dispatchers.IO) {
-//                // 如果不需要渲染高画质，就不需要分块渲染，直接使用当前采样率，用底图来展示
-//                val iss = if (needRenderHeightTexture) zeroInSampleSize else inSampleSize
-//                if (iss == backGroundInSample) return@launch
-//                backGroundInSample = iss
-//                bitmap = imageDecoder.decodeRegion(
-//                    iss, android.graphics.Rect(
-//                        0,
-//                        0,
-//                        imageDecoder.decoderWidth,
-//                        imageDecoder.decoderHeight
-//                    )
-//                )
-//            }
-//        }
         DisposableEffect(Unit) {
             onDispose {
                 bitmap?.recycle()
@@ -422,11 +377,6 @@ fun ImageCanvas(
             withTransform({
                 scale(backScale, backScale, pivot = Offset(0.5F, 0.5F))
             }) {
-                Log.i(
-                    "TAG",
-                    "ImageCanvas: Canvas Start $zeroInSampleSize $inSampleSize $needRenderHeightTexture"
-                )
-                Log.i("TAG", "ImageCanvas: bitmap $bitmap")
                 if (bitmap != null) {
                     drawImage(
                         image = bitmap!!.asImageBitmap(),

@@ -22,7 +22,7 @@ fun rememberPreviewerState(
     scope: CoroutineScope = rememberCoroutineScope(),
     defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
     @IntRange(from = 0) initialPage: Int = 0,
-    verticalDragType: VerticalDragType = VerticalDragType.None,
+    verticalDragType: VerticalDragType = VerticalDragType.Down,
     pageCount: () -> Int,
     getKey: (Int) -> Any,
 ): PreviewerState {
@@ -69,6 +69,8 @@ fun Previewer(
     enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
     // 退出动画
     exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,
+    // 调试模式
+    debugMode: Boolean = false,
     // 检测手势
     detectGesture: PagerGestureScope = PagerGestureScope(),
     // 图层修饰
@@ -83,6 +85,7 @@ fun Previewer(
         beyondBoundsItemCount = beyondBoundsItemCount,
         enter = enter,
         exit = exit,
+        debugMode = debugMode,
         detectGesture = detectGesture,
         previewerLayer = previewerLayer,
         zoomablePolicy = zoomablePolicy,

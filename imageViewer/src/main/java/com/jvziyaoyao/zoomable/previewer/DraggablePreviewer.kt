@@ -14,7 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
@@ -178,8 +178,11 @@ open class DraggablePreviewerState(
         stateCloseStart()
 
         draggableContainerState.apply {
-            val displaySize =
-                getDisplaySize(itemState.intrinsicSize ?: Size.Zero, containerSize.value)
+            val displaySize = if (itemState.intrinsicSize != null && itemState.intrinsicSize!!.isSpecified) {
+                getDisplaySize(itemState.intrinsicSize!!, containerSize.value)
+            } else {
+                getDisplaySize(containerSize.value, containerSize.value)
+            }
 
             val centerX = containerSize.value.width.div(2)
             val centerY = containerSize.value.height.div(2)
@@ -296,6 +299,8 @@ fun DraggablePreviewer(
     enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
     // 退出动画
     exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,
+    // 调试模式
+    debugMode: Boolean = false,
     // 检测手势
     detectGesture: PagerGestureScope = PagerGestureScope(),
     // 图层修饰
@@ -311,6 +316,7 @@ fun DraggablePreviewer(
             beyondBoundsItemCount = beyondBoundsItemCount,
             enter = enter,
             exit = exit,
+            debugMode = debugMode,
             detectGesture = detectGesture,
             previewerLayer = TransformLayerScope(
                 previewerDecoration = { innerBox ->

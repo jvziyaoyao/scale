@@ -1,10 +1,8 @@
 package com.jvziyaoyao.viewer.sample
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -23,7 +21,6 @@ import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,21 +30,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.jvziyaoyao.image.viewer.ImageCanvas
-import com.jvziyaoyao.image.viewer.R
-import com.jvziyaoyao.image.viewer.ROTATION_0
-import com.jvziyaoyao.image.viewer.ROTATION_180
-import com.jvziyaoyao.image.viewer.ROTATION_270
-import com.jvziyaoyao.image.viewer.ROTATION_90
 import com.jvziyaoyao.image.viewer.getViewPort
+import com.jvziyaoyao.image.viewer.rememberImageDecoder
+import com.jvziyaoyao.image.viewer.sample.R
 import com.jvziyaoyao.viewer.sample.base.BaseActivity
-import com.jvziyaoyao.viewer.sample.ui.component.rememberDecoderImagePainter
 import com.jvziyaoyao.zoomable.previewer.Previewer
 import com.jvziyaoyao.zoomable.previewer.TransformItemView
 import com.jvziyaoyao.zoomable.previewer.VerticalDragType
@@ -55,7 +46,6 @@ import com.jvziyaoyao.zoomable.previewer.rememberPreviewerState
 import com.jvziyaoyao.zoomable.previewer.rememberTransformItemState
 import com.origeek.ui.common.compose.DetectScaleGridGesture
 import com.origeek.ui.common.compose.ScaleGrid
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
@@ -95,9 +85,9 @@ fun DecoderBody() {
         )
         val inputStream = remember { context.assets.open("a350.jpg") }
         val painter = painterResource(R.drawable.a350_temp)
-        val itemState = rememberTransformItemState()
-        // TODO 要命啊，这里必须改
-        itemState.intrinsicSize = painter.intrinsicSize
+        val itemState = rememberTransformItemState(
+            intrinsicSize = painter.intrinsicSize,
+        )
         val horizontal = maxWidth > maxHeight
         // Save
         var transformEnable by rememberSaveable { mutableStateOf(true) }
@@ -209,48 +199,21 @@ fun DecoderBody() {
         }
 
         val insetRotation by remember {
-            derivedStateOf {
-                when (ceil(rotation).toInt()) {
-                    ROTATION_0 -> ROTATION_0
-                    ROTATION_90 -> ROTATION_90
-                    ROTATION_180 -> ROTATION_180
-                    ROTATION_270 -> ROTATION_270
-                    else -> ROTATION_0
-                }
-            }
+            derivedStateOf { ceil(rotation).toInt() }
         }
         Previewer(
             state = previewerState,
             zoomablePolicy = {
-                val imageDecoder = rememberDecoderImagePainter(
+                val imageDecoder = rememberImageDecoder(
                     inputStream = inputStream,
-                    rotation = insetRotation,
-                    delay = loadDelay.toLong()
+                    rotation = insetRotation
                 )
-                val thumbnail = remember { mutableStateOf<Bitmap?>(null) }
-                LaunchedEffect(imageDecoder) {
-                    if (imageDecoder != null) {
-                        scope.launch(Dispatchers.IO) {
-                            thumbnail.value = imageDecoder.createTempBitmap()
-                        }
-                    }
-                }
-                if (imageDecoder != null && thumbnail.value != null) {
-                    val intrinsicSize = Size(
-                        width = imageDecoder.decoderWidth.toFloat(),
-                        height = imageDecoder.decoderHeight.toFloat(),
-                    )
-                    ZoomablePolicy(intrinsicSize = intrinsicSize) {
+                if (imageDecoder != null) {
+                    ZoomablePolicy(intrinsicSize = imageDecoder.intrinsicSize) {
                         val viewPort = it.getViewPort()
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.Yellow)
-                        )
                         ImageCanvas(
                             imageDecoder = imageDecoder,
                             viewPort = viewPort,
-                            thumbnail = thumbnail.value,
                         )
                     }
                 } else {
@@ -258,7 +221,7 @@ fun DecoderBody() {
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                     }
                 }
-                imageDecoder != null && thumbnail.value != null
+                imageDecoder != null
             }
         )
     }

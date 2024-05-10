@@ -8,13 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import com.jvziyaoyao.image.viewer.R
+import com.jvziyaoyao.image.viewer.ImageViewer
+import com.jvziyaoyao.image.viewer.sample.R
 import com.jvziyaoyao.viewer.sample.base.BaseActivity
+import com.jvziyaoyao.viewer.sample.ui.component.rememberCoilImagePainter
 import com.jvziyaoyao.zoomable.zoomable.ZoomableGestureScope
 import com.jvziyaoyao.zoomable.zoomable.ZoomableView
 import com.jvziyaoyao.zoomable.zoomable.rememberZoomableState
-import com.origeek.imageViewer.viewer.ImageViewer
-import com.origeek.imageViewer.viewer.rememberViewerState
 import kotlinx.coroutines.launch
 
 class NormalActivity : BaseActivity() {
@@ -22,8 +22,8 @@ class NormalActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBasicContent {
-//            NormalBody()
-            NormalBody1()
+            NormalBody()
+//            NormalBody1()
         }
     }
 
@@ -32,23 +32,20 @@ class NormalActivity : BaseActivity() {
 @Composable
 fun NormalBody() {
     val scope = rememberCoroutineScope()
-    val state = rememberViewerState()
-
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
+        val painter = rememberCoilImagePainter(image = R.drawable.light_02)
+        val state = rememberZoomableState(contentSize = painter.intrinsicSize)
         ImageViewer(
+            painter = painter,
             state = state,
-            model = painterResource(id = R.drawable.light_02),
-            modifier = Modifier.fillMaxSize(),
-            detectGesture = {
-                onDoubleTap = {
-                    scope.launch {
-                        state.toggleScale(it)
-                    }
+            detectGesture = ZoomableGestureScope(onDoubleTap = {
+                scope.launch {
+                    state.toggleScale(it)
                 }
-            },
+            })
         )
     }
 }

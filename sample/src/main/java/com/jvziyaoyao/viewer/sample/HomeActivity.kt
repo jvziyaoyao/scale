@@ -31,10 +31,6 @@ class HomeActivity : BaseActivity() {
         setBasicContent {
             HomeBody()
         }
-
-//        goActivity(GalleryActivity::class.java)
-//        goActivity(ZoomableActivity::class.java)
-//        goActivity(TransformActivity::class.java)
     }
 
 }
@@ -47,6 +43,7 @@ val activityList = listOf(
     PreviewerActivity::class.java,
     TransformActivity::class.java,
     DecoderActivity::class.java,
+    PicturesActivity::class.java,
 )
 
 @Composable
