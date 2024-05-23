@@ -1,6 +1,8 @@
 package com.jvziyaoyao.viewer.sample
 
+import android.content.res.AssetManager.AssetInputStream
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -204,6 +206,7 @@ fun DecoderBody() {
         Previewer(
             state = previewerState,
             zoomablePolicy = {
+                Log.i("TAG", "DecoderBody: inputStream $inputStream")
                 val imageDecoder = rememberImageDecoder(
                     inputStream = inputStream,
                     rotation = insetRotation

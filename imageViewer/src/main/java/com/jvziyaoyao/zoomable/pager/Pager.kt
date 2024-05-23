@@ -6,6 +6,7 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.TargetedFlingBehavior
 import androidx.compose.foundation.gestures.snapping.SnapFlingBehavior
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.pager.HorizontalPager
@@ -103,14 +104,16 @@ fun rememberSupportedPagerState(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun defaultFlingBehavior(pagerState: SupportedPagerState): SnapFlingBehavior {
+fun defaultFlingBehavior(pagerState: SupportedPagerState): TargetedFlingBehavior {
     return PagerDefaults.flingBehavior(
         state = pagerState.pagerState,
-        lowVelocityAnimationSpec = tween(durationMillis = 1000, easing = LinearOutSlowInEasing),
-        highVelocityAnimationSpec = rememberSplineBasedDecay(),
     )
+//    return PagerDefaults.flingBehavior(
+//        state = pagerState.pagerState,
+//        lowVelocityAnimationSpec = tween(durationMillis = 1000, easing = LinearOutSlowInEasing),
+//        highVelocityAnimationSpec = rememberSplineBasedDecay(),
+//    )
 }
 
 /**
@@ -126,7 +129,7 @@ fun SupportedHorizonPager(
     // 每个item之间的间隔
     itemSpacing: Dp = 0.dp,
     // 页面外缓存个数
-    beyondBoundsItemCount: Int = 0,
+    beyondViewportPageCount: Int = 0,
     // 页面内容
     content: @Composable (page: Int) -> Unit,
 ) {
@@ -134,7 +137,7 @@ fun SupportedHorizonPager(
         state = state.pagerState,
         modifier = modifier,
         pageSpacing = itemSpacing,
-        beyondBoundsPageCount = beyondBoundsItemCount,
+        beyondViewportPageCount = beyondViewportPageCount,
         flingBehavior = defaultFlingBehavior(pagerState = state),
     ) { page ->
         content(page)

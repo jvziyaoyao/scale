@@ -9,7 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import com.jvziyaoyao.zoomable.pager.DEFAULT_BEYOND_BOUNDS_ITEM_COUNT
+import com.jvziyaoyao.zoomable.pager.DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT
 import com.jvziyaoyao.zoomable.pager.DEFAULT_ITEM_SPACE
 import com.jvziyaoyao.zoomable.pager.PagerGestureScope
 import com.jvziyaoyao.zoomable.pager.PagerZoomablePolicyScope
@@ -64,7 +64,7 @@ fun Previewer(
     // 图片间的间隔
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     // 页面外缓存个数
-    beyondBoundsItemCount: Int = DEFAULT_BEYOND_BOUNDS_ITEM_COUNT,
+    beyondViewportPageCount: Int = DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT,
     // 进入动画
     enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
     // 退出动画
@@ -82,7 +82,7 @@ fun Previewer(
         modifier = modifier,
         state = state,
         itemSpacing = itemSpacing,
-        beyondBoundsItemCount = beyondBoundsItemCount,
+        beyondViewportPageCount = beyondViewportPageCount,
         enter = enter,
         exit = exit,
         debugMode = debugMode,

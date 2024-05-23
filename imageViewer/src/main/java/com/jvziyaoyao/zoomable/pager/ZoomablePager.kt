@@ -6,11 +6,9 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.Dp
@@ -35,7 +33,7 @@ import kotlinx.coroutines.launch
 val DEFAULT_ITEM_SPACE = 12.dp
 
 // 页面外缓存个数
-const val DEFAULT_BEYOND_BOUNDS_ITEM_COUNT = 1
+const val DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT = 1
 
 fun interface PagerZoomablePolicyScope {
     @Composable
@@ -130,7 +128,7 @@ fun ZoomablePager(
     // 每张图片之间的间隔
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     // 页面外缓存个数
-    beyondBoundsItemCount: Int = DEFAULT_BEYOND_BOUNDS_ITEM_COUNT,
+    beyondViewportPageCount: Int = DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT,
     // 检测手势
     detectGesture: PagerGestureScope = PagerGestureScope(),
     // 图层本体
@@ -144,7 +142,7 @@ fun ZoomablePager(
         modifier = modifier
             .fillMaxSize(),
         itemSpacing = itemSpacing,
-        beyondBoundsItemCount = beyondBoundsItemCount,
+        beyondViewportPageCount = beyondViewportPageCount,
     ) { page ->
         PagerZoomablePolicyScope { intrinsicSize, content ->
             val zoomableState = rememberZoomableState(contentSize = intrinsicSize)

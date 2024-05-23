@@ -4,12 +4,19 @@ import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -52,6 +59,7 @@ import com.jvziyaoyao.viewer.sample.ui.component.loadPainter
 import com.jvziyaoyao.zoomable.previewer.Previewer
 import com.jvziyaoyao.zoomable.previewer.PreviewerState
 import com.jvziyaoyao.zoomable.previewer.TransformItemView
+import com.jvziyaoyao.zoomable.previewer.TransformLayerScope
 import com.jvziyaoyao.zoomable.previewer.rememberPreviewerState
 import com.jvziyaoyao.zoomable.previewer.rememberTransformItemState
 import com.origeek.ui.common.compose.DetectScaleGridGesture
@@ -146,6 +154,15 @@ fun PicturesDecoderPreviewLayer(
     Previewer(
         state = previewerState,
         debugMode = true,
+        previewerLayer = TransformLayerScope(
+            background = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black)
+                )
+            }
+        ),
         zoomablePolicy = { page ->
             val file = images[page]
             val imageDecoder = remember { mutableStateOf<ImageDecoder?>(null) }
@@ -171,6 +188,7 @@ fun PicturesDecoderPreviewLayer(
                     imageDecoder.value?.release()
                 }
             }
+
             imageDecoder.value?.let { decoder ->
                 ZoomablePolicy(intrinsicSize = decoder.intrinsicSize) {
                     val viewPort = it.getViewPort()
@@ -198,25 +216,33 @@ fun PicturesDecoderPreviewLayer(
                     Box(modifier = Modifier.fillMaxSize()) {
                         CircularProgressIndicator(
                             modifier = Modifier.align(Alignment.Center),
-                            color = Color.Cyan,
+                            color = LocalContentColor.current.copy(0.1F),
                         )
                     }
                 }
             }
-            if (error.value) {
-                Box(
+            AnimatedVisibility(
+                modifier = Modifier.fillMaxSize(),
+                visible = error.value,
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                Column(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colors.background)
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
                 ) {
+                    val color = Color.White.copy(0.4F)
                     Icon(
                         modifier = Modifier
-                            .size(30.dp)
-                            .align(Alignment.Center),
+                            .size(40.dp),
                         imageVector = Icons.Filled.Error,
-                        tint = LocalContentColor.current.copy(0.04F),
+                        tint = color,
                         contentDescription = null
                     )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(text = "图片加载失败", color = color)
                 }
             }
             imageDecoder.value != null || painter.value?.intrinsicSize?.isSpecified == true || error.value
@@ -259,6 +285,8 @@ fun PicturesGridLayer(
                             intrinsicSize = painter.intrinsicSize
                         )
                         TransformItemView(
+                            modifier = Modifier
+                                .background(MaterialTheme.colors.background),
                             key = item.absolutePath,
                             itemState = itemState,
                             transformState = previewerState,
@@ -266,7 +294,6 @@ fun PicturesGridLayer(
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .background(MaterialTheme.colors.background)
                             ) {
                                 Image(
                                     modifier = Modifier.fillMaxSize(),
@@ -287,53 +314,6 @@ fun PicturesGridLayer(
                             }
                         }
                     }
-
-//                    ScaleGrid(
-//                        detectGesture = DetectScaleGridGesture(
-//                            onPress = {
-//                                scope.launch {
-//                                    previewerState.enterTransform(index)
-//                                }
-//                            }
-//                        )
-//                    ) {
-//                        val painter = rememberAsyncImagePainter(item)
-//                        val itemState = rememberTransformItemState(
-//                            intrinsicSize = painter.intrinsicSize
-//                        )
-//                        TransformItemView(
-//                            key = item.absolutePath,
-//                            itemState = itemState,
-//                            transformState = previewerState,
-//                        ) {
-//                            Box(
-//                                modifier = Modifier
-//                                    .fillMaxSize()
-//                                    .background(Color.Gray.copy(0.2F))
-//                            ) {
-//                                Image(
-//                                    modifier = Modifier.fillMaxSize(),
-//                                    painter = painter,
-//                                    contentScale = ContentScale.Crop,
-//                                    contentDescription = null,
-//                                )
-//                                if (painter.state is AsyncImagePainter.State.Loading) {
-//                                    CircularProgressIndicator(
-//                                        modifier = Modifier
-//                                            .size(40.dp)
-//                                            .align(Alignment.Center)
-//                                    )
-//                                } else if (painter.state is AsyncImagePainter.State.Error) {
-//                                    Icon(
-//                                        modifier = Modifier.align(Alignment.Center),
-//                                        imageVector = Icons.Filled.Error,
-//                                        tint = LocalContentColor.current.copy(0.1F),
-//                                        contentDescription = null
-//                                    )
-//                                }
-//                            }
-//                        }
-//                    }
                 }
             }
         }

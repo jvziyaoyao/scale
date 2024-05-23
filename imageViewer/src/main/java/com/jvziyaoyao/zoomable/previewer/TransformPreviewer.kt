@@ -28,7 +28,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import com.jvziyaoyao.zoomable.pager.DEFAULT_BEYOND_BOUNDS_ITEM_COUNT
+import com.jvziyaoyao.zoomable.pager.DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT
 import com.jvziyaoyao.zoomable.pager.DEFAULT_ITEM_SPACE
 import com.jvziyaoyao.zoomable.pager.PagerGestureScope
 import com.jvziyaoyao.zoomable.pager.PagerZoomablePolicyScope
@@ -381,7 +381,7 @@ fun TransformPreviewer(
     // 图片间的间隔
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     // 页面外缓存个数
-    beyondBoundsItemCount: Int = DEFAULT_BEYOND_BOUNDS_ITEM_COUNT,
+    beyondViewportPageCount: Int = DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT,
     // 进入动画
     enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
     // 退出动画
@@ -408,7 +408,7 @@ fun TransformPreviewer(
                 enter = enter,
                 exit = exit,
                 itemSpacing = itemSpacing,
-                beyondBoundsItemCount = beyondBoundsItemCount,
+                beyondViewportPageCount = beyondViewportPageCount,
                 zoomablePolicy = { page ->
                     Box(modifier = Modifier.fillMaxSize()) {
                         // TODO 优化闪烁的问题

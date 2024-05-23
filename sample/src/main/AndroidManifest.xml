@@ -59,6 +59,10 @@
             android:name="com.jvziyaoyao.viewer.sample.PicturesActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
+        <activity
+            android:name="com.jvziyaoyao.viewer.sample.SharedActivity"
+            android:exported="true"
+            android:theme="@style/Theme.ImageViewer.NoActionBar"/>
     </application>
 
 </manifest>

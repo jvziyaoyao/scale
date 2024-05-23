@@ -5,21 +5,26 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
-import com.jvziyaoyao.zoomable.pager.DEFAULT_BEYOND_BOUNDS_ITEM_COUNT
+import androidx.compose.ui.unit.dp
+import com.jvziyaoyao.zoomable.pager.DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT
 import com.jvziyaoyao.zoomable.pager.DEFAULT_ITEM_SPACE
 import com.jvziyaoyao.zoomable.pager.PagerGestureScope
 import com.jvziyaoyao.zoomable.pager.PagerZoomablePolicyScope
@@ -178,11 +183,12 @@ open class DraggablePreviewerState(
         stateCloseStart()
 
         draggableContainerState.apply {
-            val displaySize = if (itemState.intrinsicSize != null && itemState.intrinsicSize!!.isSpecified) {
-                getDisplaySize(itemState.intrinsicSize!!, containerSize.value)
-            } else {
-                getDisplaySize(containerSize.value, containerSize.value)
-            }
+            val displaySize =
+                if (itemState.intrinsicSize != null && itemState.intrinsicSize!!.isSpecified) {
+                    getDisplaySize(itemState.intrinsicSize!!, containerSize.value)
+                } else {
+                    getDisplaySize(containerSize.value, containerSize.value)
+                }
 
             val centerX = containerSize.value.width.div(2)
             val centerY = containerSize.value.height.div(2)
@@ -221,7 +227,10 @@ open class DraggablePreviewerState(
             listOf(
                 // 缩小容器
                 async {
-                    draggableContainerState.scale.animateTo(0F, animationSpec = currentAnimationSpec)
+                    draggableContainerState.scale.animateTo(
+                        0F,
+                        animationSpec = currentAnimationSpec
+                    )
                 },
                 // 关闭UI
                 async {
@@ -238,7 +247,6 @@ open class DraggablePreviewerState(
             // 标记动作结束
             stateCloseEnd()
         }
-
     }
 }
 
@@ -294,7 +302,7 @@ fun DraggablePreviewer(
     // 图片间的间隔
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     // 页面外缓存个数
-    beyondBoundsItemCount: Int = DEFAULT_BEYOND_BOUNDS_ITEM_COUNT,
+    beyondViewportPageCount: Int = DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT,
     // 进入动画
     enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
     // 退出动画
@@ -313,13 +321,14 @@ fun DraggablePreviewer(
             modifier = modifier,
             state = state,
             itemSpacing = itemSpacing,
-            beyondBoundsItemCount = beyondBoundsItemCount,
+            beyondViewportPageCount = beyondViewportPageCount,
             enter = enter,
             exit = exit,
             debugMode = debugMode,
             detectGesture = detectGesture,
             previewerLayer = TransformLayerScope(
                 previewerDecoration = { innerBox ->
+                    val actionColor = Color.Yellow
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -332,10 +341,18 @@ fun DraggablePreviewer(
                                 scaleX = draggableContainerState.scale.value
                                 scaleY = draggableContainerState.scale.value
                             }
+                            .run {
+                                if (debugMode) border(width = 2.dp, color = actionColor) else this
+                            }
                     ) {
                         previewerLayer.previewerDecoration {
                             innerBox()
                         }
+                        if (debugMode) Text(
+                            modifier = Modifier.align(Alignment.TopEnd),
+                            text = "DraggablePreviewer",
+                            color = actionColor,
+                        )
                     }
                 },
                 background = previewerLayer.background,

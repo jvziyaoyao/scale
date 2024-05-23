@@ -108,8 +108,8 @@ fun GalleryBody02() {
         state = pagerState,
         flingBehavior = PagerDefaults.flingBehavior(
             state = pagerState,
-            lowVelocityAnimationSpec = tween(durationMillis = 600, easing = LinearOutSlowInEasing),
-            highVelocityAnimationSpec = rememberSplineBasedDecay(),
+//            lowVelocityAnimationSpec = tween(durationMillis = 600, easing = LinearOutSlowInEasing),
+//            highVelocityAnimationSpec = rememberSplineBasedDecay(),
         )
     ) { page ->
         val bgColor = if (page % 2 == 0) Color.Red else Color.Blue

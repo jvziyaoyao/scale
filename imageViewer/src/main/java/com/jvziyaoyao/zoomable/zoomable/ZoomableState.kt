@@ -356,7 +356,7 @@ open class ZoomableViewState(
 @Composable
 fun rememberZoomableState(
     // 内容大小
-    contentSize: Size,
+    contentSize: Size? = null,
     // 最大缩放率
     @FloatRange(from = 1.0) maxScale: Float = MAX_SCALE_RATE,
     // 动画窗格
@@ -369,8 +369,10 @@ fun rememberZoomableState(
             animationSpec = animationSpec,
         )
     }.apply {
-        this.contentSize = contentSize
-        // 旋转后如果超出边界了要修复回去
-        scope.launch { fixToBound() }
+        contentSize?.let {
+            this.contentSize = it
+            // 旋转后如果超出边界了要修复回去
+            scope.launch { fixToBound() }
+        }
     }
 }

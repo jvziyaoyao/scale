@@ -2,6 +2,7 @@ package com.jvziyaoyao.image.viewer
 
 import android.graphics.BitmapRegionDecoder
 import android.os.Build
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.exifinterface.media.ExifInterface
 import com.jvziyaoyao.zoomable.zoomable.ZoomableGestureScope
 import com.jvziyaoyao.zoomable.zoomable.ZoomableView
@@ -46,12 +48,12 @@ fun ImageViewer(
 }
 
 fun createImageDecoder(file: File): ImageDecoder? {
+    val inputStream = FileInputStream(file)
     val exifInterface = ExifInterface(file)
     val orientation = exifInterface.getAttributeInt(
         ExifInterface.TAG_ORIENTATION,
         ExifInterface.ORIENTATION_NORMAL
     )
-    val inputStream = FileInputStream(file)
     val decoder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         BitmapRegionDecoder.newInstance(inputStream)
     } else {
@@ -70,6 +72,23 @@ fun createImageDecoder(file: File): ImageDecoder? {
     } else null
 }
 
+@Composable
+fun rememberImageDecoder(file: File): ImageDecoder? {
+    val imageDecoder = remember { mutableStateOf<ImageDecoder?>(null) }
+    LaunchedEffect(file) {
+        launch(Dispatchers.IO) {
+            imageDecoder.value = createImageDecoder(file)
+        }
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            imageDecoder.value?.release()
+        }
+    }
+    return imageDecoder.value
+}
+
+// TODO 待优化/移除
 @Composable
 fun rememberImageDecoder(
     inputStream: InputStream,
@@ -129,5 +148,39 @@ fun ImageViewer(
             imageDecoder = imageDecoder,
             viewPort = state.getViewPort(),
         )
+    }
+}
+
+@Composable
+fun ImageViewer(
+    modifier: Modifier = Modifier,
+    model: Any?,
+    state: ZoomableViewState = rememberZoomableState(),
+    detectGesture: ZoomableGestureScope = ZoomableGestureScope(),
+) {
+    ZoomableView(
+        modifier = modifier,
+        state = state,
+        detectGesture = detectGesture,
+    ) {
+        when(model) {
+            is Painter -> {
+                // TODO 提取方法
+                state.contentSize = model.intrinsicSize
+                Image(
+                    modifier = Modifier.fillMaxSize(),
+                    painter = model,
+                    contentDescription = null,
+                )
+            }
+            is ImageDecoder -> {
+                // TODO 提取方法
+                state.contentSize = model.intrinsicSize
+                ImageCanvas(
+                    imageDecoder = model,
+                    viewPort = state.getViewPort(),
+                )
+            }
+        }
     }
 }
