@@ -1,10 +1,13 @@
 package com.jvziyaoyao.viewer.sample
 
 import android.os.Bundle
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalContext
@@ -40,7 +43,7 @@ fun HugeBody() {
     if (imageDecoder != null) {
         val state = rememberZoomableState(contentSize = imageDecoder.intrinsicSize)
         ImageViewer(
-            imageDecoder = imageDecoder,
+            model = imageDecoder,
             state = state,
             detectGesture = ZoomableGestureScope(onDoubleTap = {
                 scope.launch {
@@ -48,6 +51,10 @@ fun HugeBody() {
                 }
             })
         )
+    } else {
+        Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
     }
 }
 

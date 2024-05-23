@@ -23,6 +23,7 @@ import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,11 +37,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.jvziyaoyao.image.previewer.ImagePreviewer
 import com.jvziyaoyao.image.viewer.ImageCanvas
+import com.jvziyaoyao.image.viewer.ImageDecoder
 import com.jvziyaoyao.image.viewer.getViewPort
 import com.jvziyaoyao.image.viewer.rememberImageDecoder
 import com.jvziyaoyao.image.viewer.sample.R
 import com.jvziyaoyao.viewer.sample.base.BaseActivity
+import com.jvziyaoyao.viewer.sample.ui.component.rememberCoilImagePainter
 import com.jvziyaoyao.zoomable.previewer.Previewer
 import com.jvziyaoyao.zoomable.previewer.TransformItemView
 import com.jvziyaoyao.zoomable.previewer.VerticalDragType
@@ -48,6 +52,7 @@ import com.jvziyaoyao.zoomable.previewer.rememberPreviewerState
 import com.jvziyaoyao.zoomable.previewer.rememberTransformItemState
 import com.origeek.ui.common.compose.DetectScaleGridGesture
 import com.origeek.ui.common.compose.ScaleGrid
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
@@ -203,29 +208,46 @@ fun DecoderBody() {
         val insetRotation by remember {
             derivedStateOf { ceil(rotation).toInt() }
         }
-        Previewer(
+        ImagePreviewer(
             state = previewerState,
-            zoomablePolicy = {
-                Log.i("TAG", "DecoderBody: inputStream $inputStream")
+            imageLoader = { _ ->
                 val imageDecoder = rememberImageDecoder(
                     inputStream = inputStream,
                     rotation = insetRotation
                 )
-                if (imageDecoder != null) {
-                    ZoomablePolicy(intrinsicSize = imageDecoder.intrinsicSize) {
-                        val viewPort = it.getViewPort()
-                        ImageCanvas(
-                            imageDecoder = imageDecoder,
-                            viewPort = viewPort,
-                        )
-                    }
-                } else {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                val realImageDecoder = remember { mutableStateOf<ImageDecoder?>(null) }
+                LaunchedEffect(imageDecoder) {
+                    if (imageDecoder != null) {
+                        delay(loadDelay.toLong())
+                        realImageDecoder.value = imageDecoder
                     }
                 }
-                imageDecoder != null
+                return@ImagePreviewer Pair(realImageDecoder.value, realImageDecoder.value?.intrinsicSize)
             }
         )
+//        Previewer(
+//            state = previewerState,
+//            zoomablePolicy = {
+//                Log.i("TAG", "DecoderBody: inputStream $inputStream")
+//                val imageDecoder = rememberImageDecoder(
+//                    inputStream = inputStream,
+//                    rotation = insetRotation
+//                )
+//                if (imageDecoder != null) {
+//                    ZoomablePolicy(intrinsicSize = imageDecoder.intrinsicSize) {
+//                        val viewPort = it.getViewPort()
+//                        ImageCanvas(
+//                            imageDecoder = imageDecoder,
+//                            viewPort = viewPort,
+//                        )
+//                    }
+//                } else {
+//                    Box(modifier = Modifier.fillMaxSize()) {
+//                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+//                    }
+//                }
+//                imageDecoder != null
+//            }
+//        )
     }
 }

@@ -9,16 +9,20 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.jvziyaoyao.image.pager.ImagePager
 import com.jvziyaoyao.image.viewer.sample.R
 import com.jvziyaoyao.viewer.sample.base.BaseActivity
@@ -43,11 +47,19 @@ class GalleryActivity : BaseActivity() {
 fun GalleryBody() {
     val images = remember {
         mutableStateListOf(
-            R.drawable.light_01,
-            R.drawable.light_02,
-            R.drawable.light_03,
+            "https://t7.baidu.com/it/u=1595072465,3644073269&fm=193&f=GIF",
+            "https://t7.baidu.com/it/u=4198287529,2774471735&fm=193&f=GIF",
+            "https://t7.baidu.com/it/u=1423490396,3473826719&fm=193&f=GIF",
+            "https://t7.baidu.com/it/u=938052523,709452322&fm=193&f=GIF",
         )
     }
+//    val images = remember {
+//        mutableStateListOf(
+//            R.drawable.light_01,
+//            R.drawable.light_02,
+//            R.drawable.light_03,
+//        )
+//    }
 //    ImageGallery(
 //        modifier = Modifier.fillMaxSize(),
 //        state = rememberImageGalleryState { images.size },
@@ -56,14 +68,13 @@ fun GalleryBody() {
 //            rememberCoilImagePainter(image = image)
 //        },
 //    )
-
     ImagePager(
         modifier = Modifier.fillMaxSize(),
         pagerState = rememberZoomablePagerState { images.size },
         imageLoader = { index ->
-            val image = images[index]
-            rememberCoilImagePainter(image = image)
-        }
+            val painter = rememberCoilImagePainter(image = images[index])
+            return@ImagePager Pair(painter, painter.intrinsicSize)
+        },
     )
 }
 

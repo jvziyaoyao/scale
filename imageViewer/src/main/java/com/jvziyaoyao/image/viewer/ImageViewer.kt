@@ -4,7 +4,9 @@ import android.graphics.BitmapRegionDecoder
 import android.os.Build
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -12,7 +14,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.exifinterface.media.ExifInterface
@@ -21,31 +26,11 @@ import com.jvziyaoyao.zoomable.zoomable.ZoomableView
 import com.jvziyaoyao.zoomable.zoomable.ZoomableViewState
 import com.jvziyaoyao.zoomable.zoomable.rememberZoomableState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
-
-@Composable
-fun ImageViewer(
-    modifier: Modifier = Modifier,
-    painter: Painter,
-    state: ZoomableViewState = rememberZoomableState(contentSize = painter.intrinsicSize),
-    detectGesture: ZoomableGestureScope = ZoomableGestureScope(),
-    contentDescription: String? = null,
-) {
-    ZoomableView(
-        modifier = modifier,
-        state = state,
-        detectGesture = detectGesture,
-    ) {
-        Image(
-            modifier = Modifier.fillMaxSize(),
-            painter = painter,
-            contentDescription = contentDescription,
-        )
-    }
-}
 
 fun createImageDecoder(file: File): ImageDecoder? {
     val inputStream = FileInputStream(file)
@@ -107,7 +92,7 @@ fun rememberImageDecoder(
                 if (decoder == null) {
                     null
                 } else {
-                    val decoderRotation = when(rotation) {
+                    val decoderRotation = when (rotation) {
                         ImageDecoder.Rotation.ROTATION_90.radius -> ImageDecoder.Rotation.ROTATION_90
                         ImageDecoder.Rotation.ROTATION_180.radius -> ImageDecoder.Rotation.ROTATION_180
                         ImageDecoder.Rotation.ROTATION_270.radius -> ImageDecoder.Rotation.ROTATION_270
@@ -135,8 +120,9 @@ fun rememberImageDecoder(
 @Composable
 fun ImageViewer(
     modifier: Modifier = Modifier,
-    imageDecoder: ImageDecoder,
-    state: ZoomableViewState = rememberZoomableState(contentSize = imageDecoder.intrinsicSize),
+    model: Any?,
+    state: ZoomableViewState,
+    content: ImageContent = defaultImageContent,
     detectGesture: ZoomableGestureScope = ZoomableGestureScope(),
 ) {
     ZoomableView(
@@ -144,43 +130,50 @@ fun ImageViewer(
         state = state,
         detectGesture = detectGesture,
     ) {
-        ImageCanvas(
-            imageDecoder = imageDecoder,
-            viewPort = state.getViewPort(),
-        )
+        content.invoke(model, state)
     }
 }
 
-@Composable
-fun ImageViewer(
-    modifier: Modifier = Modifier,
-    model: Any?,
-    state: ZoomableViewState = rememberZoomableState(),
-    detectGesture: ZoomableGestureScope = ZoomableGestureScope(),
-) {
-    ZoomableView(
-        modifier = modifier,
-        state = state,
-        detectGesture = detectGesture,
-    ) {
-        when(model) {
-            is Painter -> {
-                // TODO 提取方法
-                state.contentSize = model.intrinsicSize
-                Image(
-                    modifier = Modifier.fillMaxSize(),
-                    painter = model,
-                    contentDescription = null,
-                )
-            }
-            is ImageDecoder -> {
-                // TODO 提取方法
-                state.contentSize = model.intrinsicSize
-                ImageCanvas(
-                    imageDecoder = model,
-                    viewPort = state.getViewPort(),
-                )
-            }
+typealias ImageContent = @Composable (Any?, ZoomableViewState) -> Unit
+
+val defaultImageContent: ImageContent = { model, state ->
+    when (model) {
+        is Painter -> {
+            Image(
+                modifier = Modifier.fillMaxSize(),
+                painter = model,
+                contentDescription = null,
+            )
+        }
+
+        is ImageBitmap -> {
+            Image(
+                modifier = Modifier.fillMaxSize(),
+                bitmap = model,
+                contentDescription = null,
+            )
+        }
+
+        is ImageVector -> {
+            Image(
+                modifier = Modifier.fillMaxSize(),
+                imageVector = model,
+                contentDescription = null,
+            )
+        }
+
+        is ImageDecoder -> {
+            ImageCanvas(
+                imageDecoder = model,
+                viewPort = state.getViewPort(),
+            )
+        }
+
+        // TODO 测试每一层级的适用性
+        is AnyComposable -> {
+            model.composable.invoke()
         }
     }
 }
+
+class AnyComposable(val composable: @Composable () -> Unit)

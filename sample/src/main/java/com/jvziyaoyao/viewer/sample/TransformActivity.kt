@@ -69,6 +69,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.jvziyaoyao.image.previewer.ImagePreviewer
 import com.jvziyaoyao.image.viewer.sample.R
 import com.jvziyaoyao.viewer.sample.base.BaseActivity
 import com.jvziyaoyao.viewer.sample.ui.component.rememberCoilImagePainter
@@ -286,61 +287,70 @@ fun TransformBody(
             }
         }
         SettingSurface(settingState)
-        Previewer(
+
+        ImagePreviewer(
             state = previewerState,
-            previewerLayer = TransformLayerScope(
-                foreground = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = 60.dp, end = pl),
-                        contentAlignment = Alignment.BottomEnd
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colors.surface.copy(0.2F))
-                                .clickable {
-                                    onDeleteItem(images[previewerState.currentPage])
-                                }
-                                .padding(pl)
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(22.dp),
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = null,
-                                tint = MaterialTheme.colors.surface
-                            )
-                        }
-                    }
-                },
-                background = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Black.copy(0.8F))
-                    )
-                }
-            ),
-            zoomablePolicy = { index ->
+            imageLoader = { index ->
                 val painter = if (settingState.loaderError && (index % 2 == 0)) null
                 else rememberCoilImagePainter(image = images[index].res)
-                if (painter?.intrinsicSize?.isSpecified == true) {
-                    ZoomablePolicy(intrinsicSize = painter.intrinsicSize) {
-                        Image(
-                            modifier = Modifier.fillMaxSize(),
-                            painter = painter,
-                            contentDescription = null,
-                        )
-                    }
-                } else {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                    }
-                }
-                painter?.intrinsicSize?.isSpecified == true
+                return@ImagePreviewer Pair(painter, painter?.intrinsicSize)
             }
         )
+//        Previewer(
+//            state = previewerState,
+//            previewerLayer = TransformLayerScope(
+//                foreground = {
+//                    Box(
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .padding(bottom = 60.dp, end = pl),
+//                        contentAlignment = Alignment.BottomEnd
+//                    ) {
+//                        Box(
+//                            modifier = Modifier
+//                                .clip(CircleShape)
+//                                .background(MaterialTheme.colors.surface.copy(0.2F))
+//                                .clickable {
+//                                    onDeleteItem(images[previewerState.currentPage])
+//                                }
+//                                .padding(pl)
+//                        ) {
+//                            Icon(
+//                                modifier = Modifier.size(22.dp),
+//                                imageVector = Icons.Filled.Delete,
+//                                contentDescription = null,
+//                                tint = MaterialTheme.colors.surface
+//                            )
+//                        }
+//                    }
+//                },
+//                background = {
+//                    Box(
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .background(Color.Black.copy(0.8F))
+//                    )
+//                }
+//            ),
+//            zoomablePolicy = { index ->
+//                val painter = if (settingState.loaderError && (index % 2 == 0)) null
+//                else rememberCoilImagePainter(image = images[index].res)
+//                if (painter?.intrinsicSize?.isSpecified == true) {
+//                    ZoomablePolicy(intrinsicSize = painter.intrinsicSize) {
+//                        Image(
+//                            modifier = Modifier.fillMaxSize(),
+//                            painter = painter,
+//                            contentDescription = null,
+//                        )
+//                    }
+//                } else {
+//                    Box(modifier = Modifier.fillMaxSize()) {
+//                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+//                    }
+//                }
+//                painter?.intrinsicSize?.isSpecified == true
+//            }
+//        )
     }
 }
 

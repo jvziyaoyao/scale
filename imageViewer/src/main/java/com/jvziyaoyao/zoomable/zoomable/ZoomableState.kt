@@ -1,6 +1,5 @@
 package com.jvziyaoyao.zoomable.zoomable
 
-import android.util.Log
 import androidx.annotation.FloatRange
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
@@ -94,15 +93,20 @@ open class ZoomableViewState(
     // 是否允许手势输入
     var allowGestureInput = true
 
-    private val contentSizeState = mutableStateOf(Size.Zero)
+    private val contentSizeState = mutableStateOf<Size?>(null)
+
+    val isSpecified: Boolean
+        get() {
+            return contentSizeState.value?.isSpecified == true
+        }
 
     var contentSize: Size
         set(value) {
             contentSizeState.value = value
         }
         get() {
-            return if (contentSizeState.value.isSpecified) {
-                contentSizeState.value
+            return if (contentSizeState.value?.isSpecified == true) {
+                contentSizeState.value!!
             } else {
                 Size.Zero
             }

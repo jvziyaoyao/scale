@@ -39,7 +39,7 @@ fun NormalBody() {
         val painter = rememberCoilImagePainter(image = R.drawable.light_02)
         val state = rememberZoomableState(contentSize = painter.intrinsicSize)
         ImageViewer(
-            painter = painter,
+            model = painter,
             state = state,
             detectGesture = ZoomableGestureScope(onDoubleTap = {
                 scope.launch {

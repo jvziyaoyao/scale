@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
+import com.jvziyaoyao.image.previewer.defaultPreviewBackground
 import com.jvziyaoyao.zoomable.pager.DEFAULT_ITEM_SPACE
 import com.jvziyaoyao.zoomable.previewer.DEFAULT_PREVIEWER_ENTER_TRANSITION
 import com.jvziyaoyao.zoomable.previewer.DEFAULT_PREVIEWER_EXIT_TRANSITION
@@ -40,21 +41,6 @@ import com.origeek.imageViewer.gallery.rememberImageGalleryState
 import com.origeek.imageViewer.viewer.ImageViewerState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
-
-// 预览的默认的背景颜色
-val DEEP_DARK_FANTASY = Color(0xFF000000)
-
-/**
- * 预览的默认背景
- */
-@Composable
-fun DefaultPreviewerBackground() {
-    Box(
-        modifier = Modifier
-            .background(DEEP_DARK_FANTASY)
-            .fillMaxSize()
-    )
-}
 
 /**
  * 预览组件的状态
@@ -159,7 +145,7 @@ class PreviewerLayerScope(
         page: Int, viewerState: ImageViewerState, viewer: @Composable () -> Unit
     ) -> Unit = { _, _, viewer -> viewer() },
     // 背景图层
-    var background: @Composable ((page: Int) -> Unit) = { _ -> DefaultPreviewerBackground() },
+    var background: @Composable ((page: Int) -> Unit) = { _ -> defaultPreviewBackground() },
     // 前景图层
     var foreground: @Composable ((page: Int) -> Unit) = { _ -> },
     // 加载时的占位内容
