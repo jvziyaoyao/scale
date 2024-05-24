@@ -36,11 +36,22 @@ import java.math.RoundingMode
  * @create: 2023-12-01 22:02
  **/
 
+/**
+ * 渲染的视口对象
+ *
+ * @property scale 图片相对显示倍率，相对于1倍屏幕显示倍率
+ * @property visualRect 在视口内的归一化坐标
+ */
 data class ImageCanvasViewPort(
     val scale: Float,
     val visualRect: Rect,
 )
 
+/**
+ * 从ZoomableView状态直接获取当前视口对象
+ *
+ * @return
+ */
 fun ZoomableViewState.getViewPort(): ImageCanvasViewPort {
     val realWidth = realSize.width
     val realHeight = realSize.height
@@ -67,7 +78,7 @@ fun ZoomableViewState.getViewPort(): ImageCanvasViewPort {
     )
 }
 
-fun intersectRect(rect1: Rect, rect2: Rect): Rect {
+internal fun intersectRect(rect1: Rect, rect2: Rect): Rect {
     val left = java.lang.Float.max(rect1.left, rect2.left)
     val top = java.lang.Float.max(rect1.top, rect2.top)
     val right = java.lang.Float.min(rect1.right, rect2.right)
@@ -80,7 +91,7 @@ fun intersectRect(rect1: Rect, rect2: Rect): Rect {
     }
 }
 
-fun calculateInSampleSize(
+internal fun calculateInSampleSize(
     srcWidth: Int,
     reqWidth: Int,
 ): Int {
@@ -93,7 +104,7 @@ fun calculateInSampleSize(
     return inSampleSize
 }
 
-fun checkRectInBound(
+internal fun checkRectInBound(
     stX1: Float, stY1: Float, edX1: Float, edY1: Float,
     stX2: Float, stY2: Float, edX2: Float, edY2: Float,
 ): Boolean {
@@ -104,13 +115,19 @@ fun checkRectInBound(
     return true
 }
 
-infix fun Rect.same(other: Rect): Boolean {
+internal infix fun Rect.same(other: Rect): Boolean {
     return this.left == other.left
             && this.right == other.right
             && this.top == other.top
             && this.bottom == other.bottom
 }
 
+/**
+ * 用于ImageViewer/ZoomableView进行分块显示大型图片的配套组件
+ *
+ * @param imageDecoder 图片加载器
+ * @param viewPort 视口
+ */
 @Composable
 fun ImageCanvas(
     imageDecoder: ImageDecoder,

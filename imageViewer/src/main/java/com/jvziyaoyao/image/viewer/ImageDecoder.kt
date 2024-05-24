@@ -53,6 +53,16 @@ data class RenderBlock(
 
 }
 
+/**
+ * 用以提供ImageCanvas显示大型图片，rememberImageDecoder，createImageDecoder
+ *
+ * @property decoder 图源BitmapRegionDecoder
+ * @property rotation 图片的旋转角度，通过Exif接口获取文件的旋转角度后可以设置rotation确保图像的正确显示
+ * @property onRelease 资源缩放事件
+ * @constructor
+ *
+ * @param thumbnails 默认显示的缓存图片，图片未完成加载时可用于显示占位
+ */
 class ImageDecoder(
     private val decoder: BitmapRegionDecoder,
     private val rotation: Rotation = Rotation.ROTATION_0,
@@ -287,6 +297,12 @@ class ImageDecoder(
     }
 }
 
+/**
+ * 通过文件创建ImageDecoder
+ *
+ * @param file
+ * @return
+ */
 fun createImageDecoder(file: File): ImageDecoder? {
     val inputStream = FileInputStream(file)
     val exifInterface = ExifInterface(file)
@@ -295,6 +311,12 @@ fun createImageDecoder(file: File): ImageDecoder? {
     return decoder?.let { createImageDecoder(it, rotation) }
 }
 
+/**
+ * 通过流创建BitmapRegionDecoder
+ *
+ * @param inputStream
+ * @return
+ */
 fun createBitmapRegionDecoder(inputStream: InputStream): BitmapRegionDecoder? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         BitmapRegionDecoder.newInstance(inputStream)
@@ -303,6 +325,11 @@ fun createBitmapRegionDecoder(inputStream: InputStream): BitmapRegionDecoder? {
     }
 }
 
+/**
+ * 通过Exif接口获取ImageDecoder的旋转方向
+ *
+ * @return
+ */
 fun ExifInterface.getDecoderRotation(): ImageDecoder.Rotation {
     val orientation = getAttributeInt(
         ExifInterface.TAG_ORIENTATION,
@@ -316,6 +343,13 @@ fun ExifInterface.getDecoderRotation(): ImageDecoder.Rotation {
     }
 }
 
+/**
+ * 创建ImageDecoder的主要方法
+ *
+ * @param decoder
+ * @param rotation 请参考ImageDecoder.Rotation
+ * @return
+ */
 fun createImageDecoder(
     decoder: BitmapRegionDecoder,
     rotation: ImageDecoder.Rotation = ImageDecoder.Rotation.ROTATION_0,
@@ -325,6 +359,12 @@ fun createImageDecoder(
     }
 }
 
+/**
+ * 创建ImageDecoder的方法
+ *
+ * @param file
+ * @return ImageDecoder成功创建时不为空，创建过程中出现异常会返回Exception
+ */
 @Composable
 fun rememberImageDecoder(file: File): Pair<ImageDecoder?, Exception?> {
     val imageDecoder = remember { mutableStateOf<ImageDecoder?>(null) }
@@ -346,6 +386,13 @@ fun rememberImageDecoder(file: File): Pair<ImageDecoder?, Exception?> {
     return Pair(imageDecoder.value, expectation.value)
 }
 
+/**
+ * 创建ImageDecoder的方法
+ *
+ * @param inputStream
+ * @param rotation 请参考ImageDecoder.Rotation
+ * @return ImageDecoder成功创建时不为空，创建过程中出现异常会返回Exception
+ */
 @Composable
 fun rememberImageDecoder(
     inputStream: InputStream,

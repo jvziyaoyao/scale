@@ -35,7 +35,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -60,8 +59,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.isSpecified
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -79,9 +76,7 @@ import com.jvziyaoyao.viewer.sample.ui.theme.pm
 import com.jvziyaoyao.viewer.sample.ui.theme.ps
 import com.jvziyaoyao.viewer.sample.ui.theme.pxs
 import com.jvziyaoyao.viewer.sample.ui.theme.pxxl
-import com.jvziyaoyao.zoomable.previewer.Previewer
 import com.jvziyaoyao.zoomable.previewer.TransformItemView
-import com.jvziyaoyao.zoomable.previewer.TransformLayerScope
 import com.jvziyaoyao.zoomable.previewer.VerticalDragType
 import com.jvziyaoyao.zoomable.previewer.rememberPreviewerState
 import com.jvziyaoyao.zoomable.previewer.rememberTransformItemState
@@ -296,61 +291,6 @@ fun TransformBody(
                 return@ImagePreviewer Pair(painter, painter?.intrinsicSize)
             }
         )
-//        Previewer(
-//            state = previewerState,
-//            previewerLayer = TransformLayerScope(
-//                foreground = {
-//                    Box(
-//                        modifier = Modifier
-//                            .fillMaxSize()
-//                            .padding(bottom = 60.dp, end = pl),
-//                        contentAlignment = Alignment.BottomEnd
-//                    ) {
-//                        Box(
-//                            modifier = Modifier
-//                                .clip(CircleShape)
-//                                .background(MaterialTheme.colors.surface.copy(0.2F))
-//                                .clickable {
-//                                    onDeleteItem(images[previewerState.currentPage])
-//                                }
-//                                .padding(pl)
-//                        ) {
-//                            Icon(
-//                                modifier = Modifier.size(22.dp),
-//                                imageVector = Icons.Filled.Delete,
-//                                contentDescription = null,
-//                                tint = MaterialTheme.colors.surface
-//                            )
-//                        }
-//                    }
-//                },
-//                background = {
-//                    Box(
-//                        modifier = Modifier
-//                            .fillMaxSize()
-//                            .background(Color.Black.copy(0.8F))
-//                    )
-//                }
-//            ),
-//            zoomablePolicy = { index ->
-//                val painter = if (settingState.loaderError && (index % 2 == 0)) null
-//                else rememberCoilImagePainter(image = images[index].res)
-//                if (painter?.intrinsicSize?.isSpecified == true) {
-//                    ZoomablePolicy(intrinsicSize = painter.intrinsicSize) {
-//                        Image(
-//                            modifier = Modifier.fillMaxSize(),
-//                            painter = painter,
-//                            contentDescription = null,
-//                        )
-//                    }
-//                } else {
-//                    Box(modifier = Modifier.fillMaxSize()) {
-//                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-//                    }
-//                }
-//                painter?.intrinsicSize?.isSpecified == true
-//            }
-//        )
     }
 }
 
