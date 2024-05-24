@@ -125,7 +125,6 @@ open class TransformPreviewerState(
                 // 开启viewer图层
                 animateContainerVisibleState = MutableTransitionState(true)
 
-                // TODO: intrinsicSize为空的情况
                 val displaySize = if (intrinsicSize != null && intrinsicSize!!.isSpecified) {
                     getDisplaySize(intrinsicSize!!, containerSize.value)
                 } else {
@@ -197,7 +196,6 @@ open class TransformPreviewerState(
         if (itemState != null) {
             itemState.apply {
                 stateCloseStart()
-                // TODO: 要判断intrinsicSize为null的情况
                 val displaySize = getDisplaySize(intrinsicSize ?: Size.Zero, containerSize.value)
                 val targetX = (containerSize.value.width - displaySize.width).div(2)
                 val targetY = (containerSize.value.height - displaySize.height).div(2)
@@ -411,7 +409,6 @@ fun TransformPreviewer(
                 beyondViewportPageCount = beyondViewportPageCount,
                 zoomablePolicy = { page ->
                     Box(modifier = Modifier.fillMaxSize()) {
-                        // TODO 优化闪烁的问题
                         val zoomableMounted = remember { mutableStateOf(false) }
                         if (!zoomableMounted.value) {
                             TransformContentForPage(page = page, state = state, debugMode = debugMode)
