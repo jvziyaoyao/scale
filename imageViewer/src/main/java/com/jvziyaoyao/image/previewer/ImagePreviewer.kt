@@ -9,7 +9,9 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
 import com.jvziyaoyao.image.pager.ImageLoading
+import com.jvziyaoyao.image.pager.ImageModelProcessor
 import com.jvziyaoyao.image.pager.defaultImageLoading
+import com.jvziyaoyao.image.pager.defaultImageModelProcessor
 import com.jvziyaoyao.image.viewer.ImageContent
 import com.jvziyaoyao.image.viewer.defaultImageContent
 import com.jvziyaoyao.zoomable.previewer.Previewer
@@ -30,6 +32,7 @@ fun ImagePreviewer(
     imageLoader: @Composable (Int) -> Pair<Any?, Size?>,
     imageContent: ImageContent = defaultImageContent,
     imageLoading: ImageLoading? = defaultImageLoading,
+    imageModelProcessor: ImageModelProcessor = defaultImageModelProcessor,
     previewerLayer: TransformLayerScope = TransformLayerScope(background = defaultPreviewBackground),
     pageDecoration: @Composable (page: Int, innerPage: @Composable () -> Boolean) -> Boolean
     = { _, innerPage -> innerPage() },
@@ -40,15 +43,7 @@ fun ImagePreviewer(
         zoomablePolicy = { page ->
             pageDecoration.invoke(page) decoration@{
                 val (model, size) = imageLoader.invoke(page)
-                val isSpecified = size != null && size.isSpecified
-                if (isSpecified) {
-                    ZoomablePolicy(intrinsicSize = size!!) {
-                        imageContent.invoke(model, it)
-                    }
-                } else {
-                    imageLoading?.invoke()
-                }
-                return@decoration isSpecified
+                imageModelProcessor.invoke(this, model, size, imageContent, imageLoading)
             }
         }
     )

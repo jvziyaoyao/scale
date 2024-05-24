@@ -38,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -49,6 +50,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
+import com.jvziyaoyao.image.previewer.ImagePreviewer
+import com.jvziyaoyao.image.viewer.AnyComposable
 import com.jvziyaoyao.image.viewer.ImageCanvas
 import com.jvziyaoyao.image.viewer.ImageDecoder
 import com.jvziyaoyao.image.viewer.createImageDecoder
@@ -151,103 +154,144 @@ fun PicturesDecoderPreviewLayer(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    Previewer(
+    ImagePreviewer(
         state = previewerState,
-        debugMode = true,
-        previewerLayer = TransformLayerScope(
-            background = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black)
-                )
-            }
-        ),
-        zoomablePolicy = { page ->
+        imageLoader = { page ->
             val file = images[page]
-            val imageDecoder = remember { mutableStateOf<ImageDecoder?>(null) }
-            val painter = remember { mutableStateOf<Painter?>(null) }
-            val error = remember { mutableStateOf(false) }
+            val pair = remember { mutableStateOf<Pair<Any?, Size?>>(Pair(null, null)) }
             LaunchedEffect(Unit) {
                 scope.launch(Dispatchers.IO) {
                     try {
-                        imageDecoder.value = createImageDecoder(file)
+                        createImageDecoder(file)?.let {
+                            pair.value = Pair(it, it.intrinsicSize)
+                        }
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
-                    if (imageDecoder.value != null) return@launch
-                    painter.value = loadPainter(context, file)?.let {
-                        BitmapPainter(it.toBitmap().asImageBitmap())
+                    if (pair.value.first != null) return@launch
+                    loadPainter(context, file)?.let {
+                        val painter = BitmapPainter(it.toBitmap().asImageBitmap())
+                        pair.value = Pair(painter, painter.intrinsicSize)
                     }
-                    if (painter.value != null) return@launch
-                    error.value = true
+                    if (pair.value.first != null) return@launch
+                    pair.value = Pair(AnyComposable {
+                        ErrorPlaceHolder()
+                    }, null)
                 }
             }
             DisposableEffect(Unit) {
                 onDispose {
-                    imageDecoder.value?.release()
-                }
-            }
-
-            imageDecoder.value?.let { decoder ->
-                ZoomablePolicy(intrinsicSize = decoder.intrinsicSize) {
-                    val viewPort = it.getViewPort()
-                    ImageCanvas(
-                        imageDecoder = decoder,
-                        viewPort = viewPort,
-                    )
-                    Text(text = "ImageCanvas")
-                }
-            }
-            painter.value?.let { p ->
-                if (p.intrinsicSize.isSpecified) {
-                    ZoomablePolicy(intrinsicSize = p.intrinsicSize) {
-                        Image(
-                            modifier = Modifier.fillMaxSize(),
-                            painter = p,
-                            contentDescription = null
-                        )
-                        Text(text = "Image")
+                    if (pair.value.first is ImageDecoder) {
+                        (pair.value.first as ImageDecoder).release()
                     }
                 }
             }
-            if (imageDecoder.value == null && painter.value == null) {
-                if (!error.value) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.Center),
-                            color = LocalContentColor.current.copy(0.1F),
-                        )
-                    }
-                }
-            }
-            AnimatedVisibility(
-                modifier = Modifier.fillMaxSize(),
-                visible = error.value,
-                enter = fadeIn(),
-                exit = fadeOut(),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                ) {
-                    val color = Color.White.copy(0.4F)
-                    Icon(
-                        modifier = Modifier
-                            .size(40.dp),
-                        imageVector = Icons.Filled.Error,
-                        tint = color,
-                        contentDescription = null
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(text = "图片加载失败", color = color)
-                }
-            }
-            imageDecoder.value != null || painter.value?.intrinsicSize?.isSpecified == true || error.value
-        }
+            pair.value
+        },
     )
+
+//    Previewer(
+//        state = previewerState,
+//        debugMode = true,
+//        previewerLayer = TransformLayerScope(
+//            background = {
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .background(Color.Black)
+//                )
+//            }
+//        ),
+//        zoomablePolicy = { page ->
+//            val file = images[page]
+//            val imageDecoder = remember { mutableStateOf<ImageDecoder?>(null) }
+//            val painter = remember { mutableStateOf<Painter?>(null) }
+//            val error = remember { mutableStateOf(false) }
+//            LaunchedEffect(Unit) {
+//                scope.launch(Dispatchers.IO) {
+//                    try {
+//                        imageDecoder.value = createImageDecoder(file)
+//                    } catch (e: Exception) {
+//                        e.printStackTrace()
+//                    }
+//                    if (imageDecoder.value != null) return@launch
+//                    painter.value = loadPainter(context, file)?.let {
+//                        BitmapPainter(it.toBitmap().asImageBitmap())
+//                    }
+//                    if (painter.value != null) return@launch
+//                    error.value = true
+//                }
+//            }
+//            DisposableEffect(Unit) {
+//                onDispose {
+//                    imageDecoder.value?.release()
+//                }
+//            }
+//
+//            imageDecoder.value?.let { decoder ->
+//                ZoomablePolicy(intrinsicSize = decoder.intrinsicSize) {
+//                    val viewPort = it.getViewPort()
+//                    ImageCanvas(
+//                        imageDecoder = decoder,
+//                        viewPort = viewPort,
+//                    )
+//                    Text(text = "ImageCanvas")
+//                }
+//            }
+//            painter.value?.let { p ->
+//                if (p.intrinsicSize.isSpecified) {
+//                    ZoomablePolicy(intrinsicSize = p.intrinsicSize) {
+//                        Image(
+//                            modifier = Modifier.fillMaxSize(),
+//                            painter = p,
+//                            contentDescription = null
+//                        )
+//                        Text(text = "Image")
+//                    }
+//                }
+//            }
+//            if (imageDecoder.value == null && painter.value == null) {
+//                if (!error.value) {
+//                    Box(modifier = Modifier.fillMaxSize()) {
+//                        CircularProgressIndicator(
+//                            modifier = Modifier.align(Alignment.Center),
+//                            color = LocalContentColor.current.copy(0.1F),
+//                        )
+//                    }
+//                }
+//            }
+//            AnimatedVisibility(
+//                modifier = Modifier.fillMaxSize(),
+//                visible = error.value,
+//                enter = fadeIn(),
+//                exit = fadeOut(),
+//            ) {
+//                ErrorPlaceHolder()
+//            }
+//            imageDecoder.value != null || painter.value?.intrinsicSize?.isSpecified == true || error.value
+//        }
+//    )
+}
+
+@Composable
+fun ErrorPlaceHolder() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        val color = Color.White.copy(0.4F)
+        Icon(
+            modifier = Modifier
+                .size(40.dp),
+            imageVector = Icons.Filled.Error,
+            tint = color,
+            contentDescription = null
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(text = "图片加载失败", color = color)
+    }
 }
 
 @Composable

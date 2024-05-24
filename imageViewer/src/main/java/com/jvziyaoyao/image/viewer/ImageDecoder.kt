@@ -5,16 +5,25 @@ import android.graphics.BitmapFactory
 import android.graphics.BitmapRegionDecoder
 import android.graphics.Matrix
 import android.graphics.Rect
+import android.os.Build
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.exifinterface.media.ExifInterface
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileInputStream
+import java.io.InputStream
 import java.util.concurrent.LinkedBlockingDeque
 import kotlin.math.ceil
 
@@ -276,4 +285,89 @@ class ImageDecoder(
             )
         )
     }
+}
+
+fun createImageDecoder(file: File): ImageDecoder? {
+    val inputStream = FileInputStream(file)
+    val exifInterface = ExifInterface(file)
+    val decoder = createBitmapRegionDecoder(inputStream)
+    val rotation = exifInterface.getDecoderRotation()
+    return decoder?.let { createImageDecoder(it, rotation) }
+}
+
+fun createBitmapRegionDecoder(inputStream: InputStream): BitmapRegionDecoder? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        BitmapRegionDecoder.newInstance(inputStream)
+    } else {
+        BitmapRegionDecoder.newInstance(inputStream, false)
+    }
+}
+
+fun ExifInterface.getDecoderRotation(): ImageDecoder.Rotation {
+    val orientation = getAttributeInt(
+        ExifInterface.TAG_ORIENTATION,
+        ExifInterface.ORIENTATION_NORMAL
+    )
+    return when (orientation) {
+        ExifInterface.ORIENTATION_ROTATE_90 -> ImageDecoder.Rotation.ROTATION_90
+        ExifInterface.ORIENTATION_ROTATE_180 -> ImageDecoder.Rotation.ROTATION_180
+        ExifInterface.ORIENTATION_ROTATE_270 -> ImageDecoder.Rotation.ROTATION_270
+        else -> ImageDecoder.Rotation.ROTATION_0
+    }
+}
+
+fun createImageDecoder(
+    decoder: BitmapRegionDecoder,
+    rotation: ImageDecoder.Rotation = ImageDecoder.Rotation.ROTATION_0,
+): ImageDecoder {
+    return ImageDecoder(decoder = decoder, rotation = rotation).apply {
+        this.thumbnail = createTempBitmap()
+    }
+}
+
+@Composable
+fun rememberImageDecoder(file: File): Pair<ImageDecoder?, Exception?> {
+    val imageDecoder = remember { mutableStateOf<ImageDecoder?>(null) }
+    val expectation = remember { mutableStateOf<Exception?>(null) }
+    LaunchedEffect(file) {
+        launch(Dispatchers.IO) {
+            try {
+                imageDecoder.value = createImageDecoder(file)
+            } catch (e: Exception) {
+                expectation.value = e
+            }
+        }
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            imageDecoder.value?.release()
+        }
+    }
+    return Pair(imageDecoder.value, expectation.value)
+}
+
+@Composable
+fun rememberImageDecoder(
+    inputStream: InputStream,
+    rotation: ImageDecoder.Rotation = ImageDecoder.Rotation.ROTATION_0,
+): Pair<ImageDecoder?, Exception?> {
+    val imageDecoder = remember { mutableStateOf<ImageDecoder?>(null) }
+    val expectation = remember { mutableStateOf<Exception?>(null) }
+    LaunchedEffect(inputStream) {
+        launch(Dispatchers.IO) {
+            try {
+                val decoder = createBitmapRegionDecoder(inputStream)
+                    ?: throw RuntimeException("Can not create bitmap region decoder!")
+                imageDecoder.value = createImageDecoder(decoder, rotation)
+            } catch (e: Exception) {
+                expectation.value = e
+            }
+        }
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            imageDecoder.value?.release()
+        }
+    }
+    return Pair(imageDecoder.value, expectation.value)
 }

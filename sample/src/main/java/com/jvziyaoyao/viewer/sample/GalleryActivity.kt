@@ -10,25 +10,31 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.jvziyaoyao.image.pager.ImagePager
+import com.jvziyaoyao.image.viewer.AnyComposable
 import com.jvziyaoyao.image.viewer.sample.R
 import com.jvziyaoyao.viewer.sample.base.BaseActivity
 import com.jvziyaoyao.viewer.sample.ui.component.rememberCoilImagePainter
 import com.jvziyaoyao.zoomable.pager.ZoomablePager
 import com.jvziyaoyao.zoomable.pager.rememberZoomablePagerState
+import kotlinx.coroutines.delay
 
 class GalleryActivity : BaseActivity() {
 
@@ -73,7 +79,12 @@ fun GalleryBody() {
         pagerState = rememberZoomablePagerState { images.size },
         imageLoader = { index ->
             val painter = rememberCoilImagePainter(image = images[index])
-            return@ImagePager Pair(painter, painter.intrinsicSize)
+            val pair = remember { mutableStateOf<Pair<Any?, Size?>>(Pair(null, null)) }
+            LaunchedEffect(painter) {
+                delay(1000)
+                pair.value = Pair(painter, painter.intrinsicSize)
+            }
+            return@ImagePager pair.value
         },
     )
 }

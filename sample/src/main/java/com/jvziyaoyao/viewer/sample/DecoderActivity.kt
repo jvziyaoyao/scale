@@ -205,16 +205,19 @@ fun DecoderBody() {
             }
         }
 
-        val insetRotation by remember {
-            derivedStateOf { ceil(rotation).toInt() }
-        }
+//        val insetRotation by remember {
+//            derivedStateOf { ceil(rotation).toInt() }
+//        }
         ImagePreviewer(
             state = previewerState,
             imageLoader = { _ ->
-                val imageDecoder = rememberImageDecoder(
-                    inputStream = inputStream,
-                    rotation = insetRotation
-                )
+                val decoderRotation = when (rotation.toInt()) {
+                    ImageDecoder.Rotation.ROTATION_90.radius -> ImageDecoder.Rotation.ROTATION_90
+                    ImageDecoder.Rotation.ROTATION_180.radius -> ImageDecoder.Rotation.ROTATION_180
+                    ImageDecoder.Rotation.ROTATION_270.radius -> ImageDecoder.Rotation.ROTATION_270
+                    else -> ImageDecoder.Rotation.ROTATION_0
+                }
+                val (imageDecoder, error) = rememberImageDecoder(inputStream = inputStream, rotation = decoderRotation)
                 val realImageDecoder = remember { mutableStateOf<ImageDecoder?>(null) }
                 LaunchedEffect(imageDecoder) {
                     if (imageDecoder != null) {
@@ -222,7 +225,10 @@ fun DecoderBody() {
                         realImageDecoder.value = imageDecoder
                     }
                 }
-                return@ImagePreviewer Pair(realImageDecoder.value, realImageDecoder.value?.intrinsicSize)
+                return@ImagePreviewer Pair(
+                    realImageDecoder.value,
+                    realImageDecoder.value?.intrinsicSize
+                )
             }
         )
 //        Previewer(

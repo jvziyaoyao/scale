@@ -5,14 +5,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalContext
+import androidx.exifinterface.media.ExifInterface
 import com.jvziyaoyao.image.viewer.ImageCanvas
+import com.jvziyaoyao.image.viewer.ImageDecoder
 import com.jvziyaoyao.image.viewer.ImageViewer
+import com.jvziyaoyao.image.viewer.createBitmapRegionDecoder
+import com.jvziyaoyao.image.viewer.createImageDecoder
+import com.jvziyaoyao.image.viewer.getDecoderRotation
 import com.jvziyaoyao.image.viewer.getViewPort
 import com.jvziyaoyao.image.viewer.rememberImageDecoder
 import com.jvziyaoyao.viewer.sample.base.BaseActivity
@@ -21,6 +28,7 @@ import com.jvziyaoyao.zoomable.zoomable.ZoomableGestureScope
 import com.jvziyaoyao.zoomable.zoomable.ZoomableView
 import com.jvziyaoyao.zoomable.zoomable.rememberZoomableState
 import kotlinx.coroutines.launch
+import java.io.FileInputStream
 
 class HugeActivity : BaseActivity() {
 
@@ -39,7 +47,7 @@ fun HugeBody() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val inputStream = remember { context.assets.open("a350.jpg") }
-    val imageDecoder = rememberImageDecoder(inputStream = inputStream)
+    val (imageDecoder) = rememberImageDecoder(inputStream = inputStream)
     if (imageDecoder != null) {
         val state = rememberZoomableState(contentSize = imageDecoder.intrinsicSize)
         ImageViewer(
