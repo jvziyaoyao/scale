@@ -13,6 +13,7 @@ import com.jvziyaoyao.zoomable.previewer.DEFAULT_SOFT_ANIMATION_SPEC
 import com.jvziyaoyao.zoomable.previewer.TransformItemState
 import com.jvziyaoyao.zoomable.previewer.VerticalDragType
 import com.origeek.imageViewer.gallery.ImageGalleryState
+import com.origeek.imageViewer.viewer.commonDeprecatedText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
@@ -35,6 +36,9 @@ import kotlin.math.absoluteValue
 /**
  * 增加垂直方向拖拽的能力
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 open class PreviewerVerticalDragState(
     // 协程作用域
     scope: CoroutineScope = MainScope(),

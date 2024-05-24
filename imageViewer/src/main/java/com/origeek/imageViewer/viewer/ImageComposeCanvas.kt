@@ -39,6 +39,9 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.absoluteValue
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun ImageComposeCanvas(
     modifier: Modifier = Modifier,

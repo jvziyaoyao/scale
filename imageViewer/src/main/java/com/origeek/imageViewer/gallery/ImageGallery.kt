@@ -21,6 +21,7 @@ import com.jvziyaoyao.zoomable.pager.SupportedPagerState
 import com.jvziyaoyao.zoomable.pager.rememberSupportedPagerState
 import com.origeek.imageViewer.viewer.ImageViewer
 import com.origeek.imageViewer.viewer.ImageViewerState
+import com.origeek.imageViewer.viewer.commonDeprecatedText
 import com.origeek.imageViewer.viewer.rememberViewerState
 import kotlinx.coroutines.launch
 
@@ -37,6 +38,9 @@ import kotlinx.coroutines.launch
 /**
  * gallery手势对象
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 class GalleryGestureScope(
     // 点击事件
     var onTap: () -> Unit = {},
@@ -49,6 +53,9 @@ class GalleryGestureScope(
 /**
  * gallery图层对象
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 class GalleryLayerScope(
     // viewer图层
     var viewerContainer: @Composable (
@@ -63,6 +70,9 @@ class GalleryLayerScope(
 /**
  * gallery状态
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 open class ImageGalleryState(
     val pagerState: SupportedPagerState,
 ) {
@@ -122,6 +132,9 @@ open class ImageGalleryState(
 /**
  * 记录gallery状态
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun rememberImageGalleryState(
     @IntRange(from = 0) initialPage: Int = 0,
@@ -134,6 +147,9 @@ fun rememberImageGalleryState(
 /**
  * 图片gallery,基于Pager实现的一个图片查看列表组件
  */
+@Deprecated(
+    message = "方法已弃用，请使用：com.jvziyaoyao.image.pager.ImagePager",
+)
 @Composable
 fun ImageGallery(
     // 编辑参数

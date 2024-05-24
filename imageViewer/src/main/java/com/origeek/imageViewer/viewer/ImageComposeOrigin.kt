@@ -32,6 +32,9 @@ import androidx.compose.ui.unit.IntSize
 import com.origeek.imageViewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
 import kotlinx.coroutines.launch
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 class RawGesture(
     val onTap: (Offset) -> Unit = {},
     val onDoubleTap: (Offset) -> Unit = {},
@@ -41,12 +44,18 @@ class RawGesture(
     val onGesture: (centroid: Offset, pan: Offset, zoom: Float, rotation: Float, event: PointerEvent) -> Boolean = { _, _, _, _, _ -> true },
 )
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 data class SizeChangeContent(
     val defaultSize: IntSize,
     val containerSize: IntSize,
     val maxScale: Float,
 )
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun ImageComposeOrigin(
     modifier: Modifier = Modifier,

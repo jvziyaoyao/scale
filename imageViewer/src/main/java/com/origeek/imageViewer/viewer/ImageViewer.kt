@@ -65,6 +65,9 @@ import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 
+const val commonDeprecatedText = "com.origeek.imageViewer下的全部类和方法均已弃用! " +
+        "请使用新版本：com.jvziyaoyao.viewer。"
+
 // 默认X轴偏移量
 const val DEFAULT_OFFSET_X = 0F
 
@@ -89,6 +92,9 @@ const val MIN_GESTURE_FINGER_DISTANCE = 200
 /**
  * viewer状态对象，用于记录compose组件状态
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 class ImageViewerState(
     // X轴偏移量
     offsetX: Float = DEFAULT_OFFSET_X,
@@ -271,6 +277,9 @@ class ImageViewerState(
  * 记录viewer状态
  * @return ImageViewerState 返回一个状态实例
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun rememberViewerState(
     // X轴偏移量
@@ -292,6 +301,9 @@ fun rememberViewerState(
 /**
  * viewer手势对象
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 class ViewerGestureScope(
     // 点击事件
     var onTap: (Offset) -> Unit = {},
@@ -306,6 +318,9 @@ class ViewerGestureScope(
  * @property content [@androidx.compose.runtime.Composable] [@kotlin.ExtensionFunctionType] Function1<ComposeModelScope, Unit>
  * @constructor
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 class ComposeModel(
     private val content: @Composable ComposeModel.() -> Unit = {}
 ) {
@@ -325,6 +340,9 @@ class ComposeModel(
 /**
  * model支持Painter、ImageBitmap、ImageVector、ImageDecoder、ComposeModel
  */
+@Deprecated(
+    message = "方法已弃用，请使用：com.jvziyaoyao.image.viewer.ImageViewer",
+)
 @Composable
 fun ImageViewer(
     // 修改参数

@@ -39,12 +39,16 @@ import com.origeek.imageViewer.gallery.ImageGallery
 import com.origeek.imageViewer.gallery.ImageGalleryState
 import com.origeek.imageViewer.gallery.rememberImageGalleryState
 import com.origeek.imageViewer.viewer.ImageViewerState
+import com.origeek.imageViewer.viewer.commonDeprecatedText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 
 /**
  * 预览组件的状态
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 class ImagePreviewerState(
     // 协程作用域
     scope: CoroutineScope = MainScope(),
@@ -81,6 +85,9 @@ class ImagePreviewerState(
 /**
  * 记录预览组件状态
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun rememberPreviewerState(
     // 协程作用域
@@ -126,6 +133,9 @@ val DEFAULT_PREVIEWER_PLACEHOLDER_CONTENT = @Composable {
     }
 }
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 // 加载时的占位内容
 class PreviewerPlaceholder(
     // 进入动画
@@ -139,6 +149,9 @@ class PreviewerPlaceholder(
 /**
  * 预览图层对象
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 class PreviewerLayerScope(
     // 包裹viewer的容器图层
     var viewerContainer: @Composable (
@@ -155,6 +168,9 @@ class PreviewerLayerScope(
 /**
  * 图片预览组件
  */
+@Deprecated(
+    message = "方法已弃用，请使用：com.jvziyaoyao.image.previewer.ImagePreviewer",
+)
 @Composable
 fun ImagePreviewer(
     // 编辑参数

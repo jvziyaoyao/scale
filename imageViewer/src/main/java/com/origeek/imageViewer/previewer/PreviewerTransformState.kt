@@ -15,6 +15,7 @@ import com.jvziyaoyao.zoomable.previewer.transformItemStateMap
 import com.origeek.imageViewer.gallery.ImageGalleryState
 import com.origeek.imageViewer.util.Ticket
 import com.origeek.imageViewer.viewer.ImageViewerState
+import com.origeek.imageViewer.viewer.commonDeprecatedText
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -31,6 +32,9 @@ import kotlin.coroutines.suspendCoroutine
  * @create: 2022-10-17 14:41
  **/
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 open class PreviewerTransformState(
     // 协程作用域/
     var scope: CoroutineScope = MainScope(),

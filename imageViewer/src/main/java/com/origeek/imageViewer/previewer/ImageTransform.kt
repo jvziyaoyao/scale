@@ -36,6 +36,7 @@ import com.jvziyaoyao.zoomable.previewer.TransformItemState
 import com.jvziyaoyao.zoomable.previewer.TransformItemView
 import com.jvziyaoyao.zoomable.previewer.rememberTransformItemState
 import com.jvziyaoyao.zoomable.previewer.transformItemStateMap
+import com.origeek.imageViewer.viewer.commonDeprecatedText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
@@ -56,6 +57,9 @@ import kotlin.coroutines.suspendCoroutine
  * @create: 2022-09-22 10:13
  **/
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun TransformImageView(
     modifier: Modifier = Modifier,
@@ -86,6 +90,9 @@ fun TransformImageView(
     }
 }
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun TransformImageView(
     modifier: Modifier = Modifier,
@@ -113,6 +120,9 @@ fun TransformImageView(
     }
 }
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun TransformImageView(
     modifier: Modifier = Modifier,
@@ -142,6 +152,9 @@ fun TransformImageView(
     }
 }
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun TransformImageView(
     modifier: Modifier = Modifier,
@@ -169,6 +182,9 @@ fun TransformImageView(
     }
 }
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun TransformItemView(
     modifier: Modifier = Modifier,
@@ -186,8 +202,9 @@ fun TransformItemView(
     )
 }
 
-
-
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun TransformContentView(
     transformContentState: TransformContentState = rememberTransformContentState(),
@@ -226,6 +243,9 @@ fun TransformContentView(
     }
 }
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 class TransformContentState(
     // 协程作用域
     var scope: CoroutineScope = MainScope(),
@@ -481,6 +501,9 @@ class TransformContentState(
 
 }
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun rememberTransformContentState(
     scope: CoroutineScope = rememberCoroutineScope(),
