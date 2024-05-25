@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>com.jvziyaoyao.image.viewer</title>
+    <link href="../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+                    <a class="library-name--link" href="../../index.html">
+                            imageViewer
+                    </a>
+            </div>
+            <div class="library-version">
+1.1.0-alpha.1            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":imageViewer:dokkaHtml/release">androidJvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="package" id="content" pageIds="imageViewer::com.jvziyaoyao.image.viewer////PointingToDeclaration//1276637997">
+  <div class="breadcrumbs"><a href="../../index.html">imageViewer</a><span class="delimiter">/</span><span class="current">com.jvziyaoyao.image.viewer</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button><button class="section-tab" data-togglable="PROPERTY,EXTENSION_PROPERTY">Properties</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="1336168220%2FClasslikes%2F1276637997" anchor-label="AnyComposable" id="1336168220%2FClasslikes%2F1276637997" data-filterable-set=":imageViewer:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":imageViewer:dokkaHtml/release" data-filterable-set=":imageViewer:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-any-composable/index.html"><span>Any</span><wbr></wbr><span><span>Composable</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1336168220%2FClasslikes%2F1276637997"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":imageViewer:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="-any-composable/index.html">AnyComposable</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>composable<span class="token operator">: </span><span><span class="token annotation builtin">@</span><a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/Composable.html"><span class="token annotation builtin">Composable</span></a> </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">ImageViewer传人的Model参数除了特定图片以外，还支持传人一个Composable函数</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="340963260%2FClasslikes%2F1276637997" anchor-label="ImageCanvasViewPort" id="340963260%2FClasslikes%2F1276637997" data-filterable-set=":imageViewer:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":imageViewer:dokkaHtml/release" data-filterable-set=":imageViewer:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-image-canvas-view-port/index.html"><span>Image</span><wbr></wbr><span>Canvas</span><wbr></wbr><span>View</span><wbr></wbr><span><span>Port</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="340963260%2FClasslikes%2F1276637997"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":imageViewer:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-image-canvas-view-port/index.html">ImageCanvasViewPort</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>scale<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>visualRect<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/geometry/Rect.html">Rect</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">渲染的视口对象</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1656959505%2FClasslikes%2F1276637997" anchor-label="ImageContent" id="-1656959505%2FClasslikes%2F1276637997" data-filterable-set=":imageViewer:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":imageViewer:dokkaHtml/release" data-filterable-set=":imageViewer:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-image-content/index.html"><span>Image</span><wbr></wbr><span><span>Content</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1656959505%2FClasslikes%2F1276637997"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":imageViewer:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-image-content/index.html">ImageContent</a><span class="token operator"> = </span><span><span class="token annotation builtin">@</span><a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/Composable.html"><span class="token annotation builtin">Composable</span></a> </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span><a href="../com.jvziyaoyao.zoomable.zoomable/-zoomable-view-state/index.html">ZoomableViewState</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></div><div class="brief "><p class="paragraph">用于解析图像数据给ZoomableView显示的方法</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2047008636%2FClasslikes%2F1276637997" anchor-label="ImageDecoder" id="-2047008636%2FClasslikes%2F1276637997" data-filterable-set=":imageViewer:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":imageViewer:dokkaHtml/release" data-filterable-set=":imageViewer:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-image-decoder/index.html"><span>Image</span><wbr></wbr><span><span>Decoder</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2047008636%2FClasslikes%2F1276637997"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":imageViewer:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="-image-decoder/index.html">ImageDecoder</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">decoder<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/BitmapRegionDecoder.html">BitmapRegionDecoder</a><span class="token punctuation">, </span></span><span class="parameter ">rotation<span class="token operator">: </span><a href="-image-decoder/-rotation/index.html">ImageDecoder.Rotation</a><span class="token operator"> = </span>Rotation.ROTATION_0<span class="token punctuation">, </span></span><span class="parameter ">onRelease<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{}<span class="token punctuation">, </span></span><span class="parameter ">thumbnails<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/Bitmap.html">Bitmap</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span> : <span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span></div><div class="brief "><p class="paragraph">用以提供ImageCanvas显示大型图片，rememberImageDecoder，createImageDecoder</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="852515166%2FClasslikes%2F1276637997" anchor-label="RenderBlock" id="852515166%2FClasslikes%2F1276637997" data-filterable-set=":imageViewer:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":imageViewer:dokkaHtml/release" data-filterable-set=":imageViewer:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-render-block/index.html"><span>Render</span><wbr></wbr><span><span>Block</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="852515166%2FClasslikes%2F1276637997"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":imageViewer:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-render-block/index.html">RenderBlock</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">var </span>inBound<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>inSampleSize<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">1</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>renderOffset<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/unit/IntOffset.html">IntOffset</a><span class="token operator"> = </span>IntOffset.Zero<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>renderSize<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/unit/IntSize.html">IntSize</a><span class="token operator"> = </span>IntSize.Zero<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>sliceRect<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/Rect.html">Rect</a><span class="token operator"> = </span>Rect(0, 0, 0, 0)<span class="token punctuation">, </span></span><span class="parameter ">bitmap<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/Bitmap.html">Bitmap</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1847440490%2FClasslikes%2F1276637997" anchor-label="RotationIllegalException" id="-1847440490%2FClasslikes%2F1276637997" data-filterable-set=":imageViewer:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":imageViewer:dokkaHtml/release" data-filterable-set=":imageViewer:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-rotation-illegal-exception/index.html"><span>Rotation</span><wbr></wbr><span>Illegal</span><wbr></wbr><span><span>Exception</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1847440490%2FClasslikes%2F1276637997"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":imageViewer:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="-rotation-illegal-exception/index.html">RotationIllegalException</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">msg<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">&quot;Illegal rotation angle.&quot;</span></span></span><span class="token punctuation">)</span> : <a href="https://developer.android.com/reference/kotlin/java/lang/RuntimeException.html">RuntimeException</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-875363447%2FProperties%2F1276637997" anchor-label="defaultImageContent" id="-875363447%2FProperties%2F1276637997" data-filterable-set=":imageViewer:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":imageViewer:dokkaHtml/release" data-filterable-set=":imageViewer:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="default-image-content.html"><span>default</span><wbr></wbr><span>Image</span><wbr></wbr><span><span>Content</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-875363447%2FProperties%2F1276637997"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":imageViewer:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="default-image-content.html">defaultImageContent</a><span class="token operator">: </span><a href="-image-content/index.html">ImageContent</a></div><div class="brief "><p class="paragraph">默认处理，当前model仅支持Painter、ImageBitmap、ImageVector、ImageDecoder、AnyComposable</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-1691048847%2FFunctions%2F1276637997" anchor-label="createBitmapRegionDecoder" id="-1691048847%2FFunctions%2F1276637997" data-filterable-set=":imageViewer:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":imageViewer:dokkaHtml/release" data-filterable-set=":imageViewer:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="create-bitmap-region-decoder.html"><span>create</span><wbr></wbr><span>Bitmap</span><wbr></wbr><span>Region</span><wbr></wbr><span><span>Decoder</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1691048847%2FFunctions%2F1276637997"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":imageViewer:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="create-bitmap-region-decoder.html"><span class="token function">createBitmapRegionDecoder</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">inputStream<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/io/InputStream.html">InputStream</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/BitmapRegionDecoder.html">BitmapRegionDecoder</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">通过流创建BitmapRegionDecoder</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="762191132%2FFunctions%2F1276637997" anchor-label="createImageDecoder" id="762191132%2FFunctions%2F1276637997" data-filterable-set=":imageViewer:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":imageViewer:dokkaHtml/release" data-filterable-set=":imageViewer:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="create-image-decoder.html"><span>create</span><wbr></wbr><span>Image</span><wbr></wbr><span><span>Decoder</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="762191132%2FFunctions%2F1276637997"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":imageViewer:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="create-image-decoder.html"><span class="token function">createImageDecoder</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">file<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/io/File.html">File</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-image-decoder/index.html">ImageDecoder</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">通过文件创建ImageDecoder</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="create-image-decoder.html"><span class="token function">createImageDecoder</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">decoder<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/BitmapRegionDecoder.html">BitmapRegionDecoder</a><span class="token punctuation">, </span></span><span class="parameter ">rotation<span class="token operator">: </span><a href="-image-decoder/-rotation/index.html">ImageDecoder.Rotation</a><span class="token operator"> = </span>ImageDecoder.Rotation.ROTATION_0</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-image-decoder/index.html">ImageDecoder</a></div><div class="brief "><p class="paragraph">创建ImageDecoder的主要方法</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1532178405%2FFunctions%2F1276637997" anchor-label="getDecoderRotation" id="-1532178405%2FFunctions%2F1276637997" data-filterable-set=":imageViewer:dokkaHtml/release"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":imageViewer:dokkaHtml/release" data-filterable-set=":imageViewer:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-decoder-rotation.html"><span>get</span><wbr></wbr><span>Decoder</span><wbr></wbr><span><span>Rotation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1532178405%2FFunctions%2F1276637997"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":imageViewer:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="https://developer.android.com/reference/kotlin/androidx/exifinterface/media/ExifInterface.html">ExifInterface</a><span class="token punctuation">.</span><a href="get-decoder-rotation.html"><span class="token function">getDecoderRotation</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-image-decoder/-rotation/index.html">ImageDecoder.Rotation</a></div><div class="brief "><p class="paragraph">通过Exif接口获取ImageDecoder的旋转方向</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1707512293%2FFunctions%2F1276637997" anchor-label="getViewPort" id="1707512293%2FFunctions%2F1276637997" data-filterable-set=":imageViewer:dokkaHtml/release"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":imageViewer:dokkaHtml/release" data-filterable-set=":imageViewer:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-view-port.html"><span>get</span><wbr></wbr><span>View</span><wbr></wbr><span><span>Port</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1707512293%2FFunctions%2F1276637997"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":imageViewer:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../com.jvziyaoyao.zoomable.zoomable/-zoomable-view-state/index.html">ZoomableViewState</a><span class="token punctuation">.</span><a href="get-view-port.html"><span class="token function">getViewPort</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-image-canvas-view-port/index.html">ImageCanvasViewPort</a></div><div class="brief "><p class="paragraph">从ZoomableView状态直接获取当前视口对象</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="661231670%2FFunctions%2F1276637997" anchor-label="ImageCanvas" id="661231670%2FFunctions%2F1276637997" data-filterable-set=":imageViewer:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":imageViewer:dokkaHtml/release" data-filterable-set=":imageViewer:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-image-canvas.html"><span>Image</span><wbr></wbr><span><span>Canvas</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="661231670%2FFunctions%2F1276637997"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":imageViewer:dokkaHtml/release"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/Composable.html"><span class="token annotation builtin">Composable</span></a></div></div><span class="token keyword">fun </span><a href="-image-canvas.html"><span class="token function">ImageCanvas</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">imageDecoder<span class="token operator">: </span><a href="-image-decoder/index.html">ImageDecoder</a><span class="token punctuation">, </span></span><span class="parameter ">viewPort<span class="token operator">: </span><a href="-image-canvas-view-port/index.html">ImageCanvasViewPort</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">用于ImageViewer/ZoomableView进行分块显示大型图片的配套组件</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-569763385%2FFunctions%2F1276637997" anchor-label="ImageViewer" id="-569763385%2FFunctions%2F1276637997" data-filterable-set=":imageViewer:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":imageViewer:dokkaHtml/release" data-filterable-set=":imageViewer:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-image-viewer.html"><span>Image</span><wbr></wbr><span><span>Viewer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-569763385%2FFunctions%2F1276637997"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":imageViewer:dokkaHtml/release"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/Composable.html"><span class="token annotation builtin">Composable</span></a></div></div><span class="token keyword">fun </span><a href="-image-viewer.html"><span class="token function">ImageViewer</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">modifier<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier.html">Modifier</a><span class="token operator"> = </span>Modifier<span class="token punctuation">, </span></span><span class="parameter ">model<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">state<span class="token operator">: </span><a href="../com.jvziyaoyao.zoomable.zoomable/-zoomable-view-state/index.html">ZoomableViewState</a><span class="token punctuation">, </span></span><span class="parameter ">imageContent<span class="token operator">: </span><a href="-image-content/index.html">ImageContent</a><span class="token operator"> = </span>defaultImageContent<span class="token punctuation">, </span></span><span class="parameter ">detectGesture<span class="token operator">: </span><a href="../com.jvziyaoyao.zoomable.zoomable/-zoomable-gesture-scope/index.html">ZoomableGestureScope</a><span class="token operator"> = </span>ZoomableGestureScope()</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">单个图片预览组件</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1805854211%2FFunctions%2F1276637997" anchor-label="rememberImageDecoder" id="1805854211%2FFunctions%2F1276637997" data-filterable-set=":imageViewer:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":imageViewer:dokkaHtml/release" data-filterable-set=":imageViewer:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remember-image-decoder.html"><span>remember</span><wbr></wbr><span>Image</span><wbr></wbr><span><span>Decoder</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1805854211%2FFunctions%2F1276637997"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":imageViewer:dokkaHtml/release"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/Composable.html"><span class="token annotation builtin">Composable</span></a></div></div><span class="token keyword">fun </span><a href="remember-image-decoder.html"><span class="token function">rememberImageDecoder</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">file<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/io/File.html">File</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="-image-decoder/index.html">ImageDecoder</a><span class="token operator">?</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-exception/index.html">Exception</a><span class="token operator">?</span><span class="token operator">&gt;</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/Composable.html"><span class="token annotation builtin">Composable</span></a></div></div><span class="token keyword">fun </span><a href="remember-image-decoder.html"><span class="token function">rememberImageDecoder</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">inputStream<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/io/InputStream.html">InputStream</a><span class="token punctuation">, </span></span><span class="parameter ">rotation<span class="token operator">: </span><a href="-image-decoder/-rotation/index.html">ImageDecoder.Rotation</a><span class="token operator"> = </span>ImageDecoder.Rotation.ROTATION_0</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="-image-decoder/index.html">ImageDecoder</a><span class="token operator">?</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-exception/index.html">Exception</a><span class="token operator">?</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">创建ImageDecoder的方法</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
