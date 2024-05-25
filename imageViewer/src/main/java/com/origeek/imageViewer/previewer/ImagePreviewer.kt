@@ -10,8 +10,6 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -30,39 +28,27 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.jvziyaoyao.image.previewer.defaultPreviewBackground
+import com.jvziyaoyao.zoomable.pager.DEFAULT_ITEM_SPACE
+import com.jvziyaoyao.zoomable.previewer.DEFAULT_PREVIEWER_ENTER_TRANSITION
+import com.jvziyaoyao.zoomable.previewer.DEFAULT_PREVIEWER_EXIT_TRANSITION
+import com.jvziyaoyao.zoomable.previewer.DEFAULT_SOFT_ANIMATION_SPEC
+import com.jvziyaoyao.zoomable.previewer.VerticalDragType
 import com.origeek.imageViewer.gallery.GalleryGestureScope
 import com.origeek.imageViewer.gallery.ImageGallery
 import com.origeek.imageViewer.gallery.ImageGalleryState
 import com.origeek.imageViewer.gallery.rememberImageGalleryState
 import com.origeek.imageViewer.viewer.ImageViewerState
+import com.origeek.imageViewer.viewer.commonDeprecatedText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
-
-// 预览的默认的背景颜色
-val DEEP_DARK_FANTASY = Color(0xFF000000)
-
-// 图片间的默认间隔
-val DEFAULT_ITEM_SPACE = 12.dp
-
-// 比较轻柔的动画窗格
-val DEFAULT_SOFT_ANIMATION_SPEC = tween<Float>(320)
-
-/**
- * 预览的默认背景
- */
-@Composable
-fun DefaultPreviewerBackground() {
-    Box(
-        modifier = Modifier
-            .background(DEEP_DARK_FANTASY)
-            .fillMaxSize()
-    )
-}
 
 /**
  * 预览组件的状态
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 class ImagePreviewerState(
     // 协程作用域
     scope: CoroutineScope = MainScope(),
@@ -99,6 +85,9 @@ class ImagePreviewerState(
 /**
  * 记录预览组件状态
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun rememberPreviewerState(
     // 协程作用域
@@ -125,18 +114,6 @@ fun rememberPreviewerState(
     return imagePreviewerState
 }
 
-/**
- * 默认的弹出预览时的动画效果
- */
-val DEFAULT_PREVIEWER_ENTER_TRANSITION =
-    scaleIn(tween(180)) + fadeIn(tween(240))
-
-/**
- * 默认的关闭预览时的动画效果
- */
-val DEFAULT_PREVIEWER_EXIT_TRANSITION =
-    scaleOut(tween(320)) + fadeOut(tween(240))
-
 // 默认淡入淡出动画窗格
 val DEFAULT_CROSS_FADE_ANIMATE_SPEC: AnimationSpec<Float> = tween(80)
 
@@ -156,6 +133,9 @@ val DEFAULT_PREVIEWER_PLACEHOLDER_CONTENT = @Composable {
     }
 }
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 // 加载时的占位内容
 class PreviewerPlaceholder(
     // 进入动画
@@ -169,13 +149,16 @@ class PreviewerPlaceholder(
 /**
  * 预览图层对象
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 class PreviewerLayerScope(
     // 包裹viewer的容器图层
     var viewerContainer: @Composable (
         page: Int, viewerState: ImageViewerState, viewer: @Composable () -> Unit
     ) -> Unit = { _, _, viewer -> viewer() },
     // 背景图层
-    var background: @Composable ((page: Int) -> Unit) = { _ -> DefaultPreviewerBackground() },
+    var background: @Composable ((page: Int) -> Unit) = { _ -> defaultPreviewBackground() },
     // 前景图层
     var foreground: @Composable ((page: Int) -> Unit) = { _ -> },
     // 加载时的占位内容
@@ -185,6 +168,9 @@ class PreviewerLayerScope(
 /**
  * 图片预览组件
  */
+@Deprecated(
+    message = "方法已弃用，请使用：com.jvziyaoyao.image.previewer.ImagePreviewer",
+)
 @Composable
 fun ImagePreviewer(
     // 编辑参数

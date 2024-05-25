@@ -9,9 +9,13 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.jvziyaoyao.zoomable.previewer.DEFAULT_SOFT_ANIMATION_SPEC
+import com.jvziyaoyao.zoomable.previewer.TransformItemState
+import com.jvziyaoyao.zoomable.previewer.transformItemStateMap
 import com.origeek.imageViewer.gallery.ImageGalleryState
 import com.origeek.imageViewer.util.Ticket
 import com.origeek.imageViewer.viewer.ImageViewerState
+import com.origeek.imageViewer.viewer.commonDeprecatedText
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -28,8 +32,11 @@ import kotlin.coroutines.suspendCoroutine
  * @create: 2022-10-17 14:41
  **/
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 open class PreviewerTransformState(
-    // 协程作用域
+    // 协程作用域/
     var scope: CoroutineScope = MainScope(),
     // 默认动画窗格
     var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
@@ -397,7 +404,7 @@ open class PreviewerTransformState(
         }
         // 允许使用loading
         viewerContainerState?.allowLoading = true
-        // 标记结束
+        // 标记结束；
         stateCloseEnd()
     }
 

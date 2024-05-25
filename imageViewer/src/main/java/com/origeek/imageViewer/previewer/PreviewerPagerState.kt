@@ -3,6 +3,7 @@ package com.origeek.imageViewer.previewer
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import com.origeek.imageViewer.gallery.ImageGalleryState
+import com.origeek.imageViewer.viewer.commonDeprecatedText
 
 /**
  * @program: ImageViewer
@@ -14,6 +15,9 @@ import com.origeek.imageViewer.gallery.ImageGalleryState
  * @create: 2022-10-17 14:41
  **/
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 open class PreviewerPagerState(
     val galleryState: ImageGalleryState,
 ) {

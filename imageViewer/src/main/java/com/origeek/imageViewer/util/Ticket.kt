@@ -1,7 +1,12 @@
 package com.origeek.imageViewer.util
 
-import androidx.compose.runtime.*
-import java.util.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.origeek.imageViewer.viewer.commonDeprecatedText
+import java.util.UUID
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -15,6 +20,9 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @create: 2023-05-24 12:15
  **/
+@Deprecated(
+    message = commonDeprecatedText,
+)
 class Ticket {
 
     private var ticket by mutableStateOf("")

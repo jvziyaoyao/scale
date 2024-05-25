@@ -8,13 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
@@ -34,6 +31,12 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
+import com.jvziyaoyao.zoomable.previewer.DEFAULT_SOFT_ANIMATION_SPEC
+import com.jvziyaoyao.zoomable.previewer.TransformItemState
+import com.jvziyaoyao.zoomable.previewer.TransformItemView
+import com.jvziyaoyao.zoomable.previewer.rememberTransformItemState
+import com.jvziyaoyao.zoomable.previewer.transformItemStateMap
+import com.origeek.imageViewer.viewer.commonDeprecatedText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
@@ -41,7 +44,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -55,12 +57,9 @@ import kotlin.coroutines.suspendCoroutine
  * @create: 2022-09-22 10:13
  **/
 
-// 用于操作transformItemStateMap的锁对象
-internal val imageTransformMutex = Mutex()
-
-// 用于缓存界面上的transformItemState
-internal val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>()
-
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun TransformImageView(
     modifier: Modifier = Modifier,
@@ -91,6 +90,9 @@ fun TransformImageView(
     }
 }
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun TransformImageView(
     modifier: Modifier = Modifier,
@@ -118,6 +120,9 @@ fun TransformImageView(
     }
 }
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun TransformImageView(
     modifier: Modifier = Modifier,
@@ -147,6 +152,9 @@ fun TransformImageView(
     }
 }
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun TransformImageView(
     modifier: Modifier = Modifier,
@@ -156,6 +164,9 @@ fun TransformImageView(
     content: @Composable (Any) -> Unit,
 ) = TransformImageView(modifier, key, itemState, previewerState.transformState, content)
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun TransformImageView(
     modifier: Modifier = Modifier,
@@ -174,6 +185,9 @@ fun TransformImageView(
     }
 }
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun TransformItemView(
     modifier: Modifier = Modifier,
@@ -182,37 +196,18 @@ fun TransformItemView(
     contentState: TransformContentState?,
     content: @Composable (Any) -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
-    itemState.key = key
-    itemState.blockCompose = content
-    DisposableEffect(key) {
-        // 这个composable加载时添加到map
-        scope.launch {
-            itemState.addItem()
-        }
-        onDispose {
-            // composable退出时从map移除
-            itemState.removeItem()
-        }
-    }
-    Box(
-        modifier = modifier
-            .onGloballyPositioned {
-                itemState.onPositionChange(
-                    position = it.positionInRoot(),
-                    size = it.size,
-                )
-            }
-            .fillMaxSize()
-    ) {
-        if (
-            contentState?.itemState != itemState || !contentState.onAction
-        ) {
-            itemState.blockCompose(key)
-        }
-    }
+    TransformItemView(
+        modifier = modifier,
+        key = key,
+        itemState = itemState,
+        itemVisible = contentState?.itemState != itemState || !contentState.onAction,
+        content = content,
+    )
 }
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun TransformContentView(
     transformContentState: TransformContentState = rememberTransformContentState(),
@@ -251,6 +246,9 @@ fun TransformContentView(
     }
 }
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 class TransformContentState(
     // 协程作用域
     var scope: CoroutineScope = MainScope(),
@@ -506,6 +504,9 @@ class TransformContentState(
 
 }
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun rememberTransformContentState(
     scope: CoroutineScope = rememberCoroutineScope(),
@@ -517,81 +518,4 @@ fun rememberTransformContentState(
     transformContentState.scope = scope
     transformContentState.defaultAnimationSpec = animationSpec
     return transformContentState
-}
-
-class TransformItemState(
-    var key: Any = Unit,
-    var blockCompose: (@Composable (Any) -> Unit) = {},
-    var scope: CoroutineScope,
-    var blockPosition: Offset = Offset.Zero,
-    var blockSize: IntSize = IntSize.Zero,
-    var intrinsicSize: Size? = null,
-    var checkInBound: (TransformItemState.() -> Boolean)? = null,
-) {
-
-    private fun checkItemInMap() {
-        if (checkInBound == null) return
-        if (checkInBound!!.invoke(this)) {
-            addItem()
-        } else {
-            removeItem()
-        }
-    }
-
-    /**
-     * 位置和大小发生变化时
-     * @param position Offset
-     * @param size IntSize
-     */
-    internal fun onPositionChange(position: Offset, size: IntSize) {
-        blockPosition = position
-        blockSize = size
-        scope.launch {
-            checkItemInMap()
-        }
-    }
-
-    /**
-     * 判断item是否在所需范围内，返回true，则添加该item到map，返回false则移除
-     * @param checkInBound Function0<Boolean>
-     */
-    fun checkIfInBound(checkInBound: () -> Boolean) {
-        if (checkInBound()) {
-            addItem()
-        } else {
-            removeItem()
-        }
-    }
-
-    /**
-     * 添加item到map上
-     * @param key Any?
-     */
-    fun addItem(key: Any? = null) {
-        val currentKey = key ?: this.key ?: return
-        if (checkInBound != null) return
-        synchronized(imageTransformMutex) {
-            transformItemStateMap[currentKey] = this
-        }
-    }
-
-    /**
-     * 从map上移除item
-     * @param key Any?
-     */
-    fun removeItem(key: Any? = null) {
-        synchronized(imageTransformMutex) {
-            val currentKey = key ?: this.key ?: return
-            if (checkInBound != null) return
-            transformItemStateMap.remove(currentKey)
-        }
-    }
-}
-
-@Composable
-fun rememberTransformItemState(
-    scope: CoroutineScope = rememberCoroutineScope(),
-    checkInBound: (TransformItemState.() -> Boolean)? = null,
-): TransformItemState {
-    return remember { TransformItemState(scope = scope, checkInBound = checkInBound) }
 }

@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
 
     <application
         android:allowBackup="true"
@@ -10,9 +15,10 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ImageViewer">
+        android:theme="@style/Theme.ImageViewer"
+        tools:targetApi="tiramisu">
         <activity
-            android:name="com.origeek.viewerDemo.HomeActivity"
+            android:name="com.jvziyaoyao.viewer.sample.HomeActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar">
             <intent-filter>
@@ -22,41 +28,45 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.origeek.viewerDemo.NavigationActivity"
+            android:name="com.jvziyaoyao.viewer.sample.PreviewerActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.origeek.viewerDemo.PreviewerActivity"
+            android:name="com.jvziyaoyao.viewer.sample.GalleryActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.origeek.viewerDemo.GalleryActivity"
+            android:name="com.jvziyaoyao.viewer.sample.HugeActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.origeek.viewerDemo.HugeActivity"
+            android:name="com.jvziyaoyao.viewer.sample.NormalActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.origeek.viewerDemo.NormalActivity"
+            android:name="com.jvziyaoyao.viewer.sample.DecoderActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.origeek.viewerDemo.EasyActivity"
+            android:name="com.jvziyaoyao.viewer.sample.TransformActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.origeek.viewerDemo.DecoderActivity"
+            android:name="com.jvziyaoyao.viewer.sample.ZoomableActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.origeek.viewerDemo.ComposeActivity"
+            android:name="com.jvziyaoyao.viewer.sample.PicturesActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.origeek.viewerDemo.TransformActivity"
+            android:name="com.jvziyaoyao.viewer.sample.SharedActivity"
             android:exported="true"
-            android:theme="@style/Theme.ImageViewer.NoActionBar" />
+            android:theme="@style/Theme.ImageViewer.NoActionBar"/>
+        <activity
+            android:name="com.jvziyaoyao.viewer.sample.TestActivity"
+            android:exported="true"
+            android:theme="@style/Theme.ImageViewer.NoActionBar"/>
     </application>
 
 </manifest>

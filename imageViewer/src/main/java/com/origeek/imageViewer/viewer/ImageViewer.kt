@@ -1,17 +1,34 @@
 package com.origeek.imageViewer.viewer
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.FloatExponentialDecaySpec
+import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.generateDecayAnimationSpec
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.*
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateCentroid
+import androidx.compose.foundation.gestures.calculateCentroidSize
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateRotation
+import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -20,19 +37,36 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.input.pointer.PointerEvent
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.positionChangeConsumed
+import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
+import com.jvziyaoyao.image.viewer.ImageDecoder
 import com.origeek.imageViewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.absoluteValue
+
+const val commonDeprecatedText = "com.origeek.imageViewer下的全部类和方法均已弃用! " +
+        "请使用新版本：com.jvziyaoyao.viewer。"
 
 // 默认X轴偏移量
 const val DEFAULT_OFFSET_X = 0F
@@ -58,6 +92,9 @@ const val MIN_GESTURE_FINGER_DISTANCE = 200
 /**
  * viewer状态对象，用于记录compose组件状态
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 class ImageViewerState(
     // X轴偏移量
     offsetX: Float = DEFAULT_OFFSET_X,
@@ -140,22 +177,24 @@ class ImageViewerState(
      */
     suspend fun reset(animationSpec: AnimationSpec<Float> = defaultAnimateSpec) {
         coroutineScope {
-            launch {
-                rotation.animateTo(DEFAULT_ROTATION, animationSpec)
-                resetTimeStamp = System.currentTimeMillis()
-            }
-            launch {
-                offsetX.animateTo(DEFAULT_OFFSET_X, animationSpec)
-                resetTimeStamp = System.currentTimeMillis()
-            }
-            launch {
-                offsetY.animateTo(DEFAULT_OFFSET_Y, animationSpec)
-                resetTimeStamp = System.currentTimeMillis()
-            }
-            launch {
-                scale.animateTo(DEFAULT_SCALE, animationSpec)
-                resetTimeStamp = System.currentTimeMillis()
-            }
+            listOf(
+                async {
+                    rotation.animateTo(DEFAULT_ROTATION, animationSpec)
+                    resetTimeStamp = System.currentTimeMillis()
+                },
+                async {
+                    offsetX.animateTo(DEFAULT_OFFSET_X, animationSpec)
+                    resetTimeStamp = System.currentTimeMillis()
+                },
+                async {
+                    offsetY.animateTo(DEFAULT_OFFSET_Y, animationSpec)
+                    resetTimeStamp = System.currentTimeMillis()
+                },
+                async {
+                    scale.animateTo(DEFAULT_SCALE, animationSpec)
+                    resetTimeStamp = System.currentTimeMillis()
+                },
+            ).awaitAll()
         }
     }
 
@@ -238,6 +277,9 @@ class ImageViewerState(
  * 记录viewer状态
  * @return ImageViewerState 返回一个状态实例
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun rememberViewerState(
     // X轴偏移量
@@ -259,6 +301,9 @@ fun rememberViewerState(
 /**
  * viewer手势对象
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 class ViewerGestureScope(
     // 点击事件
     var onTap: (Offset) -> Unit = {},
@@ -273,6 +318,9 @@ class ViewerGestureScope(
  * @property content [@androidx.compose.runtime.Composable] [@kotlin.ExtensionFunctionType] Function1<ComposeModelScope, Unit>
  * @constructor
  */
+@Deprecated(
+    message = commonDeprecatedText,
+)
 class ComposeModel(
     private val content: @Composable ComposeModel.() -> Unit = {}
 ) {
@@ -292,6 +340,9 @@ class ComposeModel(
 /**
  * model支持Painter、ImageBitmap、ImageVector、ImageDecoder、ComposeModel
  */
+@Deprecated(
+    message = "方法已弃用，请使用：com.jvziyaoyao.image.viewer.ImageViewer",
+)
 @Composable
 fun ImageViewer(
     // 修改参数
@@ -393,6 +444,7 @@ fun ImageViewer(
                             velocity = null
                             maxDisplayScale
                         }
+
                         else -> null
                     }
                     // 如果此时位移超出范围，就动画回范围内
@@ -583,6 +635,7 @@ fun ImageViewer(
                     crossfadeAnimationSpec = state.crossfadeAnimationSpec,
                 )
             }
+
             is ImageDecoder -> {
                 ImageComposeCanvas(
                     imageDecoder = model,
@@ -785,9 +838,11 @@ fun limitToBound(offset: Float, bound: Float): Float {
         offset > bound -> {
             bound
         }
+
         offset < -bound -> {
             -bound
         }
+
         else -> {
             offset
         }
@@ -814,10 +869,12 @@ fun panTransformAndScale(
             val upy = (uh * fromScale - uh).div(2)
             (upy - offset + center) / (fromScale * uh)
         }
+
         srcH > bh || bh > uh -> {
             val upy = (srcH - uh).div(2)
             (upy - gapH - offset + center) / (fromScale * uh)
         }
+
         else -> {
             val upy = -(bh - srcH).div(2)
             (upy - offset + center) / (fromScale * uh)
@@ -828,10 +885,12 @@ fun panTransformAndScale(
             val upy = (uh * toScale - uh).div(2)
             upy + center - py * toScale * uh
         }
+
         desH > bh -> {
             val upy = (desH - uh).div(2)
             upy - gapH + center - py * toScale * uh
         }
+
         else -> {
             val upy = -(bh - desH).div(2)
             upy + center - py * desH

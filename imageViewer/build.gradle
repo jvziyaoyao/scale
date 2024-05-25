@@ -6,8 +6,8 @@ plugins {
 
 def GROUP_NAME = 'com.github.jvziyaoyao'
 def ARTIFACT_NAME = 'image-viewer'
-def VERSION_CODE = 11
-def VERSION_NAME = '1.0.2-alpha.8'
+def VERSION_CODE = 12
+def VERSION_NAME = '1.1.0-alpha.1'
 
 group GROUP_NAME
 version VERSION_NAME
@@ -57,7 +57,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion compose_version
+        kotlinCompilerExtensionVersion compose_compiler_version
     }
     packagingOptions {
         resources {
@@ -70,19 +70,20 @@ android {
             withJavadocJar()
         }
     }
-    namespace 'com.origeek.imageViewer'
+    namespace 'com.jvziyaoyao.image.viewer'
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.exifinterface:exifinterface:1.3.7'
+    implementation 'androidx.core:core-ktx:1.13.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.google.android.material:material:1.12.0'
     implementation "androidx.compose.ui:ui-util:$compose_version"
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
-    implementation 'androidx.activity:activity-compose:1.7.2'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+    implementation 'androidx.activity:activity-compose:1.9.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
