@@ -94,4 +94,5 @@ dependencies {
 
 dokkaHtml.configure {
     outputDirectory.set(file("$rootDir/docs"))
+    moduleName.set("$ARTIFACT_NAME")
 }
