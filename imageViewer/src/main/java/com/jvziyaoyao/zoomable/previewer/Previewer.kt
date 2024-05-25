@@ -24,7 +24,7 @@ fun rememberPreviewerState(
     @IntRange(from = 0) initialPage: Int = 0,
     verticalDragType: VerticalDragType = VerticalDragType.Down,
     pageCount: () -> Int,
-    getKey: (Int) -> Any,
+    getKey: (Int) -> Any = {},
 ): PreviewerState {
     val pagerState = rememberSupportedPagerState(initialPage = initialPage, pageCount = pageCount)
     val previewerState = remember {

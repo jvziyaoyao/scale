@@ -164,6 +164,9 @@ fun TransformImageView(
     content: @Composable (Any) -> Unit,
 ) = TransformImageView(modifier, key, itemState, previewerState.transformState, content)
 
+@Deprecated(
+    message = commonDeprecatedText,
+)
 @Composable
 fun TransformImageView(
     modifier: Modifier = Modifier,

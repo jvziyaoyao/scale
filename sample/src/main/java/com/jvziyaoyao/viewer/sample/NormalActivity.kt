@@ -6,10 +6,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import com.jvziyaoyao.image.viewer.ImageViewer
 import com.jvziyaoyao.image.viewer.sample.R
 import com.jvziyaoyao.viewer.sample.base.BaseActivity
-import com.jvziyaoyao.viewer.sample.ui.component.rememberCoilImagePainter
 import com.jvziyaoyao.zoomable.zoomable.ZoomableGestureScope
 import com.jvziyaoyao.zoomable.zoomable.rememberZoomableState
 import kotlinx.coroutines.launch
@@ -27,12 +27,12 @@ class NormalActivity : BaseActivity() {
 
 @Composable
 fun NormalBody() {
-    val scope = rememberCoroutineScope()
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        val painter = rememberCoilImagePainter(image = R.drawable.light_02)
+        val scope = rememberCoroutineScope()
+        val painter = painterResource(id = R.drawable.light_02)
         val state = rememberZoomableState(contentSize = painter.intrinsicSize)
         ImageViewer(
             model = painter,

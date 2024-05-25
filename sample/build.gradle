@@ -68,7 +68,6 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-permissions:0.24.1-alpha")
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.24.1-alpha"
-    implementation 'com.google.accompanist:accompanist-insets:0.24.1-alpha'
 
     implementation "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha07"
 

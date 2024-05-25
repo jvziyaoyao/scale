@@ -1,8 +1,6 @@
 package com.jvziyaoyao.viewer.sample
 
-import android.content.res.AssetManager.AssetInputStream
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Slider
 import androidx.compose.material.Switch
@@ -24,7 +21,6 @@ import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,14 +34,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.jvziyaoyao.image.previewer.ImagePreviewer
-import com.jvziyaoyao.image.viewer.ImageCanvas
 import com.jvziyaoyao.image.viewer.ImageDecoder
-import com.jvziyaoyao.image.viewer.getViewPort
 import com.jvziyaoyao.image.viewer.rememberImageDecoder
 import com.jvziyaoyao.image.viewer.sample.R
 import com.jvziyaoyao.viewer.sample.base.BaseActivity
-import com.jvziyaoyao.viewer.sample.ui.component.rememberCoilImagePainter
-import com.jvziyaoyao.zoomable.previewer.Previewer
 import com.jvziyaoyao.zoomable.previewer.TransformItemView
 import com.jvziyaoyao.zoomable.previewer.VerticalDragType
 import com.jvziyaoyao.zoomable.previewer.rememberPreviewerState
@@ -205,9 +197,6 @@ fun DecoderBody() {
             }
         }
 
-//        val insetRotation by remember {
-//            derivedStateOf { ceil(rotation).toInt() }
-//        }
         ImagePreviewer(
             state = previewerState,
             imageLoader = { _ ->
@@ -231,29 +220,5 @@ fun DecoderBody() {
                 )
             }
         )
-//        Previewer(
-//            state = previewerState,
-//            zoomablePolicy = {
-//                Log.i("TAG", "DecoderBody: inputStream $inputStream")
-//                val imageDecoder = rememberImageDecoder(
-//                    inputStream = inputStream,
-//                    rotation = insetRotation
-//                )
-//                if (imageDecoder != null) {
-//                    ZoomablePolicy(intrinsicSize = imageDecoder.intrinsicSize) {
-//                        val viewPort = it.getViewPort()
-//                        ImageCanvas(
-//                            imageDecoder = imageDecoder,
-//                            viewPort = viewPort,
-//                        )
-//                    }
-//                } else {
-//                    Box(modifier = Modifier.fillMaxSize()) {
-//                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-//                    }
-//                }
-//                imageDecoder != null
-//            }
-//        )
     }
 }
