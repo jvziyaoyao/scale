@@ -5,6 +5,8 @@
 
 [![](https://www.jitpack.io/v/jvziyaoyao/ImageViewer.svg)](https://www.jitpack.io/#jvziyaoyao/ImageViewer)
 
+### 🥳 1.1.0 全新版本～
+
 ### 📝 更新日志 👉 [CHANGELOG](/CHANGELOG.md)
 <br/>
 

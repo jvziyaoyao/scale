@@ -1,6 +1,15 @@
 # Change Log
 All notable changes to this project will be documented in this file. 
 
+# 1.1.0-alpha.1
+- Feat: 弃用com.origeek.imageViewer；
+- Feat: 重构ImageViewer；
+- Feat: 重构ImageGallery为ImagePager；
+- Feat: 重构ImagePreviewer；
+- Feat: 新增ZoomableView；
+- Feat: 新增ZoomablePager；
+- Feat: 新增Previewer；
+
 # 1.0.2-alpha.8
 - Feat: galleryState添加pageCount；
 
