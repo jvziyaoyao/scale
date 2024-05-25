@@ -2,6 +2,7 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'maven-publish'
+    id 'org.jetbrains.dokka' version '1.9.20'
 }
 
 def GROUP_NAME = 'com.github.jvziyaoyao'
@@ -89,4 +90,9 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
+}
+
+dokkaHtml.configure {
+    outputDirectory.set(file("$rootDir/docs"))
+    moduleName.set("$ARTIFACT_NAME")
 }

@@ -46,7 +46,10 @@ implementation 'com.github.jvziyaoyao:ImageViewer:VERSION'
 
 👓 示例
 --------
-### 👋 示例代码请参考[sample](https://github.com/jvziyaoyao/ImageViewer/tree/main/sample)
+### 👋 示例代码请参考 👉 [sample](https://github.com/jvziyaoyao/ImageViewer/tree/dev/sample/src/main/java/com/jvziyaoyao/viewer/sample)
+
+🛵 使用方式
+--------
 ### 一般使用
 <img src="doc/normal_image.gif" height="444" width="200"></img>
 ```kotlin
@@ -180,6 +183,9 @@ ImagePreviewer(
 )
 ```
 
+📓 API
+--------
+### 💽 接口文档 👉 [API REFERENCE](https://jvziyaoyao.github.io/ImageViewer)
 
 🕵️‍♀️ 开源许可
 --------
