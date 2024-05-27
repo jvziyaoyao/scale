@@ -522,7 +522,7 @@ fun TransformItemView(
             itemState = itemState,
             itemVisible = if (!itemContentVisible.value) {
                 if (previewerAlpha.value == 1F) {
-                    isCurrentPage
+                    if (!visible) true else isCurrentPage
                 } else true
             } else {
                 if (previewerAlpha.value == 1F) {
