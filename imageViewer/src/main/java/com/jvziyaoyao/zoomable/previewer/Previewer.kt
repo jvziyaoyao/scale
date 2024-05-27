@@ -17,6 +17,17 @@ import com.jvziyaoyao.zoomable.pager.SupportedPagerState
 import com.jvziyaoyao.zoomable.pager.rememberSupportedPagerState
 import kotlinx.coroutines.CoroutineScope
 
+/**
+ * 获取一个图片预览的状态与控制对象
+ *
+ * @param scope 协程作用域
+ * @param defaultAnimationSpec 默认动画窗格
+ * @param initialPage 初始化页码
+ * @param verticalDragType 垂直手势类型
+ * @param pageCount 总页数
+ * @param getKey 获取某一页的key的方法
+ * @return 返回一个PreviewerState
+ */
 @Composable
 fun rememberPreviewerState(
     scope: CoroutineScope = rememberCoroutineScope(),
@@ -39,6 +50,18 @@ fun rememberPreviewerState(
     return previewerState
 }
 
+/**
+ * 图片预览的状态与控制对象
+ *
+ * @constructor
+ *
+ * @param scope 协程作用域
+ * @param defaultAnimationSpec 默认动画窗格
+ * @param verticalDragType 垂直手势类型
+ * @param scaleToCloseMinValue 下拉关闭的缩小的阈值
+ * @param pagerState 预览状态
+ * @param getKey 获取当前key的方法
+ */
 class PreviewerState(
     scope: CoroutineScope,
     defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
@@ -55,6 +78,20 @@ class PreviewerState(
     getKey
 )
 
+/**
+ * 带转换效果的图片弹出预览组件
+ *
+ * @param modifier 图层修饰
+ * @param state 状态对象
+ * @param itemSpacing 图片间的间隔
+ * @param beyondViewportPageCount 页面外缓存个数
+ * @param enter 调用open时的进入动画
+ * @param exit 调用close时的退出动画
+ * @param debugMode 调试模式
+ * @param detectGesture 检测手势
+ * @param previewerLayer 容器的图层修饰
+ * @param zoomablePolicy 缩放图层的修饰
+ */
 @Composable
 fun Previewer(
     // 编辑参数

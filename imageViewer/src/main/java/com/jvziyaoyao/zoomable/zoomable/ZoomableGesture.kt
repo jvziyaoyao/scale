@@ -20,6 +20,11 @@ import kotlin.math.absoluteValue
  * @create: 2023-11-24 16:58
  **/
 
+/**
+ * 标记手势事件开始
+ *
+ * @param scope 用于进行变换的协程作用域
+ */
 fun ZoomableViewState.onGestureStart(scope: CoroutineScope) {
     if (allowGestureInput) {
         eventChangeCount = 0
@@ -33,6 +38,12 @@ fun ZoomableViewState.onGestureStart(scope: CoroutineScope) {
     }
 }
 
+/**
+ * 标记手势事件结束
+ *
+ * @param scope 用于进行变换的协程作用域
+ * @param transformOnly 仅转换
+ */
 fun ZoomableViewState.onGestureEnd(scope: CoroutineScope, transformOnly: Boolean) {
     scope.apply {
         if (!transformOnly || !allowGestureInput || isRunning()) return
@@ -106,6 +117,17 @@ fun ZoomableViewState.onGestureEnd(scope: CoroutineScope, transformOnly: Boolean
     }
 }
 
+/**
+ * 输入手势事件
+ *
+ * @param scope 用于进行变换的协程作用域
+ * @param center 手势中心坐标
+ * @param pan 手势移动距离
+ * @param zoom 手势缩放率
+ * @param rotate 旋转角度
+ * @param event 事件对象
+ * @return 是否消费这次事件
+ */
 fun ZoomableViewState.onGesture(
     scope: CoroutineScope,
     center: Offset,

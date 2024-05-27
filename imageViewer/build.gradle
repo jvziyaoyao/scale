@@ -1,33 +1,8 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'maven-publish'
     id 'org.jetbrains.dokka' version '1.9.20'
-}
-
-def GROUP_NAME = 'com.github.jvziyaoyao'
-def ARTIFACT_NAME = 'image-viewer'
-def VERSION_CODE = 12
-def VERSION_NAME = '1.1.0-alpha.1'
-
-group GROUP_NAME
-version VERSION_NAME
-
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-                groupId = GROUP_NAME
-                artifactId = ARTIFACT_NAME
-                version = VERSION_NAME
-            }
-        }
-//        // TODO 发布的时候需要去除
-//        repositories {
-//            mavenLocal()
-//        }
-    }
+    id 'com.vanniktech.maven.publish' version '0.28.0'
 }
 
 android {
@@ -36,7 +11,6 @@ android {
     defaultConfig {
         minSdk 24
         targetSdk 34
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -65,12 +39,6 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-            withJavadocJar()
-        }
-    }
     namespace 'com.jvziyaoyao.image.viewer'
 }
 
@@ -94,5 +62,5 @@ dependencies {
 
 dokkaHtml.configure {
     outputDirectory.set(file("$rootDir/docs"))
-    moduleName.set("$ARTIFACT_NAME")
+    moduleName.set("image-viewer")
 }

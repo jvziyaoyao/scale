@@ -51,6 +51,13 @@ val DEFAULT_PREVIEWER_ENTER_TRANSITION =
 val DEFAULT_PREVIEWER_EXIT_TRANSITION =
     scaleOut(tween(320)) + fadeOut(tween(240))
 
+/**
+ * Compose中获取一个PopupPreviewerState的方式
+ *
+ * @param initialPage 初始页码
+ * @param pageCount 总页数
+ * @return 返回一个PopupPreviewerState
+ */
 @Composable
 fun rememberPopupPreviewerState(
     @IntRange(from = 0) initialPage: Int = 0,
@@ -62,6 +69,13 @@ fun rememberPopupPreviewerState(
     }
 }
 
+/**
+ * 弹出预览状态与控制对象
+ *
+ * @constructor
+ *
+ * @param pagerState 封装的通用pagerState
+ */
 open class PopupPreviewerState(
     pagerState: SupportedPagerState,
 ) : ZoomablePagerState(pagerState) {
@@ -177,26 +191,30 @@ open class PopupPreviewerState(
     }
 }
 
+/**
+ * 基于Pager、ZoomableView实现的弹出预览组件
+ *
+ * @param modifier 图层修饰
+ * @param state 组件的状态与控制对象
+ * @param itemSpacing 图片间的间隔
+ * @param beyondViewportPageCount 页面外缓存个数
+ * @param enter 进入动画
+ * @param exit 退出动画
+ * @param detectGesture 检测手势
+ * @param previewerDecoration 外侧图层容器修饰
+ * @param zoomablePolicy ZoomableView图层修饰
+ */
 @Composable
 fun PopupPreviewer(
-    // 编辑参数
     modifier: Modifier = Modifier,
-    // 状态对象
     state: PopupPreviewerState,
-    // 图片间的间隔
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
-    // 页面外缓存个数
     beyondViewportPageCount: Int = DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT,
-    // 进入动画
     enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
-    // 退出动画
     exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,
-    // 检测手势
     detectGesture: PagerGestureScope = PagerGestureScope(),
-    // 图层修饰
     previewerDecoration: @Composable (innerBox: @Composable () -> Unit) -> Unit =
         @Composable { innerBox -> innerBox() },
-    // 图层本体
     zoomablePolicy: @Composable PagerZoomablePolicyScope.(page: Int) -> Unit,
 ) {
     state.apply {

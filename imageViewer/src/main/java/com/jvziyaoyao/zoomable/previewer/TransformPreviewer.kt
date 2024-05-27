@@ -53,6 +53,17 @@ val DEFAULT_SOFT_ANIMATION_SPEC = tween<Float>(400)
  *
  * @create: 2023-12-11 20:21
  **/
+
+/**
+ * 用于控制转换效果图层与图片列表浏览图层
+ *
+ * @property scope 协程作用域
+ * @property defaultAnimationSpec 默认动画窗格
+ * @property getKey 根据下标获取唯一标识的方法
+ * @constructor
+ *
+ * @param pagerState 依赖一个通用Pager的状态
+ */
 open class TransformPreviewerState(
     // 协程作用域
     private val scope: CoroutineScope,
@@ -262,6 +273,13 @@ open class TransformPreviewerState(
 
 }
 
+/**
+ * 获取一个组件在容器中完全显示时的大小
+ *
+ * @param contentSize 组件的固有大小
+ * @param containerSize 容器大小
+ * @return 返回显示的大小
+ */
 fun getDisplaySize(contentSize: Size, containerSize: Size): Size {
     val containerRatio = containerSize.run {
         width.div(height)
@@ -281,6 +299,12 @@ fun getDisplaySize(contentSize: Size, containerSize: Size): Size {
     )
 }
 
+/**
+ * 转换过程中的转换动效图层
+ *
+ * @param state 用于控制转换效果图层与图片列表浏览图层
+ * @param debugMode 调试模式
+ */
 @Composable
 fun TransformContentLayer(
     state: TransformPreviewerState,
@@ -312,6 +336,13 @@ fun TransformContentLayer(
     }
 }
 
+/**
+ * 转换效果在切换到实际显示图层前的占位图层
+ *
+ * @param page 当前页码
+ * @param state 图层控制对象
+ * @param debugMode 是否处于调试模式
+ */
 @Composable
 fun TransformContentForPage(
     page: Int,
@@ -360,37 +391,45 @@ fun TransformContentForPage(
     }
 }
 
+/**
+ * 通过这个对象可以自定义预览图层
+ *
+ * @property previewerDecoration 图层修饰
+ * @property background 背景图层
+ * @property foreground 前景图层
+ */
 class TransformLayerScope(
-    // 图层修饰
     var previewerDecoration: @Composable (innerBox: @Composable () -> Unit) -> Unit =
         @Composable { innerBox -> innerBox() },
-    // 背景图层
     var background: @Composable () -> Unit = {},
-    // 前景图层
     var foreground: @Composable () -> Unit = {},
 )
 
+/**
+ * 支持弹出转换动画的图片预览组件
+ *
+ * @param modifier 图层修饰
+ * @param state 状态对象
+ * @param itemSpacing 图片间的间隔
+ * @param beyondViewportPageCount 页面外缓存个数
+ * @param enter 调用open时的进入动画
+ * @param exit 调用close时的退出动画
+ * @param debugMode 调试模式
+ * @param detectGesture 检测手势
+ * @param previewerLayer 容器的图层修饰
+ * @param zoomablePolicy 缩放图层的修饰
+ */
 @Composable
 fun TransformPreviewer(
-    // 编辑参数
     modifier: Modifier = Modifier,
-    // 状态对象
     state: TransformPreviewerState,
-    // 图片间的间隔
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
-    // 页面外缓存个数
     beyondViewportPageCount: Int = DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT,
-    // 进入动画
     enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
-    // 退出动画
     exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,
-    // 调试模式
     debugMode: Boolean = false,
-    // 检测手势
     detectGesture: PagerGestureScope = PagerGestureScope(),
-    // 图层修饰
     previewerLayer: TransformLayerScope = TransformLayerScope(),
-    // 缩放图层
     zoomablePolicy: @Composable PagerZoomablePolicyScope.(page: Int) -> Boolean,
 ) {
     state.apply {
@@ -453,6 +492,15 @@ fun TransformPreviewer(
 
 }
 
+/**
+ * 用于实现Previewer变换效果的小图装载容器
+ *
+ * @param modifier 图层修饰
+ * @param key 唯一标识
+ * @param itemState 该组件的状态与控制对象
+ * @param transformState 预览组件的状态与控制对象
+ * @param content 需要显示的实际内容
+ */
 @Composable
 fun TransformItemView(
     modifier: Modifier = Modifier,

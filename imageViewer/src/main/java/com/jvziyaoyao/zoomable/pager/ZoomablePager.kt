@@ -35,6 +35,10 @@ val DEFAULT_ITEM_SPACE = 12.dp
 // 页面外缓存个数
 const val DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT = 1
 
+/**
+ * 在ZoomablePager中对ZoomableView图层进行修饰对对象
+ *
+ */
 fun interface PagerZoomablePolicyScope {
     @Composable
     fun ZoomablePolicy(
@@ -44,7 +48,9 @@ fun interface PagerZoomablePolicyScope {
 }
 
 /**
- * gallery状态
+ * 用于获取ZoomablePager的状态和对其进行控制
+ *
+ * @property pagerState 底层SupportedPagerState
  */
 open class ZoomablePagerState(
     val pagerState: SupportedPagerState,
@@ -96,7 +102,11 @@ open class ZoomablePagerState(
 }
 
 /**
- * 记录gallery状态
+ * 在Compose中获取一个ZoomablePagerState
+ *
+ * @param initialPage 初始页码
+ * @param pageCount 总页数
+ * @return
  */
 @Composable
 fun rememberZoomablePagerState(
@@ -107,31 +117,36 @@ fun rememberZoomablePagerState(
     return remember { ZoomablePagerState(zoomablePagerState) }
 }
 
+/**
+ * Pager的点击事件监听对象
+ *
+ * @property onTap 点击事件
+ * @property onDoubleTap 双击事件
+ * @property onLongPress 长按事件
+ */
 class PagerGestureScope(
-    // 点击事件
     var onTap: () -> Unit = {},
-    // 双击事件
     var onDoubleTap: () -> Boolean = { false },
-    // 长按事件
     var onLongPress: () -> Unit = {},
 )
 
 /**
- * 图片gallery,基于Pager实现的一个图片查看列表组件
+ * 基于Pager和ZoomableView实现的一个图片查看列表组件
+ *
+ * @param modifier 图层修饰
+ * @param state pager状态获取与控制
+ * @param itemSpacing 每张图片之间的间隔
+ * @param beyondViewportPageCount 页面外缓存个数
+ * @param detectGesture 检测手势
+ * @param zoomablePolicy 图层本体
  */
 @Composable
 fun ZoomablePager(
-    // 编辑参数
     modifier: Modifier = Modifier,
-    // gallery状态
     state: ZoomablePagerState,
-    // 每张图片之间的间隔
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
-    // 页面外缓存个数
     beyondViewportPageCount: Int = DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT,
-    // 检测手势
     detectGesture: PagerGestureScope = PagerGestureScope(),
-    // 图层本体
     zoomablePolicy: @Composable PagerZoomablePolicyScope.(page: Int) -> Unit,
 ) {
     val scope = rememberCoroutineScope()

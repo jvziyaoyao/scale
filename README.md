@@ -26,6 +26,14 @@
 <img src="doc/huge_image.gif" height="413" width="200"></img>
 <img src="doc/previewer_images.gif" height="413" width="200"></img>
 
+📓 API
+--------
+ 💽 接口文档 👉 [API REFERENCE](https://jvziyaoyao.github.io/ImageViewer)
+
+👓 示例
+--------
+👋 示例代码请参考 👉 [sample](https://github.com/jvziyaoyao/ImageViewer/tree/dev/sample/src/main/java/com/jvziyaoyao/viewer/sample)
+
 🛒 引入
 --------
 在`settings.gradle`增加jitpack的地址
@@ -43,10 +51,6 @@ dependencyResolutionManagement {
 // 从releases里面选一个版本
 implementation 'com.github.jvziyaoyao:ImageViewer:VERSION'
 ```
-
-👓 示例
---------
-### 👋 示例代码请参考 👉 [sample](https://github.com/jvziyaoyao/ImageViewer/tree/dev/sample/src/main/java/com/jvziyaoyao/viewer/sample)
 
 🛵 使用方式
 --------
@@ -182,10 +186,6 @@ ImagePreviewer(
     }
 )
 ```
-
-📓 API
---------
-### 💽 接口文档 👉 [API REFERENCE](https://jvziyaoyao.github.io/ImageViewer)
 
 🕵️‍♀️ 开源许可
 --------

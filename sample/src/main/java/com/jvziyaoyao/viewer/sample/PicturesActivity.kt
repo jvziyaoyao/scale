@@ -156,6 +156,7 @@ fun PicturesDecoderPreviewLayer(
     val scope = rememberCoroutineScope()
     ImagePreviewer(
         state = previewerState,
+        debugMode = true,
         imageLoader = { page ->
             val file = images[page]
             val pair = remember { mutableStateOf<Pair<Any?, Size?>>(Pair(null, null)) }

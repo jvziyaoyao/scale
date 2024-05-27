@@ -49,27 +49,32 @@ import kotlin.math.absoluteValue
 
 /**
  * ZoomableView手势对象
+ *
+ * @property onTap 点击事件
+ * @property onDoubleTap 双击事件
+ * @property onLongPress 长按事件
  */
 class ZoomableGestureScope(
-    // 点击事件
     var onTap: (Offset) -> Unit = {},
-    // 双击事件
     var onDoubleTap: (Offset) -> Unit = {},
-    // 长按事件
     var onLongPress: (Offset) -> Unit = {},
 )
 
-
+/**
+ * 支持对Composable就行手势缩放的组件
+ *
+ * @param modifier 图层修饰
+ * @param boundClip 是否限制显示范围
+ * @param state ZoomableView的状态与控制对象
+ * @param detectGesture 组件手势回调
+ * @param content 用于进行手势缩放的显示内容
+ */
 @Composable
 fun ZoomableView(
     modifier: Modifier = Modifier,
-    // 是否限制范围
     boundClip: Boolean = true,
-    // 当前状态
     state: ZoomableViewState,
-    // 检测手势
     detectGesture: ZoomableGestureScope = ZoomableGestureScope(),
-    // 显示内容
     content: @Composable () -> Unit,
 ) {
     val density = LocalDensity.current
@@ -130,7 +135,15 @@ fun ZoomableView(
     }
 }
 
-fun reachSide(pan: Float, offset: Float, bound: Pair<Float, Float>): Boolean {
+/**
+ * 判断手势移动是否已经到达边缘
+ *
+ * @param pan 手势移动的距离
+ * @param offset 当前偏移量
+ * @param bound 限制位移的范围
+ * @return 是否到底边缘
+ */
+internal fun reachSide(pan: Float, offset: Float, bound: Pair<Float, Float>): Boolean {
     val reachRightSide = offset <= bound.first
     val reachLeftSide = offset >= bound.second
     return !(reachLeftSide && pan > 0)
@@ -140,6 +153,10 @@ fun reachSide(pan: Float, offset: Float, bound: Pair<Float, Float>): Boolean {
 
 /**
  * 把位移限制在边界内
+ *
+ * @param offset 偏移量
+ * @param bound 限制位移的范围
+ * @return
  */
 fun limitToBound(offset: Float, bound: Pair<Float, Float>): Float {
     return when {

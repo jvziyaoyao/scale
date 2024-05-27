@@ -49,6 +49,10 @@ import kotlin.math.absoluteValue
 // 默认下拉关闭缩放阈值
 const val DEFAULT_SCALE_TO_CLOSE_MIN_VALUE = 0.9F
 
+/**
+ * 垂直手势的类型
+ *
+ */
 enum class VerticalDragType {
     // 不开启垂直手势
     None,
@@ -61,18 +65,24 @@ enum class VerticalDragType {
     ;
 }
 
+/**
+ * 拖拉拽状态与控制
+ *
+ * @property scope 协程作用域
+ * @constructor
+ *
+ * @param defaultAnimationSpec 默认动画窗格
+ * @param verticalDragType 开启垂直手势的类型
+ * @param scaleToCloseMinValue 下拉关闭的缩小的阈值
+ * @param pagerState 预览状态
+ * @param getKey 获取当前key
+ */
 open class DraggablePreviewerState(
-    // 协程作用域
     private val scope: CoroutineScope,
-    // 默认动画窗格
     defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
-    // 开启垂直手势的类型
     verticalDragType: VerticalDragType = VerticalDragType.None,
-    // 下拉关闭的缩小的阈值
     scaleToCloseMinValue: Float = DEFAULT_SCALE_TO_CLOSE_MIN_VALUE,
-    // 预览状态
     pagerState: SupportedPagerState,
-    // 获取当前key
     getKey: (Int) -> Any,
 ) : TransformPreviewerState(
     scope, defaultAnimationSpec, pagerState, getKey
@@ -250,8 +260,12 @@ open class DraggablePreviewerState(
     }
 }
 
+/**
+ * 变换动画容器的状态
+ *
+ * @property defaultAnimationSpec 默认动画窗格
+ */
 class DraggableContainerState(
-    // 默认动画窗格
     var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
 ) {
     // 容器的偏移量X
@@ -293,27 +307,31 @@ class DraggableContainerState(
     }
 }
 
+/**
+ * 可拖拽释放的弹出预览组件
+ *
+ * @param modifier 图层修饰
+ * @param state 状态对象
+ * @param itemSpacing 图片间的间隔
+ * @param beyondViewportPageCount 页面外缓存个数
+ * @param enter 调用open时的进入动画
+ * @param exit 调用close时的退出动画
+ * @param debugMode 调试模式
+ * @param detectGesture 检测手势
+ * @param previewerLayer 容器的图层修饰
+ * @param zoomablePolicy 缩放图层的修饰
+ */
 @Composable
 fun DraggablePreviewer(
-    // 编辑参数
     modifier: Modifier = Modifier,
-    // 状态对象
     state: DraggablePreviewerState,
-    // 图片间的间隔
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
-    // 页面外缓存个数
     beyondViewportPageCount: Int = DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT,
-    // 进入动画
     enter: EnterTransition = DEFAULT_PREVIEWER_ENTER_TRANSITION,
-    // 退出动画
     exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,
-    // 调试模式
     debugMode: Boolean = false,
-    // 检测手势
     detectGesture: PagerGestureScope = PagerGestureScope(),
-    // 图层修饰
     previewerLayer: TransformLayerScope = TransformLayerScope(),
-    // 缩放图层
     zoomablePolicy: @Composable PagerZoomablePolicyScope.(page: Int) -> Boolean,
 ) {
     state.apply {

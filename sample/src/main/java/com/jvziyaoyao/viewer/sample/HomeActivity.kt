@@ -54,7 +54,7 @@ fun HomeBody() {
             .fillMaxSize()
             .verticalScroll(state = state)
             .statusBarsPadding()
-            .padding(horizontal = 16.dp),
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         activityList.forEach { activity ->

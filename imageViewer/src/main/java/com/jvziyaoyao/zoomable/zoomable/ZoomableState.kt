@@ -59,19 +59,22 @@ const val MIN_GESTURE_FINGER_DISTANCE = 200
 
 /**
  * viewer状态对象，用于记录compose组件状态
+ *
+ * @property maxScale 最大缩放率
+ * @constructor
+ *
+ * @param offsetX X轴偏移量
+ * @param offsetY Y轴偏移量
+ * @param scale 缩放率
+ * @param rotation 旋转角度
+ * @param animationSpec 动画窗格
  */
 open class ZoomableViewState(
-    // 最大缩放率
     @FloatRange(from = 1.0) val maxScale: Float = MAX_SCALE_RATE,
-    // X轴偏移量
     offsetX: Float = DEFAULT_OFFSET_X,
-    // Y轴偏移量
     offsetY: Float = DEFAULT_OFFSET_Y,
-    // 缩放率
     scale: Float = DEFAULT_SCALE,
-    // 旋转角度
     rotation: Float = DEFAULT_ROTATION,
-    // 动画窗格
     animationSpec: AnimationSpec<Float>? = null,
 ) : CoroutineScope by MainScope() {
 
@@ -357,13 +360,18 @@ open class ZoomableViewState(
 
 }
 
+/**
+ * 返回一个ZoomableState
+ *
+ * @param contentSize 内容尺寸大小，必填，不为空且大小确切的时候才能正常显示
+ * @param maxScale 最大缩放比例
+ * @param animationSpec 动画窗格
+ * @return
+ */
 @Composable
 fun rememberZoomableState(
-    // 内容大小
     contentSize: Size? = null,
-    // 最大缩放率
     @FloatRange(from = 1.0) maxScale: Float = MAX_SCALE_RATE,
-    // 动画窗格
     animationSpec: AnimationSpec<Float>? = null,
 ): ZoomableViewState {
     val scope = rememberCoroutineScope()

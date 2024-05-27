@@ -23,6 +23,14 @@ internal val imageTransformMutex = Mutex()
 // 用于缓存界面上的transformItemState
 internal val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>()
 
+/**
+ * 在compose中获取一个TransformItemState的方式
+ *
+ * @param scope 协程作用域
+ * @param checkInBound 判断当前图片是否在显示范围内，可以为空
+ * @param intrinsicSize 图片的固有大小，必须要有值且确定才能正常显示
+ * @return TransformItemState
+ */
 @Composable
 fun rememberTransformItemState(
     scope: CoroutineScope = rememberCoroutineScope(),
@@ -35,6 +43,17 @@ fun rememberTransformItemState(
     return transformItemState
 }
 
+/**
+ * TransformItem的状态与控制对象
+ *
+ * @property key 当前TransformItem的唯一标识
+ * @property blockCompose 实际TransformItem中显示的内容
+ * @property scope 协程作用域
+ * @property blockPosition TransformItem的绝对位置
+ * @property blockSize TransformItem的大小
+ * @property intrinsicSize 传入blockCompose的固有大小
+ * @property checkInBound 判断当前TransformItem是否在显示范围内的方法
+ */
 class TransformItemState(
     var key: Any = Unit,
     var blockCompose: (@Composable (Any) -> Unit) = {},
@@ -104,6 +123,15 @@ class TransformItemState(
     }
 }
 
+/**
+ * 用于实现Previewer变换效果的小图装载容器
+ *
+ * @param modifier 图层修饰
+ * @param key 唯一标识
+ * @param itemState 该组件的状态与控制对象
+ * @param itemVisible 该组件的可见性
+ * @param content 需要显示的实际内容
+ */
 @Composable
 fun TransformItemView(
     modifier: Modifier = Modifier,
