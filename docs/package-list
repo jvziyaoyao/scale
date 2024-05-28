@@ -1,0 +1,15 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+
+module:image-viewer
+com.jvziyaoyao.image.pager
+com.jvziyaoyao.image.previewer
+com.jvziyaoyao.image.viewer
+com.jvziyaoyao.zoomable.pager
+com.jvziyaoyao.zoomable.previewer
+com.origeek.imageViewer.gallery
+com.origeek.imageViewer.previewer
+com.origeek.imageViewer.util
+com.origeek.imageViewer.viewer
+module:zoomable-view
+com.jvziyaoyao.zoomable.zoomable

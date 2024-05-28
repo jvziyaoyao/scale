@@ -1,0 +1,622 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>ZoomableViewState</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../index.html">
+                            Scaler
+                    </a>            </div>
+            <div class="library-version">
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":zoomable-view:dokkaHtmlPartial/release">androidJvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="zoomable-view::com.jvziyaoyao.zoomable.zoomable/ZoomableViewState///PointingToDeclaration//663854528">
+  <div class="breadcrumbs"><a href="../../index.html">zoomable-view</a><span class="delimiter">/</span><a href="../index.html">com.jvziyaoyao.zoomable.zoomable</a><span class="delimiter">/</span><span class="current">ZoomableViewState</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Zoomable</span><wbr><span>View</span><wbr><span><span>State</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="index.html">ZoomableViewState</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><a href="https://developer.android.com/reference/kotlin/androidx/annotation/FloatRange.html"><span class="token annotation builtin">FloatRange</span></a><span class="token punctuation">(</span><span>from<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">1.0</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span><span class="token keyword">val </span>maxScale<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span>MAX_SCALE_RATE<span class="token punctuation">, </span></span><span class="parameter ">offsetX<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span>DEFAULT_OFFSET_X<span class="token punctuation">, </span></span><span class="parameter ">offsetY<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span>DEFAULT_OFFSET_Y<span class="token punctuation">, </span></span><span class="parameter ">scale<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span>DEFAULT_SCALE<span class="token punctuation">, </span></span><span class="parameter ">rotation<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span>DEFAULT_ROTATION<span class="token punctuation">, </span></span><span class="parameter ">animationSpec<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/animation/core/AnimationSpec.html">AnimationSpec</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span> : <span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span></div><p class="paragraph">viewer状态对象，用于记录compose组件状态</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>offset</span><wbr><span><span>X</span></span></u></div></span></div><div><div class="title"><p class="paragraph">X轴偏移量</p></div></div></div></div><div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>offset</span><wbr><span><span>Y</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Y轴偏移量</p></div></div></div></div><div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>scale</span></span></u></div></span></div><div><div class="title"><p class="paragraph">缩放率</p></div></div></div></div><div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>rotation</span></span></u></div></span></div><div><div class="title"><p class="paragraph">旋转角度</p></div></div></div></div><div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>animation</span><wbr><span><span>Spec</span></span></u></div></span></div><div><div class="title"><p class="paragraph">动画窗格</p></div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="1168184520%2FConstructors%2F663854528" anchor-label="ZoomableViewState" id="1168184520%2FConstructors%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-zoomable-view-state.html"><span>Zoomable</span><wbr><span>View</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1168184520%2FConstructors%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><a href="https://developer.android.com/reference/kotlin/androidx/annotation/FloatRange.html"><span class="token annotation builtin">FloatRange</span></a><span class="token punctuation">(</span><span>from<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">1.0</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span>maxScale<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span>MAX_SCALE_RATE<span class="token punctuation">, </span></span><span class="parameter ">offsetX<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span>DEFAULT_OFFSET_X<span class="token punctuation">, </span></span><span class="parameter ">offsetY<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span>DEFAULT_OFFSET_Y<span class="token punctuation">, </span></span><span class="parameter ">scale<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span>DEFAULT_SCALE<span class="token punctuation">, </span></span><span class="parameter ">rotation<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span>DEFAULT_ROTATION<span class="token punctuation">, </span></span><span class="parameter ">animationSpec<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/animation/core/AnimationSpec.html">AnimationSpec</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span></div><div class="brief "></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="-142587301%2FClasslikes%2F663854528" anchor-label="Companion" id="-142587301%2FClasslikes%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-142587301%2FClasslikes%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-1565127830%2FProperties%2F663854528" anchor-label="allowGestureInput" id="-1565127830%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="allow-gesture-input.html"><span>allow</span><wbr><span>Gesture</span><wbr><span><span>Input</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1565127830%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="allow-gesture-input.html">allowGestureInput</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1731079258%2FProperties%2F663854528" anchor-label="boundScale" id="1731079258%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="bound-scale.html"><span>bound</span><wbr><span><span>Scale</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1731079258%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="bound-scale.html">boundScale</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2086178708%2FProperties%2F663854528" anchor-label="boundX" id="-2086178708%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="bound-x.html"><span>bound</span><wbr><span><span>X</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2086178708%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="bound-x.html">boundX</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2055158901%2FProperties%2F663854528" anchor-label="boundY" id="-2055158901%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="bound-y.html"><span>bound</span><wbr><span><span>Y</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2055158901%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="bound-y.html">boundY</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="215304646%2FProperties%2F663854528" anchor-label="centroid" id="215304646%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="centroid.html"><span><span>centroid</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="215304646%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="centroid.html">centroid</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/geometry/Offset.html">Offset</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1563267124%2FProperties%2F663854528" anchor-label="containerHeight" id="-1563267124%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="container-height.html"><span>container</span><wbr><span><span>Height</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1563267124%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="container-height.html">containerHeight</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1676838834%2FProperties%2F663854528" anchor-label="containerSize" id="1676838834%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="container-size.html"><span>container</span><wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1676838834%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="container-size.html">containerSize</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/MutableState.html">MutableState</a><span class="token operator">&lt;</span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/geometry/Size.html">Size</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="266275489%2FProperties%2F663854528" anchor-label="containerWidth" id="266275489%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="container-width.html"><span>container</span><wbr><span><span>Width</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="266275489%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="container-width.html">containerWidth</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-460796806%2FProperties%2F663854528" anchor-label="contentSize" id="-460796806%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="content-size.html"><span>content</span><wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-460796806%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="content-size.html">contentSize</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/geometry/Size.html">Size</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1654120400%2FProperties%2F663854528" anchor-label="coroutineContext" id="-1654120400%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1654120400%2FProperties%2F663854528"><span>coroutine</span><wbr><span><span>Context</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1654120400%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#-1654120400%2FProperties%2F663854528">coroutineContext</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="976710170%2FProperties%2F663854528" anchor-label="decay" id="976710170%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="decay.html"><span><span>decay</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="976710170%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="decay.html">decay</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/animation/core/DecayAnimationSpec.html">DecayAnimationSpec</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-587041493%2FProperties%2F663854528" anchor-label="displayHeight" id="-587041493%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="display-height.html"><span>display</span><wbr><span><span>Height</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-587041493%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="display-height.html">displayHeight</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-690857775%2FProperties%2F663854528" anchor-label="displaySize" id="-690857775%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="display-size.html"><span>display</span><wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-690857775%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="display-size.html">displaySize</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/geometry/Size.html">Size</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-117875358%2FProperties%2F663854528" anchor-label="displayWidth" id="-117875358%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="display-width.html"><span>display</span><wbr><span><span>Width</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-117875358%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="display-width.html">displayWidth</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1453995551%2FProperties%2F663854528" anchor-label="eventChangeCount" id="-1453995551%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="event-change-count.html"><span>event</span><wbr><span>Change</span><wbr><span><span>Count</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1453995551%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="event-change-count.html">eventChangeCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="476410966%2FProperties%2F663854528" anchor-label="gestureCenter" id="476410966%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="gesture-center.html"><span>gesture</span><wbr><span><span>Center</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="476410966%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="gesture-center.html">gestureCenter</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/MutableState.html">MutableState</a><span class="token operator">&lt;</span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/geometry/Offset.html">Offset</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1034995310%2FProperties%2F663854528" anchor-label="isSpecified" id="1034995310%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-specified.html"><span>is</span><wbr><span><span>Specified</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1034995310%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="is-specified.html">isSpecified</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1667910003%2FProperties%2F663854528" anchor-label="lastPan" id="-1667910003%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="last-pan.html"><span>last</span><wbr><span><span>Pan</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1667910003%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="last-pan.html">lastPan</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/geometry/Offset.html">Offset</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1475932160%2FProperties%2F663854528" anchor-label="maxScale" id="-1475932160%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="max-scale.html"><span>max</span><wbr><span><span>Scale</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1475932160%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="max-scale.html">maxScale</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div><div class="brief "><p class="paragraph">最大缩放率</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1159362639%2FProperties%2F663854528" anchor-label="offsetX" id="1159362639%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="offset-x.html"><span>offset</span><wbr><span><span>X</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1159362639%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="offset-x.html">offsetX</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/animation/core/Animatable.html">Animatable</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/animation/core/AnimationVector1D.html">AnimationVector1D</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1190382446%2FProperties%2F663854528" anchor-label="offsetY" id="1190382446%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="offset-y.html"><span>offset</span><wbr><span><span>Y</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1190382446%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="offset-y.html">offsetY</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/animation/core/Animatable.html">Animatable</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/animation/core/AnimationVector1D.html">AnimationVector1D</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2115347033%2FProperties%2F663854528" anchor-label="realSize" id="-2115347033%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="real-size.html"><span>real</span><wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2115347033%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="real-size.html">realSize</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/geometry/Size.html">Size</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1193083336%2FProperties%2F663854528" anchor-label="rotation" id="1193083336%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="rotation.html"><span><span>rotation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1193083336%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="rotation.html">rotation</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/animation/core/Animatable.html">Animatable</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/animation/core/AnimationVector1D.html">AnimationVector1D</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1637145226%2FProperties%2F663854528" anchor-label="scale" id="1637145226%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="scale.html"><span><span>scale</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1637145226%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="scale.html">scale</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/animation/core/Animatable.html">Animatable</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/animation/core/AnimationVector1D.html">AnimationVector1D</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-658333543%2FProperties%2F663854528" anchor-label="velocityTracker" id="-658333543%2FProperties%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="velocity-tracker.html"><span>velocity</span><wbr><span><span>Tracker</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-658333543%2FProperties%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="velocity-tracker.html">velocityTracker</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/input/pointer/util/VelocityTracker.html">VelocityTracker</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="1138267928%2FFunctions%2F663854528" anchor-label="fixToBound" id="1138267928%2FFunctions%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="fix-to-bound.html"><span>fix</span><wbr><span>To</span><wbr><span><span>Bound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1138267928%2FFunctions%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="fix-to-bound.html"><span class="token function">fixToBound</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">修正offsetX,offsetY的位置</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1716777343%2FFunctions%2F663854528" anchor-label="isRunning" id="1716777343%2FFunctions%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-running.html"><span>is</span><wbr><span><span>Running</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1716777343%2FFunctions%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="is-running.html"><span class="token function">isRunning</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">判断是否有动画正在运行</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1647430044%2FFunctions%2F663854528" anchor-label="onGesture" id="-1647430044%2FFunctions%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../on-gesture.html"><span>on</span><wbr><span><span>Gesture</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1647430044%2FFunctions%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html">ZoomableViewState</a><span class="token punctuation">.</span><a href="../on-gesture.html"><span class="token function">onGesture</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">scope<span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span><span class="token punctuation">, </span></span><span class="parameter ">center<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/geometry/Offset.html">Offset</a><span class="token punctuation">, </span></span><span class="parameter ">pan<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/geometry/Offset.html">Offset</a><span class="token punctuation">, </span></span><span class="parameter ">zoom<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">rotate<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">event<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/input/pointer/PointerEvent.html">PointerEvent</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">输入手势事件</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1060080521%2FFunctions%2F663854528" anchor-label="onGestureEnd" id="-1060080521%2FFunctions%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../on-gesture-end.html"><span>on</span><wbr><span>Gesture</span><wbr><span><span>End</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1060080521%2FFunctions%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html">ZoomableViewState</a><span class="token punctuation">.</span><a href="../on-gesture-end.html"><span class="token function">onGestureEnd</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">scope<span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span><span class="token punctuation">, </span></span><span class="parameter ">transformOnly<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">标记手势事件结束</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-899281676%2FFunctions%2F663854528" anchor-label="onGestureStart" id="-899281676%2FFunctions%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../on-gesture-start.html"><span>on</span><wbr><span>Gesture</span><wbr><span><span>Start</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-899281676%2FFunctions%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html">ZoomableViewState</a><span class="token punctuation">.</span><a href="../on-gesture-start.html"><span class="token function">onGestureStart</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">scope<span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">标记手势事件开始</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1973658449%2FFunctions%2F663854528" anchor-label="reset" id="-1973658449%2FFunctions%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="reset.html"><span><span>reset</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1973658449%2FFunctions%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="reset.html"><span class="token function">reset</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">animationSpec<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/animation/core/AnimationSpec.html">AnimationSpec</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator">&gt;</span><span class="token operator"> = </span>defaultAnimateSpec</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">设置回初始值</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-357981897%2FFunctions%2F663854528" anchor-label="resetImmediately" id="-357981897%2FFunctions%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="reset-immediately.html"><span>reset</span><wbr><span><span>Immediately</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-357981897%2FFunctions%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="reset-immediately.html"><span class="token function">resetImmediately</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">立即设置回初始值</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="391635011%2FFunctions%2F663854528" anchor-label="toggleScale" id="391635011%2FFunctions%2F663854528" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":zoomable-view:dokkaHtmlPartial/release" data-filterable-set=":zoomable-view:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="toggle-scale.html"><span>toggle</span><wbr><span><span>Scale</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="391635011%2FFunctions%2F663854528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":zoomable-view:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="toggle-scale.html"><span class="token function">toggleScale</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">offset<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/geometry/Offset.html">Offset</a><span class="token punctuation">, </span></span><span class="parameter ">animationSpec<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/animation/core/AnimationSpec.html">AnimationSpec</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator">&gt;</span><span class="token operator"> = </span>defaultAnimateSpec</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">放大或缩小</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

@@ -3,8 +3,6 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.dokka'
     id 'com.vanniktech.maven.publish'
-//    id 'org.jetbrains.dokka' version '1.9.20'
-//    id 'com.vanniktech.maven.publish' version '0.28.0'
 }
 
 subprojects {
@@ -66,9 +64,4 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
-}
-
-dokkaHtml.configure {
-    outputDirectory.set(file("$rootDir/docs"))
-    moduleName.set("image-viewer")
 }

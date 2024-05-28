@@ -1,1 +1,1 @@
-sourceset_dependencies='{":imageViewer:dokkaHtml/debug":[],":imageViewer:dokkaHtml/main":[],":imageViewer:dokkaHtml/release":[]}'
+sourceset_dependencies = '{":zoomable-view:dokkaHtmlPartial/debug":[],":zoomable-view:dokkaHtmlPartial/main":[],":zoomable-view:dokkaHtmlPartial/release":[],":image-viewer:dokkaHtmlPartial/debug":[],":image-viewer:dokkaHtmlPartial/main":[],":image-viewer:dokkaHtmlPartial/release":[]}'
