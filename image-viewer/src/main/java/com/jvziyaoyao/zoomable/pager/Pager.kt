@@ -2,7 +2,6 @@ package com.jvziyaoyao.zoomable.pager
 
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.TargetedFlingBehavior
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.pager.HorizontalPager

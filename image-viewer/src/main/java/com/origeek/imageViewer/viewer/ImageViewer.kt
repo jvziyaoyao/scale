@@ -50,6 +50,7 @@ import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
 import com.jvziyaoyao.image.viewer.ImageDecoder
+import com.jvziyaoyao.zoomable.zoomable.panTransformAndScale
 import com.origeek.imageViewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -845,55 +846,6 @@ fun limitToBound(offset: Float, bound: Float): Float {
 
         else -> {
             offset
-        }
-    }
-}
-
-/**
- * 追踪缩放过程中的中心点
- */
-fun panTransformAndScale(
-    offset: Float,
-    center: Float,
-    bh: Float,
-    uh: Float,
-    fromScale: Float,
-    toScale: Float,
-): Float {
-    val srcH = uh * fromScale
-    val desH = uh * toScale
-    val gapH = (bh - uh) / 2
-
-    val py = when {
-        uh >= bh -> {
-            val upy = (uh * fromScale - uh).div(2)
-            (upy - offset + center) / (fromScale * uh)
-        }
-
-        srcH > bh || bh > uh -> {
-            val upy = (srcH - uh).div(2)
-            (upy - gapH - offset + center) / (fromScale * uh)
-        }
-
-        else -> {
-            val upy = -(bh - srcH).div(2)
-            (upy - offset + center) / (fromScale * uh)
-        }
-    }
-    return when {
-        uh >= bh -> {
-            val upy = (uh * toScale - uh).div(2)
-            upy + center - py * toScale * uh
-        }
-
-        desH > bh -> {
-            val upy = (desH - uh).div(2)
-            upy - gapH + center - py * toScale * uh
-        }
-
-        else -> {
-            val upy = -(bh - desH).div(2)
-            upy + center - py * desH
         }
     }
 }

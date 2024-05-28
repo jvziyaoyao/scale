@@ -1,8 +1,14 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'org.jetbrains.dokka' version '1.9.20'
-    id 'com.vanniktech.maven.publish' version '0.28.0'
+    id 'org.jetbrains.dokka'
+    id 'com.vanniktech.maven.publish'
+//    id 'org.jetbrains.dokka' version '1.9.20'
+//    id 'com.vanniktech.maven.publish' version '0.28.0'
+}
+
+subprojects {
+    apply plugin: 'org.jetbrains.dokka'
 }
 
 android {
@@ -43,6 +49,8 @@ android {
 }
 
 dependencies {
+    api(project(":zoomable-view"))
+
     implementation 'androidx.exifinterface:exifinterface:1.3.7'
     implementation 'androidx.core:core-ktx:1.13.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'

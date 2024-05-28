@@ -47,11 +47,14 @@ android {
 }
 
 dependencies {
-    if (isApplyModule.toBoolean()) {
-        implementation project(":imageViewer")
-    } else {
-        implementation 'com.github.jvziyaoyao:ImageViewer:1.0.2-alpha.8'
-    }
+//    if (isApplyModule.toBoolean()) {
+//        implementation project(":image-viewer")
+//    } else {
+//        implementation 'com.github.jvziyaoyao:ImageViewer:1.0.2-alpha.8'
+//    }
+
+//    implementation 'com.jvziyaoyao.scaler:zoomable-view:1.1.0-test.3'
+    implementation 'com.jvziyaoyao.scaler:image-viewer:1.1.0-test.3'
 
     // zoomable
     implementation("net.engawapg.lib:zoomable:1.5.2")

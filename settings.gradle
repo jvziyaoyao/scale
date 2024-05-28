@@ -16,4 +16,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "ImageViewer"
 include ':sample'
-include ':imageViewer'
+include ':image-viewer'
+include ':zoomable-view'
