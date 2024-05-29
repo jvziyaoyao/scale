@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "com.jvziyaoyao.zoomable"
+    namespace = "com.jvziyaoyao.image.viewer"
     compileSdk = project.compileSdk
 
     defaultConfig {
@@ -41,9 +41,21 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
+    packagingOptions {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 dependencies {
+    api(project(":zoomable-view"))
+
+    implementation(libs.androidx.exif)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.google.material)
+
     implementation(libs.androidx.compose.ui.util)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.material)
@@ -51,9 +63,8 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.google.material)
+    implementation(libs.androidx.lifecycle.runtime)
+    implementation(libs.androidx.activity.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
