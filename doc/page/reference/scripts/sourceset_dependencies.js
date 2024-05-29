@@ -1,0 +1,1 @@
+sourceset_dependencies = '{":scale-image-viewer:dokkaHtmlPartial/debug":[],":scale-image-viewer:dokkaHtmlPartial/main":[],":scale-image-viewer:dokkaHtmlPartial/release":[],":scale-zoomable-view:dokkaHtmlPartial/debug":[],":scale-zoomable-view:dokkaHtmlPartial/main":[],":scale-zoomable-view:dokkaHtmlPartial/release":[]}'

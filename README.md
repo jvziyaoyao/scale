@@ -23,8 +23,8 @@
 
 🧐 预览
 --------
-<img src="doc/huge_image.gif" height="413" width="200"></img>
-<img src="doc/previewer_images.gif" height="413" width="200"></img>
+<img src="doc/image/huge_image.gif" height="413" width="200"></img>
+<img src="doc/image/previewer_images.gif" height="413" width="200"></img>
 
 📓 API
 --------
@@ -54,7 +54,7 @@ implementation 'com.github.jvziyaoyao:ImageViewer:VERSION'
 🛵 使用方式
 --------
 ### 一般使用
-<img src="doc/normal_image.gif" height="444" width="200"></img>
+<img src="doc/image/normal_image.gif" height="444" width="200"></img>
 ```kotlin
 val scope = rememberCoroutineScope()
 val state = rememberZoomableState()
@@ -70,7 +70,7 @@ ImageViewer(
 )
 ```
 ### 加载超大图
-<img src="doc/huge_image.gif" height="413" width="200"></img>
+<img src="doc/image/huge_image.gif" height="413" width="200"></img>
 
 ‼ 仅在model类型为`ImageDecoder`才会被当做大图进行加载
 ```kotlin
@@ -87,7 +87,7 @@ if (imageDecoder != null) {
 }
 ```
 ### 图片列表浏览
-<img src="doc/pager_image.gif" height="444" width="200"></img>
+<img src="doc/image/pager_image.gif" height="444" width="200"></img>
 ```kotlin
 val images = remember {
     mutableStateListOf(
@@ -105,7 +105,7 @@ ImagePager(
 )
 ```
 ### 图片弹出预览
-<img src="doc/previewer_image.gif" height="444" width="200"></img>
+<img src="doc/image/previewer_image.gif" height="444" width="200"></img>
 ```kotlin
 val images = remember {
   listOf(
@@ -134,7 +134,7 @@ previewerState.open()
 ```
 
 ### 图片弹出预览（带转换效果）
-<img src="doc/transform_image.gif" height="444" width="200"></img>
+<img src="doc/image/transform_image.gif" height="444" width="200"></img>
 ```kotlin
 val images = remember {
     listOf(

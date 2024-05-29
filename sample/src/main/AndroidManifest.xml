@@ -18,7 +18,7 @@
         android:theme="@style/Theme.ImageViewer"
         tools:targetApi="tiramisu">
         <activity
-            android:name="com.jvziyaoyao.viewer.sample.HomeActivity"
+            android:name=".HomeActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar">
             <intent-filter>
@@ -28,39 +28,39 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.jvziyaoyao.viewer.sample.PreviewerActivity"
+            android:name=".PreviewerActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.jvziyaoyao.viewer.sample.GalleryActivity"
+            android:name=".GalleryActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.jvziyaoyao.viewer.sample.HugeActivity"
+            android:name=".HugeActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.jvziyaoyao.viewer.sample.NormalActivity"
+            android:name=".NormalActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.jvziyaoyao.viewer.sample.DecoderActivity"
+            android:name=".DecoderActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.jvziyaoyao.viewer.sample.TransformActivity"
+            android:name=".TransformActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.jvziyaoyao.viewer.sample.ZoomableActivity"
+            android:name=".ZoomableActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.jvziyaoyao.viewer.sample.PicturesActivity"
+            android:name=".PicturesActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
         <activity
-            android:name="com.jvziyaoyao.viewer.sample.SharedActivity"
+            android:name=".SharedActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar"/>
     </application>

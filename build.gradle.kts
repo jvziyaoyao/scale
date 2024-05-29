@@ -7,6 +7,6 @@ plugins {
 }
 
 tasks.dokkaHtmlMultiModule {
-    moduleName.set("Scaler")
-    outputDirectory.set(file("$rootDir/docs"))
+    moduleName.set("Scale")
+    outputDirectory.set(file("$rootDir/doc/page/reference"))
 }

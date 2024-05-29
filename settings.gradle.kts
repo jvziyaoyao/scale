@@ -14,7 +14,7 @@ dependencyResolutionManagement {
         maven(url = "https://jitpack.io")
     }
 }
-rootProject.name = "ImageViewer"
+rootProject.name = "scale"
 include(":sample")
-include(":image-viewer")
-include(":zoomable-view")
+include(":scale-image-viewer")
+include(":scale-zoomable-view")

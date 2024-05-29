@@ -1,6 +1,6 @@
-import scaler.compileSdk
-import scaler.minSdk
-import scaler.targetSdk
+import scale.compileSdk
+import scale.minSdk
+import scale.targetSdk
 
 plugins {
     alias(libs.plugins.android.application)
@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.jvziyaoyao.image.viewer.sample"
+    namespace = "com.jvziyaoyao.scale.sample"
     compileSdk = project.compileSdk
 
     defaultConfig {
-        applicationId = "com.jvziyaoyao.image.viewer.sample"
+        applicationId = "com.jvziyaoyao.scale.sample"
         minSdk = project.minSdk
         targetSdk = project.targetSdk
         versionCode = 1
@@ -53,13 +53,9 @@ android {
 }
 
 dependencies {
-    implementation(project(":image-viewer"))
-//    implementation "com.jvziyaoyao.scaler:zoomable-view:1.1.0-test.3"
+    implementation(project(":scale-image-viewer"))
+    //    implementation "com.jvziyaoyao.scaler:zoomable-view:1.1.0-test.3"
 //    implementation "com.jvziyaoyao.scaler:image-viewer:1.1.0-test.3"
-
-    // TODO 移除
-    // zoomable
-    implementation("net.engawapg.lib:zoomable:1.5.2")
 
     implementation(libs.androidx.exif)
 
