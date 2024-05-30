@@ -27,7 +27,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 
 /**
- * @program: ImageCanvas
+ * @program: SamplingCanvas
  *
  * @description:
  *
@@ -42,7 +42,7 @@ import java.math.RoundingMode
  * @property scale 图片相对显示倍率，相对于1倍屏幕显示倍率
  * @property visualRect 在视口内的归一化坐标
  */
-data class ImageCanvasViewPort(
+data class SamplingCanvasViewPort(
     val scale: Float,
     val visualRect: Rect,
 )
@@ -52,7 +52,7 @@ data class ImageCanvasViewPort(
  *
  * @return
  */
-fun ZoomableViewState.getViewPort(): ImageCanvasViewPort {
+fun ZoomableViewState.getViewPort(): SamplingCanvasViewPort {
     val realWidth = realSize.width
     val realHeight = realSize.height
     val containerCenterX = containerWidth.div(2)
@@ -72,7 +72,7 @@ fun ZoomableViewState.getViewPort(): ImageCanvasViewPort {
         right = (intersectRect.right - realRect.left).div(realWidth),
         bottom = (intersectRect.bottom - realRect.top).div(realHeight),
     )
-    return ImageCanvasViewPort(
+    return SamplingCanvasViewPort(
         scale = scale.value,
         visualRect = rectInViewPort,
     )
@@ -125,13 +125,13 @@ internal infix fun Rect.same(other: Rect): Boolean {
 /**
  * 用于ImageViewer/ZoomableView进行分块显示大型图片的配套组件
  *
- * @param imageDecoder 图片加载器
+ * @param samplingDecoder 图片加载器
  * @param viewPort 视口
  */
 @Composable
-fun ImageCanvas(
-    imageDecoder: ImageDecoder,
-    viewPort: ImageCanvasViewPort,
+fun SamplingCanvas(
+    samplingDecoder: SamplingDecoder,
+    viewPort: SamplingCanvasViewPort,
 ) {
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
@@ -149,8 +149,8 @@ fun ImageCanvas(
         val needRenderHeightTexture by remember(maxWidthPx, maxHeightPx) {
             derivedStateOf {
                 // 目前策略：原图的面积大于容器面积，就要渲染高画质
-                BigDecimal(imageDecoder.decoderWidth)
-                    .multiply(BigDecimal(imageDecoder.decoderHeight)) > BigDecimal(maxHeightPx.toDouble())
+                BigDecimal(samplingDecoder.decoderWidth)
+                    .multiply(BigDecimal(samplingDecoder.decoderHeight)) > BigDecimal(maxHeightPx.toDouble())
                     .multiply(BigDecimal(maxWidthPx.toDouble()))
             }
         }
@@ -160,7 +160,7 @@ fun ImageCanvas(
         val inSampleSize by remember(realWidth) {
             derivedStateOf {
                 calculateInSampleSize(
-                    srcWidth = imageDecoder.decoderWidth,
+                    srcWidth = samplingDecoder.decoderWidth,
                     reqWidth = realWidth.toInt()
                 )
             }
@@ -169,7 +169,7 @@ fun ImageCanvas(
         val zeroInSampleSize by remember {
             derivedStateOf {
                 calculateInSampleSize(
-                    srcWidth = imageDecoder.decoderWidth,
+                    srcWidth = samplingDecoder.decoderWidth,
                     reqWidth = maxWidthPx.toInt(),
                 )
             }
@@ -184,15 +184,15 @@ fun ImageCanvas(
                 if (needRenderHeightTexture) zeroInSampleSize else inSampleSize
             }
         }
-        var bitmap by remember { mutableStateOf(imageDecoder.thumbnail) }
+        var bitmap by remember { mutableStateOf(samplingDecoder.thumbnail) }
         LaunchedEffect(backgroundInputSample) {
             scope.launch(Dispatchers.IO) {
-                bitmap = imageDecoder.decodeRegion(
+                bitmap = samplingDecoder.decodeRegion(
                     backgroundInputSample, android.graphics.Rect(
                         0,
                         0,
-                        imageDecoder.decoderWidth,
-                        imageDecoder.decoderHeight
+                        samplingDecoder.decoderWidth,
+                        samplingDecoder.decoderHeight
                     )
                 )
             }
@@ -209,7 +209,7 @@ fun ImageCanvas(
         var renderUpdateTimeStamp by remember { mutableStateOf(0L) }
         // 开启解码队列的循环
         LaunchedEffect(key1 = Unit) {
-            imageDecoder.startRenderQueue {
+            samplingDecoder.startRenderQueue {
                 // 解码器解码一个，就更新一次时间戳
                 renderUpdateTimeStamp = System.currentTimeMillis()
             }
@@ -217,8 +217,8 @@ fun ImageCanvas(
         // 切换到不需要高画质渲染时，需要清除解码队列，清除全部的bitmap
         LaunchedEffect(key1 = renderHeightTexture) {
             if (!renderHeightTexture) {
-                imageDecoder.renderQueue.clear()
-                imageDecoder.clearAllBitmap()
+                samplingDecoder.renderQueue.clear()
+                samplingDecoder.clearAllBitmap()
             }
         }
 
@@ -259,7 +259,7 @@ fun ImageCanvas(
             previousScale = viewPort.scale
             // 计算当前渲染方块大小
             val renderBlockSize =
-                imageDecoder.blockSize * (realWidth.div(imageDecoder.decoderWidth))
+                samplingDecoder.blockSize * (realWidth.div(samplingDecoder.decoderWidth))
             var tlx: Int
             var tly: Int
             var startX: Float
@@ -277,7 +277,7 @@ fun ImageCanvas(
             var lastYDelta: Int
             val insertList = ArrayList<RenderBlock>()
             val removeList = ArrayList<RenderBlock>()
-            for ((column, list) in imageDecoder.renderList.withIndex()) {
+            for ((column, list) in samplingDecoder.renderList.withIndex()) {
                 startY = column * renderBlockSize
                 endY = (column + 1) * renderBlockSize
                 tly = startY.toInt()
@@ -329,7 +329,7 @@ fun ImageCanvas(
                     if (!renderHeightTexture) continue
                     // 解码队列操作时是有锁的，会对性能造成影响
                     if (block.inBound) {
-                        if (!imageDecoder.renderQueue.contains(block)) {
+                        if (!samplingDecoder.renderQueue.contains(block)) {
                             insertList.add(block)
                         }
                     } else {
@@ -339,12 +339,12 @@ fun ImageCanvas(
                 }
             }
             scope.launch(Dispatchers.IO) {
-                synchronized(imageDecoder.renderQueue) {
+                synchronized(samplingDecoder.renderQueue) {
                     insertList.forEach {
-                        imageDecoder.renderQueue.putFirst(it)
+                        samplingDecoder.renderQueue.putFirst(it)
                     }
                     removeList.forEach {
-                        imageDecoder.renderQueue.remove(it)
+                        samplingDecoder.renderQueue.remove(it)
                     }
                 }
             }
@@ -374,10 +374,10 @@ fun ImageCanvas(
             blockDividerCount = goBlockDividerCount
             scope.launch(Dispatchers.IO) {
                 // 清空解码队列
-                imageDecoder.renderQueue.clear()
+                samplingDecoder.renderQueue.clear()
                 // 进入修改区间
                 calcMaxCountPending = true
-                imageDecoder.setMaxBlockCount(blockDividerCount)
+                samplingDecoder.setMaxBlockCount(blockDividerCount)
                 calcMaxCountPending = false
                 // 离开修改区间
 
@@ -403,7 +403,7 @@ fun ImageCanvas(
                 // 更新渲染队列
                 if (renderUpdateTimeStamp >= 0) updateRenderList()
                 if (renderHeightTexture && !calcMaxCountPending) {
-                    imageDecoder.forEachBlock { block, _, _ ->
+                    samplingDecoder.forEachBlock { block, _, _ ->
                         block.getBitmap()?.let {
                             drawImage(
                                 image = it.asImageBitmap(),

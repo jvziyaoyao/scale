@@ -83,7 +83,8 @@ fun PreviewerBody(
         )
     }
 
-    val previewerState = rememberPreviewerState(pageCount = { images.size })
+    val previewerState =
+        rememberPreviewerState(pageCount = { images.size })
 //    val previewerState = rememberPopupPreviewerState(pageCount = { images.size })
     if (previewerState.visible) BackHandler {
         scope.launch {

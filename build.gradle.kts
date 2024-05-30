@@ -1,3 +1,5 @@
+import scale.versionName
+
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
@@ -8,5 +10,6 @@ plugins {
 
 tasks.dokkaHtmlMultiModule {
     moduleName.set("Scale")
+    moduleVersion.set(project.versionName)
     outputDirectory.set(file("$rootDir/doc/page/reference"))
 }

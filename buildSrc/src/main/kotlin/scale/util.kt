@@ -10,3 +10,6 @@ val Project.targetSdk: Int
 
 val Project.compileSdk: Int
     get() = project.properties["compileSdk"].toString().toInt()
+
+val Project.versionName: String
+    get() = project.properties["VERSION_NAME"].toString()

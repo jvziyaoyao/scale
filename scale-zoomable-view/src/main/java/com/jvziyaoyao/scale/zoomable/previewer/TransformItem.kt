@@ -20,8 +20,9 @@ import kotlinx.coroutines.sync.Mutex
 // 用于操作transformItemStateMap的锁对象
 internal val imageTransformMutex = Mutex()
 
+// TODO 限制外部访问
 // 用于缓存界面上的transformItemState
-internal val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>()
+val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>()
 
 /**
  * 在compose中获取一个TransformItemState的方式

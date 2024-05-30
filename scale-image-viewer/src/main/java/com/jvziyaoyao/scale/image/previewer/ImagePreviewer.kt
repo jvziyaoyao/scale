@@ -11,11 +11,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import com.jvziyaoyao.scale.image.pager.ImageLoading
-import com.jvziyaoyao.scale.image.pager.ImageModelProcessor
+import com.jvziyaoyao.scale.image.pager.ProceedPresentation
 import com.jvziyaoyao.scale.image.pager.defaultImageLoading
-import com.jvziyaoyao.scale.image.pager.defaultImageModelProcessor
-import com.jvziyaoyao.scale.image.viewer.ImageContent
-import com.jvziyaoyao.scale.image.viewer.defaultImageContent
+import com.jvziyaoyao.scale.image.pager.defaultProceedPresentation
+import com.jvziyaoyao.scale.image.viewer.ModelProcessor
 import com.jvziyaoyao.scale.zoomable.pager.DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT
 import com.jvziyaoyao.scale.zoomable.pager.DEFAULT_ITEM_SPACE
 import com.jvziyaoyao.scale.zoomable.pager.PagerGestureScope
@@ -47,10 +46,10 @@ val defaultPreviewBackground: (@Composable () -> Unit) = {
  * @param exit 不使用转换效果时的退出动效
  * @param debugMode 调试模式，显示图层标识等
  * @param detectGesture 手势监听对象
- * @param imageLoader 图像加载器，支持的图像类型与ImageViewer一致，如果需要支持其他类型的数据可以自定义imageContent
- * @param imageContent 用于解析图像数据的方法，可以自定义
+ * @param processor 用于解析图像数据的方法，可以自定义
+ * @param imageLoader 图像加载器，支持的图像类型与ImageViewer一致，如果需要支持其他类型的数据可以自定义processor
  * @param imageLoading 图像未完成加载时的占位
- * @param imageModelProcessor 用于控制ZoomableView、Loading等图层的切换，可以自定义
+ * @param imageModelProcessor 用于控制ZoomableView、Loading等图层的切换逻辑，可以自定义
  * @param previewerLayer 预览器容器的自定义，可设置背景、前景等
  * @param pageDecoration 每一页的图层修饰，可以用来设置页面的前景、背景等
  */
@@ -64,11 +63,13 @@ fun ImagePreviewer(
     exit: ExitTransition = DEFAULT_PREVIEWER_EXIT_TRANSITION,
     debugMode: Boolean = false,
     detectGesture: PagerGestureScope = PagerGestureScope(),
+    processor: ModelProcessor = ModelProcessor(),
     imageLoader: @Composable (Int) -> Pair<Any?, Size?>,
-    imageContent: ImageContent = defaultImageContent,
     imageLoading: ImageLoading? = defaultImageLoading,
-    imageModelProcessor: ImageModelProcessor = defaultImageModelProcessor,
-    previewerLayer: TransformLayerScope = TransformLayerScope(background = defaultPreviewBackground),
+    proceedPresentation: ProceedPresentation = defaultProceedPresentation,
+    previewerLayer: TransformLayerScope = TransformLayerScope(
+        background = defaultPreviewBackground
+    ),
     pageDecoration: @Composable (page: Int, innerPage: @Composable () -> Boolean) -> Boolean
     = { _, innerPage -> innerPage() },
 ) {
@@ -85,7 +86,7 @@ fun ImagePreviewer(
         zoomablePolicy = { page ->
             pageDecoration.invoke(page) decoration@{
                 val (model, size) = imageLoader.invoke(page)
-                imageModelProcessor.invoke(this, model, size, imageContent, imageLoading)
+                proceedPresentation.invoke(this, model, size, processor, imageLoading)
             }
         }
     )

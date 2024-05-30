@@ -11,8 +11,7 @@ import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import com.jvziyaoyao.scale.image.viewer.AnyComposable
-import com.jvziyaoyao.scale.image.viewer.ImageContent
-import com.jvziyaoyao.scale.image.viewer.defaultImageContent
+import com.jvziyaoyao.scale.image.viewer.ModelProcessor
 import com.jvziyaoyao.scale.zoomable.pager.DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT
 import com.jvziyaoyao.scale.zoomable.pager.DEFAULT_ITEM_SPACE
 import com.jvziyaoyao.scale.zoomable.pager.PagerGestureScope
@@ -28,10 +27,10 @@ import com.jvziyaoyao.scale.zoomable.pager.ZoomablePagerState
  * @param itemSpacing 每一页的间隔
  * @param beyondViewportPageCount 超出视口的页面混存的个数
  * @param detectGesture 手势监听对象
- * @param imageLoader 图像加载器，支持的图像类型与ImageViewer一致，如果需要支持其他类型的数据可以自定义imageContent
- * @param imageContent 用于解析图像数据的方法，可以自定义
+ * @param processor 用于解析图像数据的方法，可以自定义
+ * @param imageLoader 图像加载器，支持的图像类型与ImageViewer一致，如果需要支持其他类型的数据可以自定义processor
  * @param imageLoading 图像未完成加载时的占位
- * @param imageModelProcessor 用于控制ZoomableView、Loading等图层的切换，可以自定义
+ * @param proceedPresentation 用于控制ZoomableView、Loading等图层的切换逻辑，可以自定义
  * @param pageDecoration 每一页的图层修饰，可以用来设置页面的前景、背景等
  */
 @Composable
@@ -41,10 +40,10 @@ fun ImagePager(
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     beyondViewportPageCount: Int = DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT,
     detectGesture: PagerGestureScope = PagerGestureScope(),
+    processor: ModelProcessor = ModelProcessor(),
     imageLoader: @Composable (Int) -> Pair<Any?, Size?>,
-    imageContent: ImageContent = defaultImageContent,
     imageLoading: ImageLoading? = defaultImageLoading,
-    imageModelProcessor: ImageModelProcessor = defaultImageModelProcessor,
+    proceedPresentation: ProceedPresentation = defaultProceedPresentation,
     pageDecoration: @Composable (page: Int, innerPage: @Composable () -> Unit) -> Unit
     = { _, innerPage -> innerPage() },
 ) {
@@ -57,7 +56,7 @@ fun ImagePager(
     ) { page ->
         pageDecoration.invoke(page) {
             val (model, size) = imageLoader.invoke(page)
-            imageModelProcessor.invoke(this, model, size, imageContent, imageLoading)
+            proceedPresentation.invoke(this, model, size, processor, imageLoading)
         }
     }
 }
@@ -65,21 +64,21 @@ fun ImagePager(
 /**
  * 用于控制ZoomableView、Loading等图层的切换
  */
-typealias ImageModelProcessor = @Composable PagerZoomablePolicyScope.(
+typealias ProceedPresentation = @Composable PagerZoomablePolicyScope.(
     model: Any?,
     size: Size?,
-    imageContent: ImageContent,
+    processor: ModelProcessor,
     imageLoading: ImageLoading?,
 ) -> Boolean
 
 /**
  * 默认ImageModelProcessor
  */
-val defaultImageModelProcessor: ImageModelProcessor = { model, size, imageContent, imageLoading ->
+val defaultProceedPresentation: ProceedPresentation = { model, size, processor, imageLoading ->
     // TODO 这里是否要添加渐变动画?
     if (model != null && size != null && size.isSpecified) {
         ZoomablePolicy(intrinsicSize = size) {
-            imageContent.invoke(model, it)
+            processor.Deploy(model = model, state = it)
         }
         true
     } else if (model != null && model is AnyComposable && size == null) {

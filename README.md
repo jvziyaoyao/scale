@@ -5,6 +5,8 @@
 
 [![](https://www.jitpack.io/v/jvziyaoyao/ImageViewer.svg)](https://www.jitpack.io/#jvziyaoyao/ImageViewer)
 
+The latest version: <img alt="version badge" src="https://img.shields.io/github/v/release/jvziyaoyao/ImageViewer?filter=*.*.*">
+
 ### 🥳 1.1.0 全新版本～
 
 ### 📝 更新日志 👉 [CHANGELOG](/CHANGELOG.md)
@@ -77,11 +79,11 @@ ImageViewer(
 val context = LocalContext.current
 val scope = rememberCoroutineScope()
 val inputStream = remember { context.assets.open("a350.jpg") }
-val (imageDecoder) = rememberImageDecoder(inputStream = inputStream)
-if (imageDecoder != null) {
-    val state = rememberZoomableState(contentSize = imageDecoder.intrinsicSize)
+val (samplingDecoder) = rememberImageDecoder(inputStream = inputStream)
+if (samplingDecoder != null) {
+    val state = rememberZoomableState(contentSize = samplingDecoder.intrinsicSize)
     ImageViewer(
-        model = imageDecoder,
+        model = samplingDecoder,
         state = state
     )
 }

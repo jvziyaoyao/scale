@@ -79,7 +79,8 @@ fun GalleryBody01() {
             R.drawable.light_03,
         )
     }
-    val galleryState = rememberZoomablePagerState { images.size }
+    val galleryState =
+        rememberZoomablePagerState { images.size }
     ZoomablePager(state = galleryState) { page ->
         val image = images[page]
         val painter = rememberCoilImagePainter(image)

@@ -34,7 +34,8 @@ fun TransformImageView(
     transformState: TransformPreviewerState,
 ) {
     val (key, model, size) = imageLoader.invoke()
-    val itemState = rememberTransformItemState(intrinsicSize = size)
+    val itemState =
+        rememberTransformItemState(intrinsicSize = size)
     TransformItemView(
         modifier = modifier,
         key = key,

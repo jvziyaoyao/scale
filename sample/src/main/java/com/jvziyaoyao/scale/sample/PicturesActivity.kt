@@ -4,9 +4,6 @@ import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
@@ -39,11 +35,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -52,17 +46,15 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.jvziyaoyao.scale.image.previewer.ImagePreviewer
 import com.jvziyaoyao.scale.image.viewer.AnyComposable
-import com.jvziyaoyao.scale.image.viewer.ImageCanvas
-import com.jvziyaoyao.scale.image.viewer.ImageDecoder
-import com.jvziyaoyao.scale.image.viewer.createImageDecoder
-import com.jvziyaoyao.scale.image.viewer.getViewPort
+import com.jvziyaoyao.scale.image.viewer.SamplingDecoder
+import com.jvziyaoyao.scale.image.viewer.ModelProcessor
+import com.jvziyaoyao.scale.image.viewer.createSamplingDecoder
+import com.jvziyaoyao.scale.image.viewer.samplingProcessorPair
 import com.jvziyaoyao.scale.sample.base.BaseActivity
 import com.jvziyaoyao.scale.sample.base.CommonPermissions
 import com.jvziyaoyao.scale.sample.ui.component.loadPainter
-import com.jvziyaoyao.scale.zoomable.previewer.Previewer
 import com.jvziyaoyao.scale.zoomable.previewer.PreviewerState
 import com.jvziyaoyao.scale.zoomable.previewer.TransformItemView
-import com.jvziyaoyao.scale.zoomable.previewer.TransformLayerScope
 import com.jvziyaoyao.scale.zoomable.previewer.rememberPreviewerState
 import com.jvziyaoyao.scale.zoomable.previewer.rememberTransformItemState
 import com.origeek.ui.common.compose.DetectScaleGridGesture
@@ -157,13 +149,14 @@ fun PicturesDecoderPreviewLayer(
     ImagePreviewer(
         state = previewerState,
         debugMode = true,
+        processor = ModelProcessor(samplingProcessorPair),
         imageLoader = { page ->
             val file = images[page]
             val pair = remember { mutableStateOf<Pair<Any?, Size?>>(Pair(null, null)) }
             LaunchedEffect(Unit) {
                 scope.launch(Dispatchers.IO) {
                     try {
-                        createImageDecoder(file)?.let {
+                        createSamplingDecoder(file)?.let {
                             pair.value = Pair(it, it.intrinsicSize)
                         }
                     } catch (e: Exception) {
@@ -182,8 +175,8 @@ fun PicturesDecoderPreviewLayer(
             }
             DisposableEffect(Unit) {
                 onDispose {
-                    if (pair.value.first is ImageDecoder) {
-                        (pair.value.first as ImageDecoder).release()
+                    if (pair.value.first is SamplingDecoder) {
+                        (pair.value.first as SamplingDecoder).release()
                     }
                 }
             }
@@ -205,13 +198,13 @@ fun PicturesDecoderPreviewLayer(
 //        ),
 //        zoomablePolicy = { page ->
 //            val file = images[page]
-//            val imageDecoder = remember { mutableStateOf<ImageDecoder?>(null) }
+//            val imageDecoder = remember { mutableStateOf<SamplingDecoder?>(null) }
 //            val painter = remember { mutableStateOf<Painter?>(null) }
 //            val error = remember { mutableStateOf(false) }
 //            LaunchedEffect(Unit) {
 //                scope.launch(Dispatchers.IO) {
 //                    try {
-//                        imageDecoder.value = createImageDecoder(file)
+//                        imageDecoder.value = createSamplingDecoder(file)
 //                    } catch (e: Exception) {
 //                        e.printStackTrace()
 //                    }
@@ -232,11 +225,11 @@ fun PicturesDecoderPreviewLayer(
 //            imageDecoder.value?.let { decoder ->
 //                ZoomablePolicy(intrinsicSize = decoder.intrinsicSize) {
 //                    val viewPort = it.getViewPort()
-//                    ImageCanvas(
+//                    SamplingCanvas(
 //                        imageDecoder = decoder,
 //                        viewPort = viewPort,
 //                    )
-//                    Text(text = "ImageCanvas")
+//                    Text(text = "SamplingCanvas")
 //                }
 //            }
 //            painter.value?.let { p ->
@@ -326,9 +319,10 @@ fun PicturesGridLayer(
                         )
                     ) {
                         val painter = rememberAsyncImagePainter(item)
-                        val itemState = rememberTransformItemState(
-                            intrinsicSize = painter.intrinsicSize
-                        )
+                        val itemState =
+                            rememberTransformItemState(
+                                intrinsicSize = painter.intrinsicSize
+                            )
                         TransformItemView(
                             modifier = Modifier
                                 .background(MaterialTheme.colors.background),

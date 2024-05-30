@@ -11,10 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalContext
-import com.jvziyaoyao.scale.image.viewer.ImageCanvas
+import com.jvziyaoyao.scale.image.viewer.SamplingCanvas
 import com.jvziyaoyao.scale.image.viewer.ImageViewer
+import com.jvziyaoyao.scale.image.viewer.ModelProcessor
 import com.jvziyaoyao.scale.image.viewer.getViewPort
-import com.jvziyaoyao.scale.image.viewer.rememberImageDecoder
+import com.jvziyaoyao.scale.image.viewer.samplingProcessorPair
+import com.jvziyaoyao.scale.image.viewer.rememberSamplingDecoder
 import com.jvziyaoyao.scale.sample.base.BaseActivity
 import com.jvziyaoyao.scale.sample.ui.component.rememberDecoderImagePainter
 import com.jvziyaoyao.scale.zoomable.zoomable.ZoomableGestureScope
@@ -39,12 +41,13 @@ fun HugeBody() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val inputStream = remember { context.assets.open("a350.jpg") }
-    val (imageDecoder) = rememberImageDecoder(inputStream = inputStream)
-    if (imageDecoder != null) {
-        val state = rememberZoomableState(contentSize = imageDecoder.intrinsicSize)
+    val (samplingDecoder) = rememberSamplingDecoder(inputStream = inputStream)
+    if (samplingDecoder != null) {
+        val state = rememberZoomableState(contentSize = samplingDecoder.intrinsicSize)
         ImageViewer(
-            model = imageDecoder,
+            model = samplingDecoder,
             state = state,
+            processor = ModelProcessor(samplingProcessorPair),
             detectGesture = ZoomableGestureScope(onDoubleTap = {
                 scope.launch {
                     state.toggleScale(it)
@@ -63,11 +66,11 @@ fun HugeBody01() {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val inputStream = remember { context.assets.open("a350.jpg") }
-    val imageDecoder = rememberDecoderImagePainter(inputStream = inputStream)
+    val samplingDecoder = rememberDecoderImagePainter(inputStream = inputStream)
     val zoomableState = rememberZoomableState(
-        contentSize = if (imageDecoder == null) Size.Zero else Size(
-            width = imageDecoder.decoderWidth.toFloat(),
-            height = imageDecoder.decoderHeight.toFloat()
+        contentSize = if (samplingDecoder == null) Size.Zero else Size(
+            width = samplingDecoder.decoderWidth.toFloat(),
+            height = samplingDecoder.decoderHeight.toFloat()
         )
     )
     ZoomableView(
@@ -83,10 +86,10 @@ fun HugeBody01() {
             },
         ),
     ) {
-        if (imageDecoder != null) {
+        if (samplingDecoder != null) {
             val viewPort = zoomableState.getViewPort()
-            ImageCanvas(
-                imageDecoder = imageDecoder,
+            SamplingCanvas(
+                samplingDecoder = samplingDecoder,
                 viewPort = viewPort,
             )
         }

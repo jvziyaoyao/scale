@@ -54,7 +54,7 @@ data class RenderBlock(
 }
 
 /**
- * 用以提供ImageCanvas显示大型图片，rememberImageDecoder，createImageDecoder
+ * 用以提供ImageCanvas显示大型图片，rememberSamplingDecoder，createSamplingDecoder
  *
  * @property decoder 图源BitmapRegionDecoder
  * @property rotation 图片的旋转角度，通过Exif接口获取文件的旋转角度后可以设置rotation确保图像的正确显示
@@ -63,7 +63,7 @@ data class RenderBlock(
  *
  * @param thumbnails 默认显示的缓存图片，图片未完成加载时可用于显示占位
  */
-class ImageDecoder(
+class SamplingDecoder(
     private val decoder: BitmapRegionDecoder,
     private val rotation: Rotation = Rotation.ROTATION_0,
     private val onRelease: () -> Unit = {},
@@ -298,17 +298,17 @@ class ImageDecoder(
 }
 
 /**
- * 通过文件创建ImageDecoder
+ * 通过文件创建SamplingDecoder
  *
  * @param file
  * @return
  */
-fun createImageDecoder(file: File): ImageDecoder? {
+fun createSamplingDecoder(file: File): SamplingDecoder? {
     val inputStream = FileInputStream(file)
     val exifInterface = ExifInterface(file)
     val decoder = createBitmapRegionDecoder(inputStream)
     val rotation = exifInterface.getDecoderRotation()
-    return decoder?.let { createImageDecoder(it, rotation) }
+    return decoder?.let { createSamplingDecoder(it, rotation) }
 }
 
 /**
@@ -326,53 +326,53 @@ fun createBitmapRegionDecoder(inputStream: InputStream): BitmapRegionDecoder? {
 }
 
 /**
- * 通过Exif接口获取ImageDecoder的旋转方向
+ * 通过Exif接口获取SamplingDecoder的旋转方向
  *
  * @return
  */
-fun ExifInterface.getDecoderRotation(): ImageDecoder.Rotation {
+fun ExifInterface.getDecoderRotation(): SamplingDecoder.Rotation {
     val orientation = getAttributeInt(
         ExifInterface.TAG_ORIENTATION,
         ExifInterface.ORIENTATION_NORMAL
     )
     return when (orientation) {
-        ExifInterface.ORIENTATION_ROTATE_90 -> ImageDecoder.Rotation.ROTATION_90
-        ExifInterface.ORIENTATION_ROTATE_180 -> ImageDecoder.Rotation.ROTATION_180
-        ExifInterface.ORIENTATION_ROTATE_270 -> ImageDecoder.Rotation.ROTATION_270
-        else -> ImageDecoder.Rotation.ROTATION_0
+        ExifInterface.ORIENTATION_ROTATE_90 -> SamplingDecoder.Rotation.ROTATION_90
+        ExifInterface.ORIENTATION_ROTATE_180 -> SamplingDecoder.Rotation.ROTATION_180
+        ExifInterface.ORIENTATION_ROTATE_270 -> SamplingDecoder.Rotation.ROTATION_270
+        else -> SamplingDecoder.Rotation.ROTATION_0
     }
 }
 
 /**
- * 创建ImageDecoder的主要方法
+ * 创建SamplingDecoder的主要方法
  *
  * @param decoder
- * @param rotation 请参考ImageDecoder.Rotation
+ * @param rotation 请参考SamplingDecoder.Rotation
  * @return
  */
-fun createImageDecoder(
+fun createSamplingDecoder(
     decoder: BitmapRegionDecoder,
-    rotation: ImageDecoder.Rotation = ImageDecoder.Rotation.ROTATION_0,
-): ImageDecoder {
-    return ImageDecoder(decoder = decoder, rotation = rotation).apply {
+    rotation: SamplingDecoder.Rotation = SamplingDecoder.Rotation.ROTATION_0,
+): SamplingDecoder {
+    return SamplingDecoder(decoder = decoder, rotation = rotation).apply {
         this.thumbnail = createTempBitmap()
     }
 }
 
 /**
- * 创建ImageDecoder的方法
+ * 创建SamplingDecoder的方法
  *
  * @param file
- * @return ImageDecoder成功创建时不为空，创建过程中出现异常会返回Exception
+ * @return SamplingDecoder成功创建时不为空，创建过程中出现异常会返回Exception
  */
 @Composable
-fun rememberImageDecoder(file: File): Pair<ImageDecoder?, Exception?> {
-    val imageDecoder = remember { mutableStateOf<ImageDecoder?>(null) }
+fun rememberSamplingDecoder(file: File): Pair<SamplingDecoder?, Exception?> {
+    val samplingDecoder = remember { mutableStateOf<SamplingDecoder?>(null) }
     val expectation = remember { mutableStateOf<Exception?>(null) }
     LaunchedEffect(file) {
         launch(Dispatchers.IO) {
             try {
-                imageDecoder.value = createImageDecoder(file)
+                samplingDecoder.value = createSamplingDecoder(file)
             } catch (e: Exception) {
                 expectation.value = e
             }
@@ -380,32 +380,32 @@ fun rememberImageDecoder(file: File): Pair<ImageDecoder?, Exception?> {
     }
     DisposableEffect(Unit) {
         onDispose {
-            imageDecoder.value?.release()
+            samplingDecoder.value?.release()
         }
     }
-    return Pair(imageDecoder.value, expectation.value)
+    return Pair(samplingDecoder.value, expectation.value)
 }
 
 /**
- * 创建ImageDecoder的方法
+ * 创建SamplingDecoder的方法
  *
  * @param inputStream
- * @param rotation 请参考ImageDecoder.Rotation
- * @return ImageDecoder成功创建时不为空，创建过程中出现异常会返回Exception
+ * @param rotation 请参考SamplingDecoder.Rotation
+ * @return SamplingDecoder成功创建时不为空，创建过程中出现异常会返回Exception
  */
 @Composable
-fun rememberImageDecoder(
+fun rememberSamplingDecoder(
     inputStream: InputStream,
-    rotation: ImageDecoder.Rotation = ImageDecoder.Rotation.ROTATION_0,
-): Pair<ImageDecoder?, Exception?> {
-    val imageDecoder = remember { mutableStateOf<ImageDecoder?>(null) }
+    rotation: SamplingDecoder.Rotation = SamplingDecoder.Rotation.ROTATION_0,
+): Pair<SamplingDecoder?, Exception?> {
+    val samplingDecoder = remember { mutableStateOf<SamplingDecoder?>(null) }
     val expectation = remember { mutableStateOf<Exception?>(null) }
     LaunchedEffect(inputStream) {
         launch(Dispatchers.IO) {
             try {
                 val decoder = createBitmapRegionDecoder(inputStream)
                     ?: throw RuntimeException("Can not create bitmap region decoder!")
-                imageDecoder.value = createImageDecoder(decoder, rotation)
+                samplingDecoder.value = createSamplingDecoder(decoder, rotation)
             } catch (e: Exception) {
                 expectation.value = e
             }
@@ -413,8 +413,8 @@ fun rememberImageDecoder(
     }
     DisposableEffect(Unit) {
         onDispose {
-            imageDecoder.value?.release()
+            samplingDecoder.value?.release()
         }
     }
-    return Pair(imageDecoder.value, expectation.value)
+    return Pair(samplingDecoder.value, expectation.value)
 }

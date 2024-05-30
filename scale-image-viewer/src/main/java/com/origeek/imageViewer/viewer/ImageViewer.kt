@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
-import com.jvziyaoyao.scale.image.viewer.ImageDecoder
+import com.jvziyaoyao.scale.image.viewer.SamplingDecoder
 import com.jvziyaoyao.scale.zoomable.zoomable.panTransformAndScale
 import com.origeek.imageViewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
 import kotlinx.coroutines.CoroutineScope
@@ -339,7 +339,7 @@ class ComposeModel(
 }
 
 /**
- * model支持Painter、ImageBitmap、ImageVector、ImageDecoder、ComposeModel
+ * model支持Painter、ImageBitmap、ImageVector、SamplingDecoder、ComposeModel
  */
 @Deprecated(
     message = "方法已弃用，请使用：com.jvziyaoyao.image.viewer.ImageViewer",
@@ -637,9 +637,9 @@ fun ImageViewer(
                 )
             }
 
-            is ImageDecoder -> {
+            is SamplingDecoder -> {
                 ImageComposeCanvas(
-                    imageDecoder = model,
+                    samplingDecoder = model,
                     scale = state.scale.value,
                     offsetX = state.offsetX.value,
                     offsetY = state.offsetY.value,

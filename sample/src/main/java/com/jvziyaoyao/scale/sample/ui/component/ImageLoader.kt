@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
-import com.jvziyaoyao.scale.image.viewer.ImageDecoder
+import com.jvziyaoyao.scale.image.viewer.SamplingDecoder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -73,12 +73,12 @@ fun rememberDecoderImagePainter(
     inputStream: InputStream,
     rotation: Int = 0,
     delay: Long? = null,
-): ImageDecoder? {
-    var imageDecoder by remember { mutableStateOf<ImageDecoder?>(null) }
+): SamplingDecoder? {
+    var samplingDecoder by remember { mutableStateOf<SamplingDecoder?>(null) }
     LaunchedEffect(inputStream) {
         launch(Dispatchers.IO) {
             if (delay != null) delay(delay)
-            imageDecoder = try {
+            samplingDecoder = try {
                 val decoder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     BitmapRegionDecoder.newInstance(inputStream)
                 } else {
@@ -88,12 +88,12 @@ fun rememberDecoderImagePainter(
                     null
                 } else {
                     val decoderRotation = when(rotation) {
-                        ImageDecoder.Rotation.ROTATION_90.radius -> ImageDecoder.Rotation.ROTATION_90
-                        ImageDecoder.Rotation.ROTATION_180.radius -> ImageDecoder.Rotation.ROTATION_180
-                        ImageDecoder.Rotation.ROTATION_270.radius -> ImageDecoder.Rotation.ROTATION_270
-                        else -> ImageDecoder.Rotation.ROTATION_0
+                        SamplingDecoder.Rotation.ROTATION_90.radius -> SamplingDecoder.Rotation.ROTATION_90
+                        SamplingDecoder.Rotation.ROTATION_180.radius -> SamplingDecoder.Rotation.ROTATION_180
+                        SamplingDecoder.Rotation.ROTATION_270.radius -> SamplingDecoder.Rotation.ROTATION_270
+                        else -> SamplingDecoder.Rotation.ROTATION_0
                     }
-                    ImageDecoder(decoder = decoder, rotation = decoderRotation)
+                    SamplingDecoder(decoder = decoder, rotation = decoderRotation)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -103,8 +103,8 @@ fun rememberDecoderImagePainter(
     }
     DisposableEffect(Unit) {
         onDispose {
-            imageDecoder?.release()
+            samplingDecoder?.release()
         }
     }
-    return imageDecoder
+    return samplingDecoder
 }

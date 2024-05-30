@@ -23,6 +23,7 @@
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/sample" />
             <option value="$PROJECT_DIR$/scale-image-viewer" />
+            <option value="$PROJECT_DIR$/scale-zoomable-previewer" />
             <option value="$PROJECT_DIR$/scale-zoomable-view" />
           </set>
         </option>

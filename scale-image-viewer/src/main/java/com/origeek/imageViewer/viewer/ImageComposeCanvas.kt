@@ -28,7 +28,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import com.jvziyaoyao.scale.image.viewer.ImageDecoder
+import com.jvziyaoyao.scale.image.viewer.SamplingDecoder
 import com.jvziyaoyao.scale.image.viewer.RenderBlock
 import com.jvziyaoyao.scale.image.viewer.calculateInSampleSize
 import com.jvziyaoyao.scale.image.viewer.checkRectInBound
@@ -45,7 +45,7 @@ import kotlin.math.absoluteValue
 @Composable
 fun ImageComposeCanvas(
     modifier: Modifier = Modifier,
-    imageDecoder: ImageDecoder,
+    samplingDecoder: SamplingDecoder,
     scale: Float = DEFAULT_SCALE,
     offsetX: Float = DEFAULT_OFFSET_X,
     offsetY: Float = DEFAULT_OFFSET_Y,
@@ -63,13 +63,13 @@ fun ImageComposeCanvas(
     // 容器长宽比
     val bRatio by remember { derivedStateOf { bSize.width.toFloat() / bSize.height.toFloat() } }
     // 原图长宽比
-    val oRatio by remember { derivedStateOf { imageDecoder.decoderWidth.toFloat() / imageDecoder.decoderHeight.toFloat() } }
+    val oRatio by remember { derivedStateOf { samplingDecoder.decoderWidth.toFloat() / samplingDecoder.decoderHeight.toFloat() } }
     // 是否宽度与容器大小一致
     var widthFixed by remember { mutableStateOf(false) }
     // 长宽是否均超出容器长宽
     val superSize by remember {
         derivedStateOf {
-            imageDecoder.decoderHeight > bSize.height && imageDecoder.decoderWidth > bSize.width
+            samplingDecoder.decoderHeight > bSize.height && samplingDecoder.decoderWidth > bSize.width
         }
     }
     // 显示的默认大小
@@ -105,7 +105,7 @@ fun ImageComposeCanvas(
         // 获取最大缩放率
         val maxScale = when {
             superSize -> {
-                imageDecoder.decoderWidth.toFloat() / uSize.width.toFloat()
+                samplingDecoder.decoderWidth.toFloat() / uSize.width.toFloat()
             }
             widthFixed -> {
                 bSize.height.toFloat() / uSize.height.toFloat()
@@ -128,8 +128,8 @@ fun ImageComposeCanvas(
     val needRenderHeightTexture by remember(key1 = bSize) {
         derivedStateOf {
             // 目前策略：原图的面积大于容器面积，就要渲染高画质
-            BigDecimal(imageDecoder.decoderWidth)
-                .multiply(BigDecimal(imageDecoder.decoderHeight)) > BigDecimal(bSize.height)
+            BigDecimal(samplingDecoder.decoderWidth)
+                .multiply(BigDecimal(samplingDecoder.decoderHeight)) > BigDecimal(bSize.height)
                 .multiply(BigDecimal(bSize.width))
         }
     }
@@ -147,7 +147,7 @@ fun ImageComposeCanvas(
     LaunchedEffect(key1 = rSize) {
         if (scale < 1F) return@LaunchedEffect
         inSampleSize = calculateInSampleSize(
-            srcWidth = imageDecoder.decoderWidth,
+            srcWidth = samplingDecoder.decoderWidth,
             reqWidth = rSize.width
         )
         if (scale == 1F) {
@@ -161,12 +161,12 @@ fun ImageComposeCanvas(
             val iss = if (needRenderHeightTexture) zeroInSampleSize else inSampleSize
             if (iss == backGroundInSample) return@launch
             backGroundInSample = iss
-            bitmap = imageDecoder.decodeRegion(
+            bitmap = samplingDecoder.decodeRegion(
                 iss, Rect(
                     0,
                     0,
-                    imageDecoder.decoderWidth,
-                    imageDecoder.decoderHeight
+                    samplingDecoder.decoderWidth,
+                    samplingDecoder.decoderHeight
                 )
             )
         }
@@ -247,7 +247,7 @@ fun ImageComposeCanvas(
     var renderUpdateTimeStamp by remember { mutableStateOf(0L) }
     // 开启解码队列的循环
     LaunchedEffect(key1 = Unit) {
-        imageDecoder.startRenderQueue {
+        samplingDecoder.startRenderQueue {
             // 解码器解码一个，就更新一次时间戳
             renderUpdateTimeStamp = System.currentTimeMillis()
         }
@@ -255,8 +255,8 @@ fun ImageComposeCanvas(
     // 切换到不需要高画质渲染时，需要清除解码队列，清除全部的bitmap
     LaunchedEffect(key1 = renderHeightTexture) {
         if (!renderHeightTexture) {
-            imageDecoder.renderQueue.clear()
-            imageDecoder.clearAllBitmap()
+            samplingDecoder.renderQueue.clear()
+            samplingDecoder.clearAllBitmap()
         }
     }
 
@@ -289,7 +289,7 @@ fun ImageComposeCanvas(
         previousOffset = Offset(offsetX, offsetY)
         // 计算当前渲染方块大小
         val renderBlockSize =
-            imageDecoder.blockSize * (rSize.width.toFloat().div(imageDecoder.decoderWidth))
+            samplingDecoder.blockSize * (rSize.width.toFloat().div(samplingDecoder.decoderWidth))
         var tlx: Int
         var tly: Int
         var startX: Float
@@ -307,7 +307,7 @@ fun ImageComposeCanvas(
         var lastYDelta: Int
         val insertList = ArrayList<RenderBlock>()
         val removeList = ArrayList<RenderBlock>()
-        for ((column, list) in imageDecoder.renderList.withIndex()) {
+        for ((column, list) in samplingDecoder.renderList.withIndex()) {
             startY = column * renderBlockSize
             endY = (column + 1) * renderBlockSize
             tly = (deltaY + startY).toInt()
@@ -359,7 +359,7 @@ fun ImageComposeCanvas(
                 if (!renderHeightTexture) continue
                 // 解码队列操作时是有锁的，会对性能造成影响
                 if (block.inBound) {
-                    if (!imageDecoder.renderQueue.contains(block)) {
+                    if (!samplingDecoder.renderQueue.contains(block)) {
                         insertList.add(block)
                     }
                 } else {
@@ -369,12 +369,12 @@ fun ImageComposeCanvas(
             }
         }
         scope.launch(Dispatchers.IO) {
-            synchronized(imageDecoder.renderQueue) {
+            synchronized(samplingDecoder.renderQueue) {
                 insertList.forEach {
-                    imageDecoder.renderQueue.putFirst(it)
+                    samplingDecoder.renderQueue.putFirst(it)
                 }
                 removeList.forEach {
-                    imageDecoder.renderQueue.remove(it)
+                    samplingDecoder.renderQueue.remove(it)
                 }
             }
         }
@@ -402,10 +402,10 @@ fun ImageComposeCanvas(
         blockDividerCount = goBlockDividerCount
         scope.launch(Dispatchers.IO) {
             // 清空解码队列
-            imageDecoder.renderQueue.clear()
+            samplingDecoder.renderQueue.clear()
             // 进入修改区间
             calcMaxCountPending = true
-            imageDecoder.setMaxBlockCount(blockDividerCount)
+            samplingDecoder.setMaxBlockCount(blockDividerCount)
             calcMaxCountPending = false
             // 离开修改区间
 
@@ -478,7 +478,7 @@ fun ImageComposeCanvas(
             // 更新渲染队列
             if (renderUpdateTimeStamp >= 0) updateRenderList()
             if (renderHeightTexture && !calcMaxCountPending) {
-                imageDecoder.forEachBlock { block, _, _ ->
+                samplingDecoder.forEachBlock { block, _, _ ->
                     block.getBitmap()?.let {
                         drawImage(
                             image = it.asImageBitmap(),

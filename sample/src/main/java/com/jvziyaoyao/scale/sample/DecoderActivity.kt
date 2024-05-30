@@ -34,8 +34,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.jvziyaoyao.scale.image.previewer.ImagePreviewer
-import com.jvziyaoyao.scale.image.viewer.ImageDecoder
-import com.jvziyaoyao.scale.image.viewer.rememberImageDecoder
+import com.jvziyaoyao.scale.image.viewer.SamplingDecoder
+import com.jvziyaoyao.scale.image.viewer.ModelProcessor
+import com.jvziyaoyao.scale.image.viewer.samplingProcessorPair
+import com.jvziyaoyao.scale.image.viewer.rememberSamplingDecoder
 import com.jvziyaoyao.scale.sample.base.BaseActivity
 import com.jvziyaoyao.scale.zoomable.previewer.TransformItemView
 import com.jvziyaoyao.scale.zoomable.previewer.VerticalDragType
@@ -198,24 +200,28 @@ fun DecoderBody() {
 
         ImagePreviewer(
             state = previewerState,
+            processor = ModelProcessor(samplingProcessorPair),
             imageLoader = { _ ->
                 val decoderRotation = when (rotation.toInt()) {
-                    ImageDecoder.Rotation.ROTATION_90.radius -> ImageDecoder.Rotation.ROTATION_90
-                    ImageDecoder.Rotation.ROTATION_180.radius -> ImageDecoder.Rotation.ROTATION_180
-                    ImageDecoder.Rotation.ROTATION_270.radius -> ImageDecoder.Rotation.ROTATION_270
-                    else -> ImageDecoder.Rotation.ROTATION_0
+                    SamplingDecoder.Rotation.ROTATION_90.radius -> SamplingDecoder.Rotation.ROTATION_90
+                    SamplingDecoder.Rotation.ROTATION_180.radius -> SamplingDecoder.Rotation.ROTATION_180
+                    SamplingDecoder.Rotation.ROTATION_270.radius -> SamplingDecoder.Rotation.ROTATION_270
+                    else -> SamplingDecoder.Rotation.ROTATION_0
                 }
-                val (imageDecoder, error) = rememberImageDecoder(inputStream = inputStream, rotation = decoderRotation)
-                val realImageDecoder = remember { mutableStateOf<ImageDecoder?>(null) }
-                LaunchedEffect(imageDecoder) {
-                    if (imageDecoder != null) {
+                val (samplingDecoder, error) = rememberSamplingDecoder(
+                    inputStream = inputStream,
+                    rotation = decoderRotation
+                )
+                val realSamplingDecoder = remember { mutableStateOf<SamplingDecoder?>(null) }
+                LaunchedEffect(samplingDecoder) {
+                    if (samplingDecoder != null) {
                         delay(loadDelay.toLong())
-                        realImageDecoder.value = imageDecoder
+                        realSamplingDecoder.value = samplingDecoder
                     }
                 }
                 return@ImagePreviewer Pair(
-                    realImageDecoder.value,
-                    realImageDecoder.value?.intrinsicSize
+                    realSamplingDecoder.value,
+                    realSamplingDecoder.value?.intrinsicSize
                 )
             }
         )

@@ -140,7 +140,8 @@ fun rememberImageGalleryState(
     @IntRange(from = 0) initialPage: Int = 0,
     pageCount: () -> Int,
 ): ImageGalleryState {
-    val imagePagerState = rememberSupportedPagerState(initialPage, pageCount)
+    val imagePagerState =
+        rememberSupportedPagerState(initialPage, pageCount)
     return remember { ImageGalleryState(imagePagerState) }
 }
 

@@ -215,9 +215,10 @@ fun TransformBody(
                         item(key = item.id) {
                             val needStart = index % lineCount != 0
                             val painter = painterResource(id = item.res)
-                            val itemState = rememberTransformItemState(
-                                intrinsicSize = painter.intrinsicSize
-                            )
+                            val itemState =
+                                rememberTransformItemState(
+                                    intrinsicSize = painter.intrinsicSize
+                                )
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
