@@ -28,10 +28,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import com.jvziyaoyao.scale.image.viewer.SamplingDecoder
-import com.jvziyaoyao.scale.image.viewer.RenderBlock
-import com.jvziyaoyao.scale.image.viewer.calculateInSampleSize
-import com.jvziyaoyao.scale.image.viewer.checkRectInBound
+import com.jvziyaoyao.scale.image.sampling.SamplingDecoder
+import com.jvziyaoyao.scale.image.sampling.RenderBlock
+import com.jvziyaoyao.scale.image.sampling.calculateInSampleSize
+import com.jvziyaoyao.scale.image.sampling.checkRectInBound
 import com.origeek.imageViewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

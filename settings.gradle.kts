@@ -17,4 +17,7 @@ dependencyResolutionManagement {
 rootProject.name = "scale"
 include(":sample")
 include(":scale-image-viewer")
+include(":scale-image-viewer-classic")
 include(":scale-zoomable-view")
+include(":scale-sampling-decoder")
+include(":mylibrary")

@@ -94,13 +94,6 @@ val basicModelProcessorList: List<ModelProcessorPair> = listOf(
     }
 )
 
-val samplingProcessorPair: ModelProcessorPair = SamplingDecoder::class to { model, state ->
-    SamplingCanvas(
-        samplingDecoder = model as SamplingDecoder,
-        viewPort = state.getViewPort(),
-    )
-}
-
 /**
  * 判断对象是否为某个类的子类
  *

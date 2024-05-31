@@ -1,4 +1,4 @@
-package com.jvziyaoyao.scale.image.viewer
+package com.jvziyaoyao.scale.image.sampling
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

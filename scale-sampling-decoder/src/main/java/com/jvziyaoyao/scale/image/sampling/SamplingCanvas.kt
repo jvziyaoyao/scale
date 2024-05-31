@@ -1,4 +1,4 @@
-package com.jvziyaoyao.scale.image.viewer
+package com.jvziyaoyao.scale.image.sampling
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -91,7 +91,7 @@ internal fun intersectRect(rect1: Rect, rect2: Rect): Rect {
     }
 }
 
-internal fun calculateInSampleSize(
+fun calculateInSampleSize(
     srcWidth: Int,
     reqWidth: Int,
 ): Int {
@@ -104,7 +104,7 @@ internal fun calculateInSampleSize(
     return inSampleSize
 }
 
-internal fun checkRectInBound(
+fun checkRectInBound(
     stX1: Float, stY1: Float, edX1: Float, edY1: Float,
     stX2: Float, stY2: Float, edX2: Float, edY2: Float,
 ): Boolean {

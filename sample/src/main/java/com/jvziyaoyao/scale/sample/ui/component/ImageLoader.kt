@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
-import com.jvziyaoyao.scale.image.viewer.SamplingDecoder
+import com.jvziyaoyao.scale.image.sampling.SamplingDecoder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -93,7 +93,10 @@ fun rememberDecoderImagePainter(
                         SamplingDecoder.Rotation.ROTATION_270.radius -> SamplingDecoder.Rotation.ROTATION_270
                         else -> SamplingDecoder.Rotation.ROTATION_0
                     }
-                    SamplingDecoder(decoder = decoder, rotation = decoderRotation)
+                    SamplingDecoder(
+                        decoder = decoder,
+                        rotation = decoderRotation
+                    )
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

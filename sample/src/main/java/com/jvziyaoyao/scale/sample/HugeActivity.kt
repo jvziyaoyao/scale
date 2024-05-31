@@ -11,12 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalContext
-import com.jvziyaoyao.scale.image.viewer.SamplingCanvas
+import com.jvziyaoyao.scale.image.sampling.SamplingCanvas
+import com.jvziyaoyao.scale.image.sampling.getViewPort
+import com.jvziyaoyao.scale.image.sampling.rememberSamplingDecoder
+import com.jvziyaoyao.scale.image.sampling.samplingProcessorPair
 import com.jvziyaoyao.scale.image.viewer.ImageViewer
 import com.jvziyaoyao.scale.image.viewer.ModelProcessor
-import com.jvziyaoyao.scale.image.viewer.getViewPort
-import com.jvziyaoyao.scale.image.viewer.samplingProcessorPair
-import com.jvziyaoyao.scale.image.viewer.rememberSamplingDecoder
 import com.jvziyaoyao.scale.sample.base.BaseActivity
 import com.jvziyaoyao.scale.sample.ui.component.rememberDecoderImagePainter
 import com.jvziyaoyao.scale.zoomable.zoomable.ZoomableGestureScope

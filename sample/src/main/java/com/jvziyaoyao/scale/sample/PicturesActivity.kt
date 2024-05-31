@@ -45,11 +45,11 @@ import androidx.core.graphics.drawable.toBitmap
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.jvziyaoyao.scale.image.previewer.ImagePreviewer
+import com.jvziyaoyao.scale.image.sampling.SamplingDecoder
+import com.jvziyaoyao.scale.image.sampling.createSamplingDecoder
+import com.jvziyaoyao.scale.image.sampling.samplingProcessorPair
 import com.jvziyaoyao.scale.image.viewer.AnyComposable
-import com.jvziyaoyao.scale.image.viewer.SamplingDecoder
 import com.jvziyaoyao.scale.image.viewer.ModelProcessor
-import com.jvziyaoyao.scale.image.viewer.createSamplingDecoder
-import com.jvziyaoyao.scale.image.viewer.samplingProcessorPair
 import com.jvziyaoyao.scale.sample.base.BaseActivity
 import com.jvziyaoyao.scale.sample.base.CommonPermissions
 import com.jvziyaoyao.scale.sample.ui.component.loadPainter

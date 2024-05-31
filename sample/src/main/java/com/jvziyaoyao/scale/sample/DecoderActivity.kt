@@ -34,10 +34,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.jvziyaoyao.scale.image.previewer.ImagePreviewer
-import com.jvziyaoyao.scale.image.viewer.SamplingDecoder
+import com.jvziyaoyao.scale.image.sampling.SamplingDecoder
+import com.jvziyaoyao.scale.image.sampling.rememberSamplingDecoder
+import com.jvziyaoyao.scale.image.sampling.samplingProcessorPair
 import com.jvziyaoyao.scale.image.viewer.ModelProcessor
-import com.jvziyaoyao.scale.image.viewer.samplingProcessorPair
-import com.jvziyaoyao.scale.image.viewer.rememberSamplingDecoder
 import com.jvziyaoyao.scale.sample.base.BaseActivity
 import com.jvziyaoyao.scale.zoomable.previewer.TransformItemView
 import com.jvziyaoyao.scale.zoomable.previewer.VerticalDragType
