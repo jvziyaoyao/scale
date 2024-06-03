@@ -1,0 +1,6 @@
+site_name: Scale
+theme: material
+
+nav:
+  - Overview: overview.md
+  - ZoomableView: zoomable_view.md

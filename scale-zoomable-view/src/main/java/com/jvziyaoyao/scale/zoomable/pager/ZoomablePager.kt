@@ -3,6 +3,7 @@ package com.jvziyaoyao.scale.zoomable.pager
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -159,30 +160,32 @@ fun ZoomablePager(
         itemSpacing = itemSpacing,
         beyondViewportPageCount = beyondViewportPageCount,
     ) { page ->
-        PagerZoomablePolicyScope { intrinsicSize, content ->
-            val zoomableState = rememberZoomableState(contentSize = intrinsicSize)
-            LaunchedEffect(key1 = state.currentPage) {
-                if (state.currentPage != page) {
-                    zoomableState.reset()
+        Box(modifier = Modifier.fillMaxSize()) {
+            PagerZoomablePolicyScope { intrinsicSize, content ->
+                val zoomableState = rememberZoomableState(contentSize = intrinsicSize)
+                LaunchedEffect(key1 = state.currentPage) {
+                    if (state.currentPage != page) {
+                        zoomableState.reset()
+                    }
+                    if (currentPage == page) state.zoomableViewState.value = zoomableState
                 }
-                if (currentPage == page) state.zoomableViewState.value = zoomableState
-            }
-            ZoomableView(
-                state = zoomableState,
-                boundClip = false,
-                detectGesture = ZoomableGestureScope(
-                    onTap = { detectGesture.onTap() },
-                    onDoubleTap = {
-                        val consumed = detectGesture.onDoubleTap()
-                        if (!consumed) scope.launch {
-                            zoomableState.toggleScale(it)
-                        }
-                    },
-                    onLongPress = { detectGesture.onLongPress() },
-                )
-            ) {
-                content(zoomableState)
-            }
-        }.zoomablePolicy(page)
+                ZoomableView(
+                    state = zoomableState,
+                    boundClip = false,
+                    detectGesture = ZoomableGestureScope(
+                        onTap = { detectGesture.onTap() },
+                        onDoubleTap = {
+                            val consumed = detectGesture.onDoubleTap()
+                            if (!consumed) scope.launch {
+                                zoomableState.toggleScale(it)
+                            }
+                        },
+                        onLongPress = { detectGesture.onLongPress() },
+                    )
+                ) {
+                    content(zoomableState)
+                }
+            }.zoomablePolicy(page)
+        }
     }
 }

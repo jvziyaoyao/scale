@@ -41,7 +41,7 @@ val defaultPreviewBackground: (@Composable () -> Unit) = {
  * @param modifier 图层修饰
  * @param state 控件状态与控制对象
  * @param itemSpacing 每一页的间隔
- * @param beyondViewportPageCount 超出视口的页面混存的个数
+ * @param beyondViewportPageCount 超出视口的页面缓存的个数
  * @param enter 不使用转换效果时的弹出动效
  * @param exit 不使用转换效果时的退出动效
  * @param debugMode 调试模式，显示图层标识等

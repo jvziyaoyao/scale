@@ -25,7 +25,7 @@ import com.jvziyaoyao.scale.zoomable.pager.ZoomablePagerState
  * @param modifier 图层修饰
  * @param pagerState 控件状态与控制对象
  * @param itemSpacing 每一页的间隔
- * @param beyondViewportPageCount 超出视口的页面混存的个数
+ * @param beyondViewportPageCount 超出视口的页面缓存的个数
  * @param detectGesture 手势监听对象
  * @param processor 用于解析图像数据的方法，可以自定义
  * @param imageLoader 图像加载器，支持的图像类型与ImageViewer一致，如果需要支持其他类型的数据可以自定义processor

@@ -54,7 +54,7 @@ data class RenderBlock(
 }
 
 /**
- * 用以提供ImageCanvas显示大型图片，rememberSamplingDecoder，createSamplingDecoder
+ * 用以提供SamplingCanvas显示大型图片，rememberSamplingDecoder，createSamplingDecoder
  *
  * @property decoder 图源BitmapRegionDecoder
  * @property rotation 图片的旋转角度，通过Exif接口获取文件的旋转角度后可以设置rotation确保图像的正确显示
