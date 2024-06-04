@@ -4,3 +4,6 @@ theme: material
 nav:
   - Overview: overview.md
   - ZoomableView: zoomable_view.md
+  - ZoomableView State and Gesture: zoomable_state.md
+  - ZoomablePager: zoomable_pager.md
+  - ZoomablePager State and Gesture: zoomable_pager_state.md

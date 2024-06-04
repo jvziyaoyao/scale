@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import com.jvziyaoyao.scale.image.viewer.AnyComposable
@@ -76,13 +75,13 @@ typealias ProceedPresentation = @Composable PagerZoomablePolicyScope.(
  */
 val defaultProceedPresentation: ProceedPresentation = { model, size, processor, imageLoading ->
     // TODO 这里是否要添加渐变动画?
-    if (model != null && size != null && size.isSpecified) {
+    if (model != null && model is AnyComposable && size == null) {
+        model.composable.invoke()
+        true
+    } else if (model != null && size != null) {
         ZoomablePolicy(intrinsicSize = size) {
             processor.Deploy(model = model, state = it)
         }
-        true
-    } else if (model != null && model is AnyComposable && size == null) {
-        model.composable.invoke()
         true
     } else {
         imageLoading?.invoke()

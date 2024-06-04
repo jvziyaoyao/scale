@@ -20,7 +20,7 @@ import com.jvziyaoyao.scale.zoomable.previewer.rememberTransformItemState
  *
  * @param modifier 图层修饰
  * @param imageLoader 图片加载器，Triple<Any, Size, Any>，
- *                      其中三个参数分别为：图片数据、图片大小、Key
+ *                      其中三个参数分别为：Key、图片数据、图片大小、
  *                      图片数据支持Painter、ImageBitmap、ImageVector、AnyComposable
  *                      Key必须要与transformState中输入的key一致
  * @param imageItemContent 用于解析图像数据的方法，可以自定义

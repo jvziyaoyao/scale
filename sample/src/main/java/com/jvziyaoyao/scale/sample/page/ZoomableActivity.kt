@@ -17,8 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.jvziyaoyao.scale.sample.base.BaseActivity
-import com.jvziyaoyao.scale.sample.sample.ImageViewerSample
-import com.jvziyaoyao.scale.sample.sample.PreviewerSample
+import com.jvziyaoyao.scale.sample.sample.SamplingDecoderSample
 import com.jvziyaoyao.scale.sample.sample.ZoomablePagerSample
 import com.jvziyaoyao.scale.sample.ui.component.rememberCoilImagePainter
 import com.jvziyaoyao.scale.zoomable.zoomable.ZoomableGestureScope
@@ -42,9 +41,13 @@ class ZoomableActivity : BaseActivity() {
         setBasicContent {
 //            ZoomableBody()
 
-//            ZoomablePagerSample.StateSample()
+            ZoomablePagerSample.CoilSample()
 //            PreviewerSample.DecorationSample()
-            ImageViewerSample.BasicSample()
+//            ImageViewerSample.ProcessSample()
+//            ImagePagerSample.DecorationSample()
+//            ImagePreviewerSample.DecorationSample()
+//            SamplingDecoderSample.BasicSample()
+//            SamplingDecoderSample.RawSample()
         }
     }
 
