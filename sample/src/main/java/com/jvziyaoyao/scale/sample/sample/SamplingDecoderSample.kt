@@ -70,7 +70,7 @@ object SamplingDecoderSample {
                 modifier = Modifier
                     .fillMaxSize()
                     .pointerInput(Unit) {
-                        detectTransformGestures { centroid, pan, zoom, rotation, event ->
+                        detectTransformGestures { _, pan, zoom, _, _ ->
                             offset.value += pan
                             scale.value *= zoom
                             true
@@ -94,7 +94,10 @@ object SamplingDecoderSample {
                 ) {
                     SamplingCanvas(
                         samplingDecoder = samplingDecoder,
-                        viewPort = SamplingCanvasViewPort(8F, Rect(0.4F, 0.4F, 0.6F, 0.8F))
+                        viewPort = SamplingCanvasViewPort(
+                            scale = 8F,
+                            visualRect = Rect(0.4F, 0.4F, 0.6F, 0.8F)
+                        )
                     )
                 }
             }

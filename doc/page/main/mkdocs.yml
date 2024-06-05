@@ -3,7 +3,8 @@ theme: material
 
 nav:
   - Overview: overview.md
+  - ImageViewer: image_viewer.md
+  - SamplingDecoder: sampling_decoder.md
   - ZoomableView: zoomable_view.md
-  - ZoomableView State and Gesture: zoomable_state.md
   - ZoomablePager: zoomable_pager.md
-  - ZoomablePager State and Gesture: zoomable_pager_state.md
+  - Previewer: previewer.md

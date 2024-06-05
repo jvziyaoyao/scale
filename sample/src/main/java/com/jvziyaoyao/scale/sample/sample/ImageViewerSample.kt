@@ -64,7 +64,7 @@ object ImageViewerSample {
                             .background(Color.White)
                             .align(Alignment.BottomEnd)
                     )
-                    Text(modifier = Modifier.align(Alignment.Center), text = "HelloCompose~")
+                    Text(modifier = Modifier.align(Alignment.Center), text = "Hello Compose")
                 }
             }
         )
