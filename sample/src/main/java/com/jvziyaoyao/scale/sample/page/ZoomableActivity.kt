@@ -17,8 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.jvziyaoyao.scale.sample.base.BaseActivity
-import com.jvziyaoyao.scale.sample.sample.SamplingDecoderSample
-import com.jvziyaoyao.scale.sample.sample.ZoomablePagerSample
 import com.jvziyaoyao.scale.sample.ui.component.rememberCoilImagePainter
 import com.jvziyaoyao.scale.zoomable.zoomable.ZoomableGestureScope
 import com.jvziyaoyao.scale.zoomable.zoomable.ZoomableView
@@ -39,15 +37,7 @@ class ZoomableActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBasicContent {
-//            ZoomableBody()
-
-            ZoomablePagerSample.CoilSample()
-//            PreviewerSample.DecorationSample()
-//            ImageViewerSample.ProcessSample()
-//            ImagePagerSample.DecorationSample()
-//            ImagePreviewerSample.DecorationSample()
-//            SamplingDecoderSample.BasicSample()
-//            SamplingDecoderSample.RawSample()
+            ZoomableBody()
         }
     }
 
@@ -60,13 +50,6 @@ fun ZoomableBody() {
     val url = "https://t7.baidu.com/it/u=1595072465,3644073269&fm=193&f=GIF"
     val painter = rememberCoilImagePainter(url)
     val zoomableState = rememberZoomableState(contentSize = painter.intrinsicSize)
-    ZoomableView(state = zoomableState) {
-        Image(
-            modifier = Modifier.fillMaxSize(),
-            painter = painter,
-            contentDescription = null,
-        )
-    }
 
     Box(
         modifier = Modifier

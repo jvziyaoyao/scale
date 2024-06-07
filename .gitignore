@@ -13,4 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
-/doc/page/main/paython
+/doc/docs/reference
+/doc/docs/index.md
+/doc/docs/change_log.md

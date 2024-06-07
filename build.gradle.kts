@@ -11,5 +11,5 @@ plugins {
 tasks.dokkaHtmlMultiModule {
     moduleName.set("Scale")
     moduleVersion.set(project.versionName)
-    outputDirectory.set(file("$rootDir/doc/page/reference"))
+    outputDirectory.set(file("$rootDir/doc/docs/reference"))
 }

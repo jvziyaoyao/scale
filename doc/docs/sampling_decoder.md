@@ -2,6 +2,12 @@
 
 `Scale`提供了`SamplingDecoder`、`SamplingCanvas`用于实现超级大图的预览，`SamplingDecoder`对`BitmapRegionDecoder`进行了封装，有助于开发者通过简单的`API`调用实现大型图片的加载显示，避免`OOM`
 
+添加`SamplingDecoder`依赖支持：
+
+```kotlin
+implementation("com.jvziyaoyao.scale:sampling-decoder:$version")
+```
+
 ## 🍋 简单使用
 ```kotlin
 val context = LocalContext.current

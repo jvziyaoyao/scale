@@ -207,6 +207,7 @@ open class TransformPreviewerState(
         if (itemState != null) {
             itemState.apply {
                 stateCloseStart()
+
                 val displaySize = getDisplaySize(intrinsicSize ?: Size.Zero, containerSize.value)
                 val targetX = (containerSize.value.width - displaySize.width).div(2)
                 val targetY = (containerSize.value.height - displaySize.height).div(2)
@@ -450,7 +451,11 @@ fun TransformPreviewer(
                     Box(modifier = Modifier.fillMaxSize()) {
                         val zoomableMounted = remember { mutableStateOf(false) }
                         if (!zoomableMounted.value) {
-                            TransformContentForPage(page = page, state = state, debugMode = debugMode)
+                            TransformContentForPage(
+                                page = page,
+                                state = state,
+                                debugMode = debugMode
+                            )
                         }
                         zoomableMounted.value = zoomablePolicy(page)
                         LaunchedEffect(zoomableMounted.value) {

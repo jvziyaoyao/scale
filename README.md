@@ -1,15 +1,17 @@
-# ImageViewer
-🖼 ImageViewer for jetpack compose.
+# Scale
+🖼 An image viewer for jetpack compose.
 
-一款基于Jetpack Compose开发的图片预览库，支持超大图片的显示
+一款基于`Jetpack Compose`开发的图片浏览库，支持过渡变换和超大图片的显示
 
-[![](https://www.jitpack.io/v/jvziyaoyao/ImageViewer.svg)](https://www.jitpack.io/#jvziyaoyao/ImageViewer)
+The latest version:  
+<img alt="version badge" src="https://img.shields.io/github/v/release/jvziyaoyao/ImageViewer?filter=*.*.*">
 
-The latest version: <img alt="version badge" src="https://img.shields.io/github/v/release/jvziyaoyao/ImageViewer?filter=*.*.*">
+### 🥳 1.1.0 全新版本～ `ImageViewer`现已更名为`Scale`
 
-### 🥳 1.1.0 全新版本～
+### 📓 开发文档 👉 [DOCS](https://jvziyaoyao.github.io/scale)
 
 ### 📝 更新日志 👉 [CHANGELOG](/CHANGELOG.md)
+
 <br/>
 
 👌 特性
@@ -25,38 +27,50 @@ The latest version: <img alt="version badge" src="https://img.shields.io/github/
 
 🧐 预览
 --------
-<img src="doc/image/huge_image.gif" height="413" width="200"></img>
-<img src="doc/image/previewer_images.gif" height="413" width="200"></img>
+<img src="doc/docs/image/huge_image.gif" height="413" width="200"></img>
+<img src="doc/docs/image/previewer_images.gif" height="413" width="200"></img>
 
 📓 API
 --------
- 💽 接口文档 👉 [API REFERENCE](https://jvziyaoyao.github.io/ImageViewer)
+ 💽 接口文档 👉 [API REFERENCE](https://jvziyaoyao.github.io/scale/reference)
 
 👓 示例
 --------
-👋 示例代码请参考 👉 [sample](https://github.com/jvziyaoyao/ImageViewer/tree/dev/sample/src/main/java/com/jvziyaoyao/viewer/sample)
+👋 示例代码请参考 👉 [SAMPLE](https://github.com/jvziyaoyao/ImageViewer/tree/dev/sample/src/main/java/com/jvziyaoyao/viewer/sample)
 
 🛒 引入
 --------
-在`settings.gradle`增加jitpack的地址
-```groovy
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        maven { url 'https://jitpack.io' }
-    }
+Scale is available on `mavenCentral()`
+```kotlin
+// 使用MavenCentral仓库
+repositories {
+    mavenCentral()
 }
-```
-在`build.gradle`增加依赖的引入
-```gradle
-// 从releases里面选一个版本
-implementation 'com.github.jvziyaoyao:ImageViewer:VERSION'
+
+// 图片浏览库
+implementation("com.jvziyaoyao.scale:image-viewer:$version")
+// 大型图片支持
+implementation("com.jvziyaoyao.scale:sampling-decoder:$version")
 ```
 
 🛵 使用方式
 --------
-### 一般使用
-<img src="doc/image/normal_image.gif" height="444" width="200"></img>
+
+### 1️⃣ 缩放组件
+```kotlin
+val painter = painterResource(id = R.drawable.light_02)
+val state = rememberZoomableState(contentSize = painter.intrinsicSize)
+ZoomableView(state = state) {
+    Image(
+        modifier = Modifier.fillMaxSize(), // 这里请务必要充满整个图层
+        painter = painter,
+        contentDescription = null,
+    )
+}
+```
+
+### 2️⃣ 查看图片
+<img src="doc/docs/image/normal_image.gif" height="444" width="200"></img>
 ```kotlin
 val scope = rememberCoroutineScope()
 val state = rememberZoomableState()
@@ -65,31 +79,41 @@ ImageViewer(
     model = painterResource(id = R.drawable.light_02),
     modifier = Modifier.fillMaxSize(),
     detectGesture = ZoomableGestureScope(onDoubleTap = {
+        // 双击放大缩小
         scope.launch {
             state.toggleScale(it)
         }
     })
 )
 ```
-### 加载超大图
-<img src="doc/image/huge_image.gif" height="413" width="200"></img>
 
-‼ 仅在model类型为`ImageDecoder`才会被当做大图进行加载
+### 3️⃣ 加载超大图
+<img src="doc/docs/image/huge_image.gif" height="413" width="200"></img>
+
+添加`SamplingDecoder`依赖支持：
+```kotlin
+implementation("com.jvziyaoyao.scale:sampling-decoder:$version")
+```
+
+‼ 仅在`model`类型为`SamplingDecoder`才会被当做大图进行加载
 ```kotlin
 val context = LocalContext.current
 val scope = rememberCoroutineScope()
 val inputStream = remember { context.assets.open("a350.jpg") }
-val (samplingDecoder) = rememberImageDecoder(inputStream = inputStream)
+val (samplingDecoder) = rememberSamplingDecoder(inputStream = inputStream)
 if (samplingDecoder != null) {
-    val state = rememberZoomableState(contentSize = samplingDecoder.intrinsicSize)
+    val state = rememberZoomableState(
+        contentSize = samplingDecoder.intrinsicSize
+    )
     ImageViewer(
         model = samplingDecoder,
-        state = state
+        state = state,
+        processor = ModelProcessor(samplingProcessorPair),
     )
 }
 ```
-### 图片列表浏览
-<img src="doc/image/pager_image.gif" height="444" width="200"></img>
+### 4️⃣ 图片列表浏览
+<img src="doc/docs/image/pager_image.gif" height="444" width="200"></img>
 ```kotlin
 val images = remember {
     mutableStateListOf(
@@ -106,8 +130,8 @@ ImagePager(
     },
 )
 ```
-### 图片弹出预览
-<img src="doc/image/previewer_image.gif" height="444" width="200"></img>
+### 5️⃣ 图片弹出预览
+<img src="doc/docs/image/previewer_image.gif" height="444" width="200"></img>
 ```kotlin
 val images = remember {
   listOf(
@@ -135,8 +159,8 @@ ImagePreviewer(
 previewerState.open()
 ```
 
-### 图片弹出预览（带转换效果）
-<img src="doc/image/transform_image.gif" height="444" width="200"></img>
+### 6️⃣ 图片弹出预览（带转换效果）
+<img src="doc/docs/image/transform_image.gif" height="444" width="200"></img>
 ```kotlin
 val images = remember {
     listOf(
@@ -190,24 +214,16 @@ ImagePreviewer(
 
 🕵️‍♀️ 开源许可
 --------
-MIT License
+Copyright 2022 jvziyaoyao
 
-Copyright (c) 2022 JVZIYAOYAO
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+       http://www.apache.org/licenses/LICENSE-2.0
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
