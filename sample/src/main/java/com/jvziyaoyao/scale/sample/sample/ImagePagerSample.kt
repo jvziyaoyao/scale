@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.jvziyaoyao.scale.image.pager.ImagePager
+import com.jvziyaoyao.scale.image.pager.defaultProceedPresentation
 import com.jvziyaoyao.scale.sample.R
 import com.jvziyaoyao.scale.zoomable.pager.rememberZoomablePagerState
 
@@ -65,6 +66,7 @@ object ImagePagerSample {
         val pagerState = rememberZoomablePagerState { images.size }
         ImagePager(
             pagerState = pagerState,
+            proceedPresentation = defaultProceedPresentation,
             imageLoader = { page ->
                 val painter = painterResource(id = images[page])
                 Pair(painter, painter.intrinsicSize)

@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import com.jvziyaoyao.scale.image.viewer.AnyComposable
@@ -82,7 +83,7 @@ val defaultProceedPresentation: ProceedPresentation = { model, size, processor, 
         ZoomablePolicy(intrinsicSize = size) {
             processor.Deploy(model = model, state = it)
         }
-        true
+        size.isSpecified
     } else {
         imageLoading?.invoke()
         false

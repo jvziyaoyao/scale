@@ -35,6 +35,7 @@ state.open()
 state.close()
 ```
 
+<a id="transformitemview"></a>
 ## 🍞 过渡动效
 
 过渡动效依赖`TransformItemView`，预览组件展开时，会按照 `TransformItemView -> Previewer` 
@@ -158,6 +159,7 @@ Previewer(
 }
 ```
 
+<a id="previewersetting"></a>
 ## 🥐 基本配置
 
 可以通过`itemSpacing`设置每一页的间隙，`beyondViewportPageCount`设置预加载的页数，展开时，

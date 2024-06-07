@@ -87,14 +87,14 @@ object ImageViewerSample {
     }
 
     val stringProcessorPair: ModelProcessorPair = String::class to { model, _ ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.LightGray)
-        ) {
-            Text(modifier = Modifier.align(Alignment.Center), text = model as String)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.LightGray)
+            ) {
+                Text(modifier = Modifier.align(Alignment.Center), text = model as String)
+            }
         }
-    }
 
     @Composable
     fun ProcessSample() {

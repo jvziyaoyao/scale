@@ -2,9 +2,14 @@ site_name: Scale
 theme: material
 
 nav:
-  - Overview: overview.md
+  - Overview: index.md
+  - Getting Started: getting_started.md
   - ImageViewer: image_viewer.md
+  - ImagePager: image_pager.md
+  - ImagePreviewer: image_previewer.md
   - SamplingDecoder: sampling_decoder.md
   - ZoomableView: zoomable_view.md
   - ZoomablePager: zoomable_pager.md
   - Previewer: previewer.md
+  - Reference ⏏: reference/index.html
+  - Change Log: change_log.md
