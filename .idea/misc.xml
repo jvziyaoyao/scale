@@ -1,19 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DesignSurface">
-    <option name="filePathToZoomLevelMap">
-      <map>
-        <entry key="..\:/jesson/workspace2021/project/ImageViewer/dev/ImageViewer/imageViewer/src/main/res/drawable/shape_gray_rect.xml" value="0.1955" />
-        <entry key="..\:/jesson/workspace2021/project/ImageViewer/dev/ImageViewer/sample/src/main/res/drawable/ic_cm.xml" value="0.1955" />
-        <entry key="..\:/jesson/workspace2021/project/ImageViewer/dev/ImageViewer/sample/src/main/res/drawable/ic_cn.xml" value="0.1955" />
-        <entry key="..\:/jesson/workspace2021/project/ImageViewer/dev/ImageViewer/sample/src/main/res/drawable/ic_dark_bg.xml" value="0.163" />
-        <entry key="..\:/jesson/workspace2021/project/ImageViewer/dev/ImageViewer/sample/src/main/res/drawable/ic_empty_image.xml" value="0.2755" />
-      </map>
-    </option>
-  </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="jbr-17" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
-  </component>
-  <component name="ProjectType">
-    <option name="id" value="Android" />
   </component>
 </project>
