@@ -152,7 +152,6 @@ fun ZoomablePager(
 ) {
     val scope = rememberCoroutineScope()
     // 确保不会越界
-    val currentPage = state.currentPage
     SupportedHorizonPager(
         state = state.pagerState,
         modifier = modifier
@@ -163,11 +162,12 @@ fun ZoomablePager(
         Box(modifier = Modifier.fillMaxSize()) {
             PagerZoomablePolicyScope { intrinsicSize, content ->
                 val zoomableState = rememberZoomableState(contentSize = intrinsicSize)
-                LaunchedEffect(key1 = state.currentPage) {
-                    if (state.currentPage != page) {
+                LaunchedEffect(key1 = state.currentPage, key2 = zoomableState) {
+                    if (state.currentPage == page) {
+                        state.zoomableViewState.value = zoomableState
+                    } else {
                         zoomableState.reset()
                     }
-                    if (currentPage == page) state.zoomableViewState.value = zoomableState
                 }
                 ZoomableView(
                     state = zoomableState,

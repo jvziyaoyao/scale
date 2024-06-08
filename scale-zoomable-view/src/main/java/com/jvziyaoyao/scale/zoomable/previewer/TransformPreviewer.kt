@@ -10,7 +10,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +22,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
@@ -209,10 +210,18 @@ open class TransformPreviewerState(
                 stateCloseStart()
 
                 val displaySize = getDisplaySize(intrinsicSize ?: Size.Zero, containerSize.value)
-                val targetX = (containerSize.value.width - displaySize.width).div(2)
-                val targetY = (containerSize.value.height - displaySize.height).div(2)
-                displayWidth.snapTo(displaySize.width)
-                displayHeight.snapTo(displaySize.height)
+                val displayX = (containerSize.value.width - displaySize.width).div(2)
+                val displayY = (containerSize.value.height - displaySize.height).div(2)
+                var targetSize = displaySize
+                var targetX = displayX
+                var targetY = displayY
+                zoomableViewState.value?.apply {
+                    targetSize = displaySize * scale.value
+                    targetX = offsetX.value + displayX - (targetSize.width - displaySize.width).div(2)
+                    targetY = offsetY.value + displayY - (targetSize.height - displaySize.height).div(2)
+                }
+                displayWidth.snapTo(targetSize.width)
+                displayHeight.snapTo(targetSize.height)
                 displayOffsetX.snapTo(targetX)
                 displayOffsetY.snapTo(targetY)
 
@@ -311,27 +320,42 @@ fun TransformContentLayer(
     state: TransformPreviewerState,
     debugMode: Boolean = false,
 ) {
-    val density = LocalDensity.current
-    state.apply {
-        Box(modifier = Modifier.fillMaxSize()) {
-            val actionColor = Color.Green
-            Box(
-                modifier = Modifier
-                    .size(
-                        width = density.run { displayWidth.value.toDp() },
-                        height = density.run { displayHeight.value.toDp() }
-                    )
-                    .offset(
-                        x = density.run { displayOffsetX.value.toDp() },
-                        y = density.run { displayOffsetY.value.toDp() },
-                    )
-                    .run {
-                        if (debugMode) border(width = 2.dp, color = actionColor) else this
-                    }
+    LocalDensity.current.apply {
+        state.apply {
+            BoxWithConstraints(
+                modifier = Modifier.fillMaxSize()
             ) {
-                val item = findTransformItemByIndex(enterIndex.value ?: currentPage)
-                item?.blockCompose?.invoke(item.key)
-                if (debugMode) Text(text = "Transform", color = actionColor)
+                val maxWidthPx = maxWidth.toPx()
+                val maxHeightPx = maxHeight.toPx()
+                val fitSize = getDisplaySize(
+                    containerSize = Size(maxWidthPx, maxHeightPx),
+                    contentSize = Size(displayWidth.value, displayHeight.value),
+                )
+                val targetScaleX = displayWidth.value.div(fitSize.width)
+                val targetScaleY = displayHeight.value.div(fitSize.height)
+
+                val actionColor = Color.Green
+                Box(
+                    modifier = Modifier
+                        .graphicsLayer {
+                            scaleX = targetScaleX
+                            scaleY = targetScaleY
+                            translationX = displayOffsetX.value
+                            translationY = displayOffsetY.value
+                            transformOrigin = TransformOrigin(0F, 0F)
+                        }
+                        .size(
+                            width = fitSize.width.toDp(),
+                            height = fitSize.height.toDp()
+                        )
+                        .run {
+                            if (debugMode) border(width = 2.dp, color = actionColor) else this
+                        }
+                ) {
+                    val item = findTransformItemByIndex(enterIndex.value ?: currentPage)
+                    item?.blockCompose?.invoke(item.key)
+                    if (debugMode) Text(text = "Transform", color = actionColor)
+                }
             }
         }
     }
