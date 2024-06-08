@@ -1,6 +1,6 @@
 import os
 
-target_file = 'doc/docs/index.md'
+target_file = 'docs/index.md'
 
 with open(target_file, 'r') as src:
     content = src.read()

@@ -1,4 +1,10 @@
-# Scale
+<div style="display: flex; align-items: center;">
+  <img src="doc/docs/image/scale_icon.svg" alt="Scale" width="40" height="40">
+  <div style="margin-left: 16px;font-size: 1.6rem;color: dimgray;">Scale</div>
+</div>
+
+----
+
 🖼 An image viewer for jetpack compose.
 
 一款基于`Jetpack Compose`开发的图片浏览库，支持过渡变换和超大图片的显示
@@ -8,9 +14,11 @@ The latest version:
 
 ### 🥳 1.1.0 全新版本～ `ImageViewer`现已更名为`Scale`
 
-### 📓 开发文档 👉 [DOCS](https://jvziyaoyao.github.io/scale)
+#### 📓 开发文档 👉 [DOCS](https://jvziyaoyao.github.io/scale)
 
-### 📝 更新日志 👉 [CHANGELOG](/CHANGELOG.md)
+#### 📝 更新日志 👉 [CHANGELOG](/CHANGELOG.md)
+
+#### 👨‍💻 产品与开源 👉 [JVZIYAOYAO](https://www.jvziyaoyao.com)
 
 <br/>
 

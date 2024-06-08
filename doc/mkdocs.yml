@@ -1,5 +1,59 @@
+# Project information
 site_name: Scale
-theme: material
+site_description: An image viewer for jetpack compose
+site_author: 2022 jvziyaoyao
+site_url: https://jvziyaoyao.github.io/scale/
+remote_branch: gh-pages
+
+# Configuration
+theme:
+  name: material
+  language: zh
+  favicon: 'image/scale_icon.svg'
+  logo: 'image/scale_icon.svg'
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: white
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: black
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: 'Roboto'
+    code: 'Roboto Mono'
+
+# Repository
+repo_name: Scale
+repo_url: https://github.com/jvziyaoyao/ImageViewer
+
+# Copyright
+copyright: Copyright &copy; 2022 jvziyaoyao
+
+# Customization
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/jvziyaoyao/ImageViewer
+    - icon: fontawesome/solid/mug-hot
+      link: https://www.jvziyaoyao.com
+
 
 nav:
   - Overview: index.md
