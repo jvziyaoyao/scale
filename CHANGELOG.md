@@ -1,6 +1,17 @@
 # **Change Log**
 All notable changes to this project will be documented in this file. 
 
+## 1.1.0-alpha.2 (Jun 9, 2024)
+- Feat: 发布到MavenCentral；
+- Feat: 增加ModelProcessor;
+- Feat: ImageDecoder、ImageCanvas更名为SamplingDecoder、SamplingCanvas;
+- Feat: 新增[使用文档](https://jvziyaoyao.github.io/scale/) 、[API文档](https://jvziyaoyao.github.io/scale/reference/);
+- Feat: 更换开源协议为Apache2.0;
+- Fix: 修复enterTransform后close小图未显示的问题;
+- Fix: 修复ZoomablePager中state与页码不匹配的问题;
+- Fix: 修复TransformPreviewer在缩放率大于1时关闭动画错乱的问题;
+- Fix: 将Zoomable最大缩放比调整回4;
+
 ## 1.1.0-alpha.1 (May 25, 2024)
 - Feat: 弃用com.origeek.imageViewer；
 - Feat: 重构ImageViewer；

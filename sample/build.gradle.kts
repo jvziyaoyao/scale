@@ -53,11 +53,12 @@ android {
 }
 
 dependencies {
-    implementation(project(":scale-image-viewer-classic"))
-    implementation(project(":scale-image-viewer"))
-    implementation(project(":scale-sampling-decoder"))
-    //    implementation "com.jvziyaoyao.scaler:zoomable-view:1.1.0-test.3"
-//    implementation "com.jvziyaoyao.scaler:image-viewer:1.1.0-test.3"
+//    implementation(project(":scale-image-viewer-classic"))
+//    implementation(project(":scale-image-viewer"))
+//    implementation(project(":scale-sampling-decoder"))
+    implementation(libs.scale.image.viewer)
+    implementation(libs.scale.image.viewer.classic)
+    implementation(libs.scale.sampling.decoder)
 
     implementation(libs.androidx.exif)
 

@@ -1,7 +1,4 @@
-<div style="display: flex; align-items: center;">
-  <img src="doc/docs/image/scale_icon.svg" alt="Scale" width="40" height="40">
-  <div style="margin-left: 16px;font-size: 1.6rem;color: dimgray;">Scale</div>
-</div>
+<img src="doc/docs/image/scale_logo.svg" alt="Scale" width="200">
 
 ----
 
@@ -10,7 +7,7 @@
 一款基于`Jetpack Compose`开发的图片浏览库，支持过渡变换和超大图片的显示
 
 The latest version:  
-<img alt="version badge" src="https://img.shields.io/github/v/release/jvziyaoyao/ImageViewer?filter=*.*.*">
+<img alt="version badge" src="https://img.shields.io/github/v/release/jvziyaoyao/scale?filter=*.*.*">
 
 ### 🥳 1.1.0 全新版本～ `ImageViewer`现已更名为`Scale`
 
@@ -44,7 +41,7 @@ The latest version:
 
 👓 示例
 --------
-👋 示例代码请参考 👉 [SAMPLE](https://github.com/jvziyaoyao/ImageViewer/tree/dev/sample/src/main/java/com/jvziyaoyao/viewer/sample)
+👋 示例代码请参考 👉 [SAMPLE](https://github.com/jvziyaoyao/scale/tree/dev/sample/src/main/java/com/jvziyaoyao/scale/sample)
 
 🛒 引入
 --------
@@ -55,6 +52,7 @@ repositories {
     mavenCentral()
 }
 
+val version = "1.1.0-alpha.2"
 // 图片浏览库
 implementation("com.jvziyaoyao.scale:image-viewer:$version")
 // 大型图片支持

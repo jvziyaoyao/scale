@@ -41,7 +41,7 @@ theme:
 
 # Repository
 repo_name: Scale
-repo_url: https://github.com/jvziyaoyao/ImageViewer
+repo_url: https://github.com/jvziyaoyao/scale
 
 # Copyright
 copyright: Copyright &copy; 2022 jvziyaoyao
@@ -50,7 +50,7 @@ copyright: Copyright &copy; 2022 jvziyaoyao
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/jvziyaoyao/ImageViewer
+      link: https://github.com/jvziyaoyao/scale
     - icon: fontawesome/solid/mug-hot
       link: https://www.jvziyaoyao.com
 
