@@ -50,9 +50,9 @@ const val DEFAULT_ROTATION = 0F
 const val MIN_SCALE = 0.5F
 
 // 图片最大缩放率
-const val MAX_SCALE_RATE = 8F
+//const val MAX_SCALE_RATE = 8F
 //const val MAX_SCALE_RATE = 2F
-//const val MAX_SCALE_RATE = 4F
+const val MAX_SCALE_RATE = 4F
 
 // 最小手指手势间距
 const val MIN_GESTURE_FINGER_DISTANCE = 200
