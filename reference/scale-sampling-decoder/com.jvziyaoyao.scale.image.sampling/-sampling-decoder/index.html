@@ -1,0 +1,367 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>SamplingDecoder</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../index.html">
+                            Scale
+                    </a>            </div>
+            <div class="library-version">1.1.0-alpha.1
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":scale-sampling-decoder:dokkaHtmlPartial/release">androidJvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="scale-sampling-decoder::com.jvziyaoyao.scale.image.sampling/SamplingDecoder///PointingToDeclaration//-2022783886">
+  <div class="breadcrumbs"><a href="../../index.html">scale-sampling-decoder</a><span class="delimiter">/</span><a href="../index.html">com.jvziyaoyao.scale.image.sampling</a><span class="delimiter">/</span><span class="current">SamplingDecoder</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Sampling</span><wbr><span><span>Decoder</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">SamplingDecoder</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">decoder<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/BitmapRegionDecoder.html">BitmapRegionDecoder</a><span class="token punctuation">, </span></span><span class="parameter ">rotation<span class="token operator">: </span><a href="-rotation/index.html">SamplingDecoder.Rotation</a><span class="token operator"> = </span>Rotation.ROTATION_0<span class="token punctuation">, </span></span><span class="parameter ">onRelease<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{}<span class="token punctuation">, </span></span><span class="parameter ">thumbnails<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/Bitmap.html">Bitmap</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span> : <span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span></div><p class="paragraph">用以提供SamplingCanvas显示大型图片，rememberSamplingDecoder，createSamplingDecoder</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>thumbnails</span></span></u></div></span></div><div><div class="title"><p class="paragraph">默认显示的缓存图片，图片未完成加载时可用于显示占位</p></div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="229414854%2FConstructors%2F-2022783886" anchor-label="SamplingDecoder" id="229414854%2FConstructors%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sampling-decoder.html"><span>Sampling</span><wbr><span><span>Decoder</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="229414854%2FConstructors%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">decoder<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/BitmapRegionDecoder.html">BitmapRegionDecoder</a><span class="token punctuation">, </span></span><span class="parameter ">rotation<span class="token operator">: </span><a href="-rotation/index.html">SamplingDecoder.Rotation</a><span class="token operator"> = </span>Rotation.ROTATION_0<span class="token punctuation">, </span></span><span class="parameter ">onRelease<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{}<span class="token punctuation">, </span></span><span class="parameter ">thumbnails<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/Bitmap.html">Bitmap</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span></div><div class="brief "></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="663050135%2FClasslikes%2F-2022783886" anchor-label="Rotation" id="663050135%2FClasslikes%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-rotation/index.html"><span><span>Rotation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="663050135%2FClasslikes%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">enum </span><a href="-rotation/index.html">Rotation</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="-rotation/index.html">SamplingDecoder.Rotation</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-1837127092%2FProperties%2F-2022783886" anchor-label="blockSize" id="-1837127092%2FProperties%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="block-size.html"><span>block</span><wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1837127092%2FProperties%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="block-size.html">blockSize</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1654120400%2FProperties%2F-2022783886" anchor-label="coroutineContext" id="-1654120400%2FProperties%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1654120400%2FProperties%2F-2022783886"><span>coroutine</span><wbr><span><span>Context</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1654120400%2FProperties%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#-1654120400%2FProperties%2F-2022783886">coroutineContext</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-906249713%2FProperties%2F-2022783886" anchor-label="decoderHeight" id="-906249713%2FProperties%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="decoder-height.html"><span>decoder</span><wbr><span><span>Height</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-906249713%2FProperties%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="decoder-height.html">decoderHeight</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-820909058%2FProperties%2F-2022783886" anchor-label="decoderWidth" id="-820909058%2FProperties%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="decoder-width.html"><span>decoder</span><wbr><span><span>Width</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-820909058%2FProperties%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="decoder-width.html">decoderWidth</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1711610452%2FProperties%2F-2022783886" anchor-label="intrinsicSize" id="1711610452%2FProperties%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="intrinsic-size.html"><span>intrinsic</span><wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1711610452%2FProperties%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="intrinsic-size.html">intrinsicSize</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/geometry/Size.html">Size</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-156967540%2FProperties%2F-2022783886" anchor-label="renderList" id="-156967540%2FProperties%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="render-list.html"><span>render</span><wbr><span><span>List</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-156967540%2FProperties%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="render-list.html">renderList</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="../-render-block/index.html">RenderBlock</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="577775807%2FProperties%2F-2022783886" anchor-label="renderQueue" id="577775807%2FProperties%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="render-queue.html"><span>render</span><wbr><span><span>Queue</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="577775807%2FProperties%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="render-queue.html">renderQueue</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/util/concurrent/LinkedBlockingDeque.html">LinkedBlockingDeque</a><span class="token operator">&lt;</span><a href="../-render-block/index.html">RenderBlock</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-151530162%2FProperties%2F-2022783886" anchor-label="thumbnail" id="-151530162%2FProperties%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="thumbnail.html"><span><span>thumbnail</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-151530162%2FProperties%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="thumbnail.html">thumbnail</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/Bitmap.html">Bitmap</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="1691366365%2FFunctions%2F-2022783886" anchor-label="clearAllBitmap" id="1691366365%2FFunctions%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="clear-all-bitmap.html"><span>clear</span><wbr><span>All</span><wbr><span><span>Bitmap</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1691366365%2FFunctions%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="clear-all-bitmap.html"><span class="token function">clearAllBitmap</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="729311519%2FFunctions%2F-2022783886" anchor-label="createTempBitmap" id="729311519%2FFunctions%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="create-temp-bitmap.html"><span>create</span><wbr><span>Temp</span><wbr><span><span>Bitmap</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="729311519%2FFunctions%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="create-temp-bitmap.html"><span class="token function">createTempBitmap</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">targetWidth<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">720</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/Bitmap.html">Bitmap</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="88191895%2FFunctions%2F-2022783886" anchor-label="decodeRegion" id="88191895%2FFunctions%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="decode-region.html"><span>decode</span><wbr><span><span>Region</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="88191895%2FFunctions%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="decode-region.html"><span class="token function">decodeRegion</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">inSampleSize<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">rect<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/Rect.html">Rect</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/Bitmap.html">Bitmap</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">解码渲染区域</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="906372685%2FFunctions%2F-2022783886" anchor-label="forEachBlock" id="906372685%2FFunctions%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="for-each-block.html"><span>for</span><wbr><span>Each</span><wbr><span><span>Block</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="906372685%2FFunctions%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="for-each-block.html"><span class="token function">forEachBlock</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">action<span class="token operator">: </span><span class="token punctuation">(</span>block<span class="token operator">: </span><a href="../-render-block/index.html">RenderBlock</a><span class="token punctuation">, </span>column<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span>row<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1704518075%2FFunctions%2F-2022783886" anchor-label="getRotateBitmap" id="1704518075%2FFunctions%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-rotate-bitmap.html"><span>get</span><wbr><span>Rotate</span><wbr><span><span>Bitmap</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1704518075%2FFunctions%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-rotate-bitmap.html"><span class="token function">getRotateBitmap</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bitmap<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/Bitmap.html">Bitmap</a><span class="token punctuation">, </span></span><span class="parameter ">degree<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/Bitmap.html">Bitmap</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="986627539%2FFunctions%2F-2022783886" anchor-label="release" id="986627539%2FFunctions%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="release.html"><span><span>release</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="986627539%2FFunctions%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="release.html"><span class="token function">release</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="73864058%2FFunctions%2F-2022783886" anchor-label="setMaxBlockCount" id="73864058%2FFunctions%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-max-block-count.html"><span>set</span><wbr><span>Max</span><wbr><span>Block</span><wbr><span><span>Count</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="73864058%2FFunctions%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-max-block-count.html"><span class="token function">setMaxBlockCount</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">count<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-586506689%2FFunctions%2F-2022783886" anchor-label="startRenderQueue" id="-586506689%2FFunctions%2F-2022783886" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release"></a>
+          <div class="table-row" data-filterable-current=":scale-sampling-decoder:dokkaHtmlPartial/release" data-filterable-set=":scale-sampling-decoder:dokkaHtmlPartial/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="start-render-queue.html"><span>start</span><wbr><span>Render</span><wbr><span><span>Queue</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-586506689%2FFunctions%2F-2022783886"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-sampling-decoder:dokkaHtmlPartial/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="start-render-queue.html"><span class="token function">startRenderQueue</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">onUpdate<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
