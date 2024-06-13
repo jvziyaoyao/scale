@@ -2,7 +2,8 @@ package com.jvziyaoyao.scale.zoomable.pager
 
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
-import androidx.compose.foundation.gestures.TargetedFlingBehavior
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.snapping.SnapFlingBehavior
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
@@ -29,37 +30,42 @@ import androidx.compose.ui.unit.dp
  *
  * @property pagerState 可以用来控制页面切换和获取页面状态等
  */
-open class SupportedPagerState(
+open class SupportedPagerState @OptIn(ExperimentalFoundationApi::class) constructor(
     val pagerState: PagerState,
 ) {
 
     /**
      * 当前页码
      */
+    @OptIn(ExperimentalFoundationApi::class)
     val currentPage: Int
         get() = pagerState.currentPage
 
     /**
      * 目标页码
      */
+    @OptIn(ExperimentalFoundationApi::class)
     val targetPage: Int
         get() = pagerState.targetPage
 
     /**
      * 当前页数
      */
+    @OptIn(ExperimentalFoundationApi::class)
     val pageCount: Int
         get() = pagerState.pageCount
 
     /**
      * interactionSource
      */
+    @OptIn(ExperimentalFoundationApi::class)
     val interactionSource: InteractionSource
         get() = pagerState.interactionSource
 
     /**
      * 滚动到指定页面
      */
+    @OptIn(ExperimentalFoundationApi::class)
     suspend fun scrollToPage(
         // 指定的页码
         @IntRange(from = 0) page: Int,
@@ -70,6 +76,7 @@ open class SupportedPagerState(
     /**
      * 动画滚动到指定页面
      */
+    @OptIn(ExperimentalFoundationApi::class)
     suspend fun animateScrollToPage(
         // 指定的页码
         @IntRange(from = 0) page: Int,
@@ -86,6 +93,7 @@ open class SupportedPagerState(
  * @param pageCount 总页数
  * @return 返回一个通用对PagerState
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun rememberSupportedPagerState(
     // 默认显示的页码
@@ -104,12 +112,12 @@ fun rememberSupportedPagerState(
  * @param pagerState 页面状态对象
  * @return TargetedFlingBehavior
  */
-@Composable
-fun defaultFlingBehavior(pagerState: SupportedPagerState): TargetedFlingBehavior {
-    return PagerDefaults.flingBehavior(
-        state = pagerState.pagerState,
-    )
-}
+//@Composable
+//fun defaultFlingBehavior(pagerState: SupportedPagerState): TargetedFlingBehavior {
+//    return PagerDefaults.flingBehavior(
+//        state = pagerState.pagerState,
+//    )
+//}
 
 /**
  * 一个通用pager组件，对底层对pager进行了封装
@@ -120,20 +128,23 @@ fun defaultFlingBehavior(pagerState: SupportedPagerState): TargetedFlingBehavior
  * @param beyondViewportPageCount 页面外缓存个数
  * @param content 页面内容
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SupportedHorizonPager(
     modifier: Modifier = Modifier,
     state: SupportedPagerState,
     itemSpacing: Dp = 0.dp,
     beyondViewportPageCount: Int = 0,
+//    flingBehavior: SnapFlingBehavior = PagerDefaults.flingBehavior(state = state.pagerState),
     content: @Composable (page: Int) -> Unit,
 ) {
     HorizontalPager(
         state = state.pagerState,
         modifier = modifier,
         pageSpacing = itemSpacing,
-        beyondViewportPageCount = beyondViewportPageCount,
-        flingBehavior = defaultFlingBehavior(pagerState = state),
+        beyondBoundsPageCount = beyondViewportPageCount,
+//        flingBehavior = flingBehavior
+//        flingBehavior = defaultFlingBehavior(pagerState = state),
     ) { page ->
         content(page)
     }
