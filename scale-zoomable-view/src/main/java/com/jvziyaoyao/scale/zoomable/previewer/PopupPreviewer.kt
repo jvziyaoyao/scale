@@ -12,6 +12,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +27,8 @@ import com.jvziyaoyao.scale.zoomable.pager.SupportedPagerState
 import com.jvziyaoyao.scale.zoomable.pager.ZoomablePager
 import com.jvziyaoyao.scale.zoomable.pager.ZoomablePagerState
 import com.jvziyaoyao.scale.zoomable.pager.rememberSupportedPagerState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -85,6 +88,9 @@ open class PopupPreviewerState(
 
     // 最外侧animateVisibleState
     internal var animateContainerVisibleState by mutableStateOf(MutableTransitionState(false))
+
+    // 用于监听状态
+    internal var containerVisibleFlow = MutableStateFlow(false)
 
     // 进入转换动画
     internal var enterTransition: EnterTransition? = null
@@ -154,6 +160,8 @@ open class PopupPreviewerState(
         animateContainerVisibleState.targetState = true
         // 滚动到指定页面
         scrollToPage(index)
+        // 等状态变到目标值
+        containerVisibleFlow.takeWhile { !it }.collect {}
     }
 
     suspend fun open(
@@ -177,6 +185,8 @@ open class PopupPreviewerState(
         animateContainerVisibleState = MutableTransitionState(true)
         // 开启container关闭动画
         animateContainerVisibleState.targetState = false
+        // 等状态变到目标值
+        containerVisibleFlow.takeWhile { it }.collect {}
     }
 
     suspend fun close(
@@ -218,6 +228,9 @@ fun PopupPreviewer(
     zoomablePolicy: @Composable PagerZoomablePolicyScope.(page: Int) -> Unit,
 ) {
     state.apply {
+        LaunchedEffect(animateContainerVisibleState.currentState) {
+            containerVisibleFlow.value = animateContainerVisibleState.currentState
+        }
         AnimatedVisibility(
             modifier = Modifier.fillMaxSize(),
             visibleState = animateContainerVisibleState,
