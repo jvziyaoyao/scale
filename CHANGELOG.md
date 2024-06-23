@@ -1,6 +1,8 @@
 # **Change Log**
 All notable changes to this project will be documented in this file. 
 
+## 1.1.0-alpha.4 (Jun 23, 2024)
+- Fix: 修复PopupPreviewer显示与关闭完成状态不正确的问题；
 
 ## 1.1.0-alpha.3 (Jun 14, 2024)
 - Fix: Compose回退到稳定版本1.6.8；
