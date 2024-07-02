@@ -10,8 +10,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.jvziyaoyao.scale.zoomable.previewer.DEFAULT_SOFT_ANIMATION_SPEC
+import com.jvziyaoyao.scale.zoomable.previewer.ItemStateMap
 import com.jvziyaoyao.scale.zoomable.previewer.TransformItemState
-import com.jvziyaoyao.scale.zoomable.previewer.transformItemStateMap
 import com.origeek.imageViewer.gallery.ImageGalleryState
 import com.origeek.imageViewer.util.Ticket
 import com.origeek.imageViewer.viewer.ImageViewerState
@@ -42,6 +42,8 @@ open class PreviewerTransformState(
     var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
     // 预览状态
     galleryState: ImageGalleryState,
+    // 用于获取TransformItemState
+    var itemStateMap: ItemStateMap,
 ) : PreviewerPagerState(
     galleryState = galleryState,
 ) {
@@ -188,7 +190,7 @@ open class PreviewerTransformState(
 
     // 查找key关联的transformItem
     fun findTransformItem(key: Any): TransformItemState? {
-        return transformItemStateMap[key]
+        return itemStateMap[key]
     }
 
     // 根据index查询key
@@ -198,7 +200,7 @@ open class PreviewerTransformState(
     }
 
     // 清除全部transformItems
-    fun clearTransformItems() = transformItemStateMap.clear()
+    fun clearTransformItems() = itemStateMap.clear()
 
     /**
      * 打开previewer

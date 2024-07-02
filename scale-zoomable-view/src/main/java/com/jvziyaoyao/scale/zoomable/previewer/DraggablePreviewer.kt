@@ -83,9 +83,10 @@ open class DraggablePreviewerState(
     verticalDragType: VerticalDragType = VerticalDragType.None,
     scaleToCloseMinValue: Float = DEFAULT_SCALE_TO_CLOSE_MIN_VALUE,
     pagerState: SupportedPagerState,
+    itemStateMap: ItemStateMap,
     getKey: (Int) -> Any,
 ) : TransformPreviewerState(
-    scope, defaultAnimationSpec, pagerState, getKey
+    scope, defaultAnimationSpec, pagerState, itemStateMap, getKey
 ) {
 
     /**

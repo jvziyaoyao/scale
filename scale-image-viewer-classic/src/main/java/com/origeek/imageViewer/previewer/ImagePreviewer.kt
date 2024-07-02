@@ -10,7 +10,6 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +32,8 @@ import com.jvziyaoyao.scale.zoomable.pager.DEFAULT_ITEM_SPACE
 import com.jvziyaoyao.scale.zoomable.previewer.DEFAULT_PREVIEWER_ENTER_TRANSITION
 import com.jvziyaoyao.scale.zoomable.previewer.DEFAULT_PREVIEWER_EXIT_TRANSITION
 import com.jvziyaoyao.scale.zoomable.previewer.DEFAULT_SOFT_ANIMATION_SPEC
+import com.jvziyaoyao.scale.zoomable.previewer.ItemStateMap
+import com.jvziyaoyao.scale.zoomable.previewer.LocalTransformItemStateMap
 import com.jvziyaoyao.scale.zoomable.previewer.VerticalDragType
 import com.origeek.imageViewer.gallery.GalleryGestureScope
 import com.origeek.imageViewer.gallery.ImageGallery
@@ -56,9 +57,19 @@ class ImagePreviewerState(
     defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
     // 预览状态
     galleryState: ImageGalleryState,
-) : PreviewerVerticalDragState(scope, defaultAnimationSpec, galleryState = galleryState) {
+    // 用于获取transformItemState
+    itemStateMap: ItemStateMap,
+) : PreviewerVerticalDragState(
+    scope,
+    defaultAnimationSpec,
+    galleryState = galleryState,
+    itemStateMap = itemStateMap
+) {
     companion object {
-        fun getSaver(galleryState: ImageGalleryState): Saver<ImagePreviewerState, *> {
+        fun getSaver(
+            galleryState: ImageGalleryState,
+            itemStateMap: ItemStateMap
+        ): Saver<ImagePreviewerState, *> {
             return mapSaver(
                 save = {
                     mapOf<String, Any>(
@@ -69,7 +80,10 @@ class ImagePreviewerState(
                     )
                 },
                 restore = {
-                    val previewerState = ImagePreviewerState(galleryState = galleryState)
+                    val previewerState = ImagePreviewerState(
+                        galleryState = galleryState,
+                        itemStateMap = itemStateMap
+                    )
                     previewerState.animateContainerVisibleState =
                         MutableTransitionState(it[ImagePreviewerState::animateContainerVisibleState.name] as Boolean)
                     previewerState.uiAlpha =
@@ -103,10 +117,12 @@ fun rememberPreviewerState(
     // 提供给组件用于获取key的方法
     getKey: ((Int) -> Any)? = null,
 ): ImagePreviewerState {
+    val itemStateMap = LocalTransformItemStateMap.current
     val galleryState = rememberImageGalleryState(initialPage, pageCount)
-    val imagePreviewerState = rememberSaveable(saver = ImagePreviewerState.getSaver(galleryState)) {
-        ImagePreviewerState(galleryState = galleryState)
-    }
+    val imagePreviewerState =
+        rememberSaveable(saver = ImagePreviewerState.getSaver(galleryState, itemStateMap)) {
+            ImagePreviewerState(galleryState = galleryState, itemStateMap = itemStateMap)
+        }
     imagePreviewerState.scope = scope
     imagePreviewerState.getKey = getKey
     imagePreviewerState.defaultAnimationSpec = animationSpec

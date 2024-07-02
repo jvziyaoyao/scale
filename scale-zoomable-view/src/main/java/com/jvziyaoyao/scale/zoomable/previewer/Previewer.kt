@@ -38,11 +38,13 @@ fun rememberPreviewerState(
     getKey: (Int) -> Any = {},
 ): PreviewerState {
     val pagerState = rememberSupportedPagerState(initialPage = initialPage, pageCount = pageCount)
+    val transformItemStateMap = LocalTransformItemStateMap.current
     val previewerState = remember {
         PreviewerState(
             scope = scope,
             verticalDragType = verticalDragType,
             pagerState = pagerState,
+            itemStateMap = transformItemStateMap,
             getKey = getKey,
         )
     }
@@ -68,6 +70,7 @@ class PreviewerState(
     verticalDragType: VerticalDragType = VerticalDragType.None,
     scaleToCloseMinValue: Float = DEFAULT_SCALE_TO_CLOSE_MIN_VALUE,
     pagerState: SupportedPagerState,
+    itemStateMap: ItemStateMap,
     getKey: (Int) -> Any,
 ) : DraggablePreviewerState(
     scope,
@@ -75,6 +78,7 @@ class PreviewerState(
     verticalDragType,
     scaleToCloseMinValue,
     pagerState,
+    itemStateMap,
     getKey
 )
 

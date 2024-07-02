@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import com.jvziyaoyao.scale.zoomable.previewer.DEFAULT_SOFT_ANIMATION_SPEC
+import com.jvziyaoyao.scale.zoomable.previewer.LocalTransformItemStateMap
 import com.jvziyaoyao.scale.zoomable.previewer.TransformItemState
 import com.origeek.imageViewer.viewer.ImageViewerState
 import com.origeek.imageViewer.viewer.commonDeprecatedText
@@ -51,7 +52,7 @@ internal class ViewerContainerState(
     // 协程作用域
     var scope: CoroutineScope = MainScope(),
     // 转换图层的状态
-    var transformState: TransformContentState = TransformContentState(),
+    var transformState: TransformContentState,
     // viewer的状态
     var imageViewerState: ImageViewerState = ImageViewerState(),
     // 默认动画窗格
@@ -224,7 +225,8 @@ internal class ViewerContainerState(
                 )
             },
             restore = {
-                val viewerContainerState = ViewerContainerState()
+                val contentState = TransformContentState(itemStateMap = mutableMapOf())
+                val viewerContainerState = ViewerContainerState(transformState = contentState)
                 viewerContainerState.offsetX =
                     Animatable(it[viewerContainerState::offsetX.name] as Float)
                 viewerContainerState.offsetY =
@@ -255,8 +257,10 @@ internal fun rememberViewerContainerState(
     // 动画窗格
     animationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
 ): ViewerContainerState {
+    val itemStateMap = LocalTransformItemStateMap.current
+    val transformState = TransformContentState(itemStateMap = itemStateMap)
     val viewerContainerState = rememberSaveable(saver = ViewerContainerState.Saver) {
-        ViewerContainerState()
+        ViewerContainerState(transformState = transformState)
     }
     viewerContainerState.scope = scope
     viewerContainerState.imageViewerState = viewerState

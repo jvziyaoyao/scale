@@ -10,6 +10,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputScope
 import com.jvziyaoyao.scale.zoomable.previewer.DEFAULT_SCALE_TO_CLOSE_MIN_VALUE
 import com.jvziyaoyao.scale.zoomable.previewer.DEFAULT_SOFT_ANIMATION_SPEC
+import com.jvziyaoyao.scale.zoomable.previewer.ItemStateMap
 import com.jvziyaoyao.scale.zoomable.previewer.TransformItemState
 import com.jvziyaoyao.scale.zoomable.previewer.VerticalDragType
 import com.origeek.imageViewer.gallery.ImageGalleryState
@@ -32,7 +33,6 @@ import kotlin.math.absoluteValue
  **/
 
 
-
 /**
  * 增加垂直方向拖拽的能力
  */
@@ -50,7 +50,9 @@ open class PreviewerVerticalDragState(
     scaleToCloseMinValue: Float = DEFAULT_SCALE_TO_CLOSE_MIN_VALUE,
     // 预览状态
     galleryState: ImageGalleryState,
-) : PreviewerTransformState(scope, defaultAnimationSpec, galleryState) {
+    // 用于获取TransformItemState
+    itemStateMap: ItemStateMap,
+) : PreviewerTransformState(scope, defaultAnimationSpec, galleryState, itemStateMap) {
 
     /**
      * viewer容器缩小关闭

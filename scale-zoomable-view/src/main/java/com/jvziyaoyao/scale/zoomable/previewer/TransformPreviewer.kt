@@ -72,6 +72,8 @@ open class TransformPreviewerState(
     var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
     // 预览状态
     pagerState: SupportedPagerState,
+    // 用于获取transformItemState
+    private var itemStateMap: ItemStateMap,
     // 获取当前key
     val getKey: (Int) -> Any,
 ) : PopupPreviewerState(pagerState) {
@@ -90,7 +92,7 @@ open class TransformPreviewerState(
 
     // 查找key关联的transformItem
     private fun findTransformItem(key: Any): TransformItemState? {
-        return transformItemStateMap[key]
+        return itemStateMap[key]
     }
 
     // 根据index查询key

@@ -32,10 +32,11 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import com.jvziyaoyao.scale.zoomable.previewer.DEFAULT_SOFT_ANIMATION_SPEC
+import com.jvziyaoyao.scale.zoomable.previewer.ItemStateMap
+import com.jvziyaoyao.scale.zoomable.previewer.LocalTransformItemStateMap
 import com.jvziyaoyao.scale.zoomable.previewer.TransformItemState
 import com.jvziyaoyao.scale.zoomable.previewer.TransformItemView
 import com.jvziyaoyao.scale.zoomable.previewer.rememberTransformItemState
-import com.jvziyaoyao.scale.zoomable.previewer.transformItemStateMap
 import com.origeek.imageViewer.viewer.commonDeprecatedText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -253,7 +254,9 @@ class TransformContentState(
     // 协程作用域
     var scope: CoroutineScope = MainScope(),
     // 默认动画窗格
-    var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
+    var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
+    // 用于获取transformItemState
+    var itemStateMap: ItemStateMap,
 ) {
 
     var itemState: TransformItemState? by mutableStateOf(null)
@@ -368,9 +371,9 @@ class TransformContentState(
         specifierSizeFlow.takeWhile { !it }.collect {}
     }
 
-    fun findTransformItem(key: Any) = transformItemStateMap[key]
+    fun findTransformItem(key: Any) = itemStateMap[key]
 
-    fun clearTransformItems() = transformItemStateMap.clear()
+    fun clearTransformItems() = itemStateMap.clear()
 
     fun setEnterState() {
         onAction = true
@@ -495,7 +498,8 @@ class TransformContentState(
                 )
             },
             restore = {
-                val transformContentState = TransformContentState()
+                val transformContentState =
+                    TransformContentState(itemStateMap = mutableMapOf())
                 transformContentState.onAction = it[0] as Boolean
                 transformContentState
             }
@@ -512,8 +516,9 @@ fun rememberTransformContentState(
     scope: CoroutineScope = rememberCoroutineScope(),
     animationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
 ): TransformContentState {
+    val transformItemState = LocalTransformItemStateMap.current
     val transformContentState = rememberSaveable(saver = TransformContentState.Saver) {
-        TransformContentState()
+        TransformContentState(itemStateMap = transformItemState)
     }
     transformContentState.scope = scope
     transformContentState.defaultAnimationSpec = animationSpec
