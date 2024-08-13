@@ -65,7 +65,8 @@ fun ZoomableViewState.onGestureEnd(scope: CoroutineScope, transformOnly: Boolean
         }
         launch {
             if (inBound(offsetX.value, boundX) && velocity != null) {
-                val vx = sameDirection(lastPan.x, velocity.x)
+                val velocityX = if (velocity.x.isNaN()) 0F else velocity.x
+                val vx = sameDirection(lastPan.x, velocityX)
                 offsetX.updateBounds(boundX.first, boundX.second)
                 offsetX.animateDecay(vx, decay)
             } else {
@@ -86,7 +87,8 @@ fun ZoomableViewState.onGestureEnd(scope: CoroutineScope, transformOnly: Boolean
         }
         launch {
             if (inBound(offsetY.value, boundY) && velocity != null) {
-                val vy = sameDirection(lastPan.y, velocity.y)
+                val velocityY = if (velocity.y.isNaN()) 0F else velocity.y
+                val vy = sameDirection(lastPan.y, velocityY)
                 offsetY.updateBounds(boundY.first, boundY.second)
                 offsetY.animateDecay(vy, decay)
             } else {

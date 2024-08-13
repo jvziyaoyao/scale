@@ -147,6 +147,7 @@ fun ZoomablePager(
     state: ZoomablePagerState,
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     beyondViewportPageCount: Int = DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT,
+    userScrollEnabled: Boolean = true,
     detectGesture: PagerGestureScope = PagerGestureScope(),
     zoomablePolicy: @Composable PagerZoomablePolicyScope.(page: Int) -> Unit,
 ) {
@@ -158,6 +159,7 @@ fun ZoomablePager(
             .fillMaxSize(),
         itemSpacing = itemSpacing,
         beyondViewportPageCount = beyondViewportPageCount,
+        userScrollEnabled = userScrollEnabled,
     ) { page ->
         Box(modifier = Modifier.fillMaxSize()) {
             PagerZoomablePolicyScope { intrinsicSize, content ->

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +28,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.jvziyaoyao.scale.zoomable.pager.DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT
@@ -148,35 +150,50 @@ open class TransformPreviewerState(
                 val targetX = (containerSize.value.width - displaySize.width).div(2)
                 val targetY = (containerSize.value.height - displaySize.height).div(2)
 //                val animationSpec = tween<Float>(600)f
-                listOf(
-                    scope.async {
-                        decorationAlpha.animateTo(1F, currentAnimationSpec)
-                    },
-                    scope.async {
-                        displayWidth.animateTo(displaySize.width, currentAnimationSpec)
-                    },
-                    scope.async {
-                        displayHeight.animateTo(displaySize.height, currentAnimationSpec)
-                    },
-                    scope.async {
-                        displayOffsetX.animateTo(targetX, currentAnimationSpec)
-                    },
-                    scope.async {
-                        displayOffsetY.animateTo(targetY, currentAnimationSpec)
-                    },
-                ).awaitAll()
+                try {
+                    listOf(
+                        scope.async {
+                            decorationAlpha.animateTo(1F, currentAnimationSpec)
+                        },
+                        scope.async {
+                            displayWidth.animateTo(displaySize.width, currentAnimationSpec)
+                        },
+                        scope.async {
+                            displayHeight.animateTo(displaySize.height, currentAnimationSpec)
+                        },
+                        scope.async {
+                            displayOffsetX.animateTo(targetX, currentAnimationSpec)
+                        },
+                        scope.async {
+                            displayOffsetY.animateTo(targetY, currentAnimationSpec)
+                        },
+                    ).awaitAll()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
 
                 previewerAlpha.snapTo(1F)
-                // 切换页面到index
-                pagerState.scrollToPage(index)
+
+                updateState(animating = false, visible = false, visibleTarget = true)
+
+                val alreadyScroll2Current = try {
+                    // 切换页面到index
+                    pagerState.scrollToPage(index)
+                    true
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    false
+                }
+
                 // 等待挂载成功
-                awaitMounted()
+                if (alreadyScroll2Current) awaitMounted()
                 // 动画结束，开启预览
                 itemContentVisible.value = false
                 // 恢复
                 enterIndex.value = null
 
-                stateOpenEnd()
+//                stateOpenEnd()
+                updateState(animating = false, visible = true, visibleTarget = null)
             }
         } else {
             open(index)
@@ -207,7 +224,7 @@ open class TransformPreviewerState(
         val index = currentPage
         // 同步动画开始的位置
         val itemState = findTransformItemByIndex(index)
-        if (itemState != null) {
+        if (itemState != null && itemState.blockSize != IntSize.Zero) {
             itemState.apply {
                 stateCloseStart()
 
@@ -219,8 +236,10 @@ open class TransformPreviewerState(
                 var targetY = displayY
                 zoomableViewState.value?.apply {
                     targetSize = displaySize * scale.value
-                    targetX = offsetX.value + displayX - (targetSize.width - displaySize.width).div(2)
-                    targetY = offsetY.value + displayY - (targetSize.height - displaySize.height).div(2)
+                    targetX =
+                        offsetX.value + displayX - (targetSize.width - displaySize.width).div(2)
+                    targetY =
+                        offsetY.value + displayY - (targetSize.height - displaySize.height).div(2)
                 }
                 displayWidth.snapTo(targetSize.width)
                 displayHeight.snapTo(targetSize.height)
@@ -247,24 +266,28 @@ open class TransformPreviewerState(
         // 关闭viewer图层
         previewerAlpha.snapTo(0F)
 
-        itemState.apply {
-            listOf(
-                scope.async {
-                    decorationAlpha.animateTo(0F, currentAnimationSpec)
-                },
-                scope.async {
-                    displayWidth.animateTo(blockSize.width.toFloat(), currentAnimationSpec)
-                },
-                scope.async {
-                    displayHeight.animateTo(blockSize.height.toFloat(), currentAnimationSpec)
-                },
-                scope.async {
-                    displayOffsetX.animateTo(blockPosition.x, currentAnimationSpec)
-                },
-                scope.async {
-                    displayOffsetY.animateTo(blockPosition.y, currentAnimationSpec)
-                },
-            ).awaitAll()
+        try {
+            itemState.apply {
+                listOf(
+                    scope.async {
+                        decorationAlpha.animateTo(0F, currentAnimationSpec)
+                    },
+                    scope.async {
+                        displayWidth.animateTo(blockSize.width.toFloat(), currentAnimationSpec)
+                    },
+                    scope.async {
+                        displayHeight.animateTo(blockSize.height.toFloat(), currentAnimationSpec)
+                    },
+                    scope.async {
+                        displayOffsetX.animateTo(blockPosition.x, currentAnimationSpec)
+                    },
+                    scope.async {
+                        displayOffsetY.animateTo(blockPosition.y, currentAnimationSpec)
+                    },
+                ).awaitAll()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
 
         // 关闭viewer图层
@@ -333,30 +356,33 @@ fun TransformContentLayer(
                     containerSize = Size(maxWidthPx, maxHeightPx),
                     contentSize = Size(displayWidth.value, displayHeight.value),
                 )
-                val targetScaleX = displayWidth.value.div(fitSize.width)
-                val targetScaleY = displayHeight.value.div(fitSize.height)
-
-                val actionColor = Color.Green
-                Box(
-                    modifier = Modifier
-                        .graphicsLayer {
-                            scaleX = targetScaleX
-                            scaleY = targetScaleY
-                            translationX = displayOffsetX.value
-                            translationY = displayOffsetY.value
-                            transformOrigin = TransformOrigin(0F, 0F)
-                        }
-                        .size(
-                            width = fitSize.width.toDp(),
-                            height = fitSize.height.toDp()
-                        )
-                        .run {
-                            if (debugMode) border(width = 2.dp, color = actionColor) else this
-                        }
-                ) {
-                    val item = findTransformItemByIndex(enterIndex.value ?: currentPage)
-                    item?.blockCompose?.invoke(item.key)
-                    if (debugMode) Text(text = "Transform", color = actionColor)
+                if (fitSize.isSpecified) {
+                    val targetScaleX = displayWidth.value.div(fitSize.width)
+                    val targetScaleY = displayHeight.value.div(fitSize.height)
+                    val actionColor = Color.Green
+                    Box(
+                        modifier = Modifier
+                            .graphicsLayer {
+                                scaleX = targetScaleX
+                                scaleY = targetScaleY
+                                translationX = displayOffsetX.value
+                                translationY = displayOffsetY.value
+                                transformOrigin = TransformOrigin(0F, 0F)
+                            }
+                            .size(
+                                width = fitSize.width.toDp(),
+                                height = fitSize.height.toDp()
+                            )
+                            .run {
+                                if (debugMode) border(width = 2.dp, color = actionColor) else this
+                            }
+                    ) {
+                        val item = findTransformItemByIndex(enterIndex.value ?: currentPage)
+                        item?.blockCompose?.invoke(item.key)
+                        if (debugMode) Text(text = "Transform", color = actionColor)
+                    }
+                } else {
+                    if (debugMode) Text(text = "FitSize unspecified", color = Color.Yellow)
                 }
             }
         }
@@ -485,8 +511,23 @@ fun TransformPreviewer(
                         }
                         zoomableMounted.value = zoomablePolicy(page)
                         LaunchedEffect(zoomableMounted.value) {
+//                            Log.i(
+//                                "TAG",
+//                                "TransformBody TransformPreviewer: ${enterIndex.value == page} ~ ${zoomableMounted.value} ~ $page"
+//                            )
                             if (enterIndex.value == page && zoomableMounted.value) {
+//                                delay(1000)
                                 mountedFlow.emit(true)
+                            }
+                        }
+                        // 如果等待mounted时间很久，用户切换页面过快导致开启的页面被移除
+                        DisposableEffect(Unit) {
+                            onDispose {
+                                if (enterIndex.value == page && zoomableMounted.value) {
+                                    if (!mountedFlow.value) {
+                                        mountedFlow.value = true
+                                    }
+                                }
                             }
                         }
                     }
