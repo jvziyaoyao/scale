@@ -75,6 +75,7 @@ enum class VerticalDragType {
  * @param verticalDragType 开启垂直手势的类型
  * @param scaleToCloseMinValue 下拉关闭的缩小的阈值
  * @param pagerState 预览状态
+ * @param itemStateMap 用于获取transformItemState
  * @param getKey 获取当前key
  */
 open class DraggablePreviewerState(

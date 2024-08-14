@@ -124,6 +124,7 @@ fun rememberSupportedPagerState(
  * @param state pager状态获取与控制
  * @param itemSpacing 每个item之间的间隔
  * @param beyondViewportPageCount 页面外缓存个数
+ * @param userScrollEnabled 是否允许页面滚动
  * @param content 页面内容
  */
 @OptIn(ExperimentalFoundationApi::class)

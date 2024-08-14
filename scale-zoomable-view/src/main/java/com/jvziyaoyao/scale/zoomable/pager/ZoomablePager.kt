@@ -138,6 +138,7 @@ class PagerGestureScope(
  * @param state pager状态获取与控制
  * @param itemSpacing 每张图片之间的间隔
  * @param beyondViewportPageCount 页面外缓存个数
+ * @param userScrollEnabled 是否允许页面滚动
  * @param detectGesture 检测手势
  * @param zoomablePolicy 图层本体
  */

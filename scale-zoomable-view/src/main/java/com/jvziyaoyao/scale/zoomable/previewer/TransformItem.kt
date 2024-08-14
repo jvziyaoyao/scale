@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+/**
+ * 页面根据Key获取对应小图转换的状态数据
+ */
 val LocalTransformItemStateMap =
     compositionLocalOf<MutableMap<Any, TransformItemState>> { mutableStateMapOf() }
 

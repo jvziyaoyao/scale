@@ -62,10 +62,11 @@ val DEFAULT_SOFT_ANIMATION_SPEC = tween<Float>(400)
  *
  * @property scope 协程作用域
  * @property defaultAnimationSpec 默认动画窗格
+ * @property itemStateMap 用于获取transformItemState
  * @property getKey 根据下标获取唯一标识的方法
  * @constructor
  *
- * @param pagerState 依赖一个通用Pager的状态
+ * @param pagerState
  */
 open class TransformPreviewerState(
     // 协程作用域

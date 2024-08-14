@@ -62,6 +62,7 @@ fun rememberPreviewerState(
  * @param verticalDragType 垂直手势类型
  * @param scaleToCloseMinValue 下拉关闭的缩小的阈值
  * @param pagerState 预览状态
+ * @param itemStateMap 用于获取transformItemState
  * @param getKey 获取当前key的方法
  */
 class PreviewerState(
