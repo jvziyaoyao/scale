@@ -34,11 +34,11 @@ fun rememberPreviewerState(
     defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
     @IntRange(from = 0) initialPage: Int = 0,
     verticalDragType: VerticalDragType = VerticalDragType.Down,
+    transformItemStateMap: ItemStateMap = LocalTransformItemStateMap.current,
     pageCount: () -> Int,
     getKey: (Int) -> Any = {},
 ): PreviewerState {
     val pagerState = rememberSupportedPagerState(initialPage = initialPage, pageCount = pageCount)
-    val transformItemStateMap = LocalTransformItemStateMap.current
     val previewerState = remember {
         PreviewerState(
             scope = scope,

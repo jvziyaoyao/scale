@@ -26,6 +26,7 @@ import com.jvziyaoyao.scale.zoomable.pager.ZoomablePagerState
  * @param pagerState 控件状态与控制对象
  * @param itemSpacing 每一页的间隔
  * @param beyondViewportPageCount 超出视口的页面缓存的个数
+ * @param userScrollEnabled 是否允许页面滚动
  * @param detectGesture 手势监听对象
  * @param processor 用于解析图像数据的方法，可以自定义
  * @param imageLoader 图像加载器，支持的图像类型与ImageViewer一致，如果需要支持其他类型的数据可以自定义processor
@@ -39,6 +40,7 @@ fun ImagePager(
     pagerState: ZoomablePagerState,
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     beyondViewportPageCount: Int = DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT,
+    userScrollEnabled: Boolean = true,
     detectGesture: PagerGestureScope = PagerGestureScope(),
     processor: ModelProcessor = ModelProcessor(),
     imageLoader: @Composable (Int) -> Pair<Any?, Size?>,
@@ -52,6 +54,7 @@ fun ImagePager(
         state = pagerState,
         itemSpacing = itemSpacing,
         beyondViewportPageCount = beyondViewportPageCount,
+        userScrollEnabled = userScrollEnabled,
         detectGesture = detectGesture,
     ) { page ->
         pageDecoration.invoke(page) {

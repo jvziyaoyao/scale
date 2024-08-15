@@ -142,11 +142,11 @@ fun TransformItemView(
     modifier: Modifier = Modifier,
     key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
+    itemStateMap: ItemStateMap = LocalTransformItemStateMap.current,
     itemVisible: Boolean,
     content: @Composable (Any) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val itemStateMap = LocalTransformItemStateMap.current
     itemState.key = key
     itemState.blockCompose = content
     DisposableEffect(key) {
