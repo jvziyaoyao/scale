@@ -34,6 +34,7 @@ fun rememberPreviewerState(
     defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
     @IntRange(from = 0) initialPage: Int = 0,
     verticalDragType: VerticalDragType = VerticalDragType.Down,
+    transformItemStateMap: ItemStateMap = LocalTransformItemStateMap.current,
     pageCount: () -> Int,
     getKey: (Int) -> Any = {},
 ): PreviewerState {
@@ -43,6 +44,7 @@ fun rememberPreviewerState(
             scope = scope,
             verticalDragType = verticalDragType,
             pagerState = pagerState,
+            itemStateMap = transformItemStateMap,
             getKey = getKey,
         )
     }
@@ -60,6 +62,7 @@ fun rememberPreviewerState(
  * @param verticalDragType 垂直手势类型
  * @param scaleToCloseMinValue 下拉关闭的缩小的阈值
  * @param pagerState 预览状态
+ * @param itemStateMap 用于获取transformItemState
  * @param getKey 获取当前key的方法
  */
 class PreviewerState(
@@ -68,6 +71,7 @@ class PreviewerState(
     verticalDragType: VerticalDragType = VerticalDragType.None,
     scaleToCloseMinValue: Float = DEFAULT_SCALE_TO_CLOSE_MIN_VALUE,
     pagerState: SupportedPagerState,
+    itemStateMap: ItemStateMap,
     getKey: (Int) -> Any,
 ) : DraggablePreviewerState(
     scope,
@@ -75,6 +79,7 @@ class PreviewerState(
     verticalDragType,
     scaleToCloseMinValue,
     pagerState,
+    itemStateMap,
     getKey
 )
 

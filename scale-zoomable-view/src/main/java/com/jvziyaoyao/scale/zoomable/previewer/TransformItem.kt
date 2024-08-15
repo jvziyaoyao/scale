@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -15,14 +16,14 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
 
-// 用于操作transformItemStateMap的锁对象
-internal val imageTransformMutex = Mutex()
+/**
+ * 页面根据Key获取对应小图转换的状态数据
+ */
+val LocalTransformItemStateMap =
+    compositionLocalOf<MutableMap<Any, TransformItemState>> { mutableStateMapOf() }
 
-// TODO 限制外部访问
-// 用于缓存界面上的transformItemState
-val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>()
+typealias ItemStateMap = MutableMap<Any, TransformItemState>
 
 /**
  * 在compose中获取一个TransformItemState的方式
@@ -39,7 +40,12 @@ fun rememberTransformItemState(
     intrinsicSize: Size? = null,
 ): TransformItemState {
     val transformItemState =
-        remember { TransformItemState(scope = scope, checkInBound = checkInBound) }
+        remember {
+            TransformItemState(
+                scope = scope,
+                checkInBound = checkInBound,
+            )
+        }
     transformItemState.intrinsicSize = intrinsicSize
     return transformItemState
 }
@@ -65,12 +71,12 @@ class TransformItemState(
     var checkInBound: (TransformItemState.() -> Boolean)? = null,
 ) {
 
-    private fun checkItemInMap() {
+    private fun checkItemInMap(itemMap: ItemStateMap) {
         if (checkInBound == null) return
         if (checkInBound!!.invoke(this)) {
-            addItem()
+            addItem(itemMap = itemMap)
         } else {
-            removeItem()
+            removeItem(itemMap = itemMap)
         }
     }
 
@@ -79,11 +85,11 @@ class TransformItemState(
      * @param position Offset
      * @param size IntSize
      */
-    internal fun onPositionChange(position: Offset, size: IntSize) {
+    internal fun onPositionChange(position: Offset, size: IntSize, itemMap: ItemStateMap) {
         blockPosition = position
         blockSize = size
         scope.launch {
-            checkItemInMap()
+            checkItemInMap(itemMap)
         }
     }
 
@@ -91,11 +97,11 @@ class TransformItemState(
      * 判断item是否在所需范围内，返回true，则添加该item到map，返回false则移除
      * @param checkInBound Function0<Boolean>
      */
-    fun checkIfInBound(checkInBound: () -> Boolean) {
+    fun checkIfInBound(itemMap: ItemStateMap, checkInBound: () -> Boolean) {
         if (checkInBound()) {
-            addItem()
+            addItem(itemMap = itemMap)
         } else {
-            removeItem()
+            removeItem(itemMap = itemMap)
         }
     }
 
@@ -103,24 +109,22 @@ class TransformItemState(
      * 添加item到map上
      * @param key Any?
      */
-    fun addItem(key: Any? = null) {
-        val currentKey = key ?: this.key ?: return
+    fun addItem(key: Any? = null, itemMap: ItemStateMap) {
+        // TODO mutex
+        val currentKey = key ?: this.key
         if (checkInBound != null) return
-        synchronized(imageTransformMutex) {
-            transformItemStateMap[currentKey] = this
-        }
+        itemMap[currentKey] = this
     }
 
     /**
      * 从map上移除item
      * @param key Any?
      */
-    fun removeItem(key: Any? = null) {
-        synchronized(imageTransformMutex) {
-            val currentKey = key ?: this.key ?: return
-            if (checkInBound != null) return
-            transformItemStateMap.remove(currentKey)
-        }
+    fun removeItem(key: Any? = null, itemMap: ItemStateMap) {
+        // TODO mutex
+        val currentKey = key ?: this.key
+        if (checkInBound != null) return
+        itemMap.remove(currentKey)
     }
 }
 
@@ -138,6 +142,7 @@ fun TransformItemView(
     modifier: Modifier = Modifier,
     key: Any,
     itemState: TransformItemState = rememberTransformItemState(),
+    itemStateMap: ItemStateMap = LocalTransformItemStateMap.current,
     itemVisible: Boolean,
     content: @Composable (Any) -> Unit,
 ) {
@@ -147,11 +152,11 @@ fun TransformItemView(
     DisposableEffect(key) {
         // 这个composable加载时添加到map
         scope.launch {
-            itemState.addItem()
+            itemState.addItem(itemMap = itemStateMap)
         }
         onDispose {
             // composable退出时从map移除
-            itemState.removeItem()
+            itemState.removeItem(itemMap = itemStateMap)
         }
     }
     Box(
@@ -160,6 +165,7 @@ fun TransformItemView(
                 itemState.onPositionChange(
                     position = it.positionInRoot(),
                     size = it.size,
+                    itemMap = itemStateMap,
                 )
             }
             .fillMaxSize()

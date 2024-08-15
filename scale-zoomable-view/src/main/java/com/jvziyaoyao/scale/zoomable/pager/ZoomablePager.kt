@@ -138,6 +138,7 @@ class PagerGestureScope(
  * @param state pager状态获取与控制
  * @param itemSpacing 每张图片之间的间隔
  * @param beyondViewportPageCount 页面外缓存个数
+ * @param userScrollEnabled 是否允许页面滚动
  * @param detectGesture 检测手势
  * @param zoomablePolicy 图层本体
  */
@@ -147,6 +148,7 @@ fun ZoomablePager(
     state: ZoomablePagerState,
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     beyondViewportPageCount: Int = DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT,
+    userScrollEnabled: Boolean = true,
     detectGesture: PagerGestureScope = PagerGestureScope(),
     zoomablePolicy: @Composable PagerZoomablePolicyScope.(page: Int) -> Unit,
 ) {
@@ -158,6 +160,7 @@ fun ZoomablePager(
             .fillMaxSize(),
         itemSpacing = itemSpacing,
         beyondViewportPageCount = beyondViewportPageCount,
+        userScrollEnabled = userScrollEnabled,
     ) { page ->
         Box(modifier = Modifier.fillMaxSize()) {
             PagerZoomablePolicyScope { intrinsicSize, content ->

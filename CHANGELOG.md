@@ -1,5 +1,13 @@
 # **Change Log**
-All notable changes to this project will be documented in this file. 
+All notable changes to this project will be documented in this file.
+
+## 1.1.0-alpha.5 (Aug 15, 2024)
+- Feat: 根据当前环境获取transformItemStateMap;
+- Feat: Pager、ImagePager增加是否允许滚动的参数;
+- Feat: 限制动画进行时页面滚动；
+- Fix: 修复animating状态需等图片加载完才标记结束的问题；
+- Fix: 修复openTransform过程中偶发崩溃的问题；
+- Fix: 修复页面快速切换导致图片不显示的问题；
 
 ## 1.1.0-alpha.4 (Jun 23, 2024)
 - Fix: 修复PopupPreviewer显示与关闭完成状态不正确的问题；

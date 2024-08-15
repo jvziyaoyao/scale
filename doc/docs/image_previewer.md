@@ -90,6 +90,43 @@ images.forEachIndexed { index, image ->
 state.enterTransform(index)
 ```
 
+在同一个界面中，如果存在同一个`key`同时出现在不同的部位时，此时使用弹出动画会导致动画位置不符合预期的情况，可以通过指定`ItemStateMap`的方式来解决
+```kotlin
+val imageIds = remember { listOf(R.drawable.img_03, R.drawable.img_06) }
+
+val itemStateMap01 = remember { mutableStateMapOf<Any, TransformItemState>() }
+val previewerState01 = rememberPreviewerState(
+    transformItemStateMap = itemStateMap01,
+    pageCount = { imageIds.size },
+    getKey = { imageIds[it] },
+)
+
+val itemStateMap02 = remember { mutableStateMapOf<Any, TransformItemState>() }
+val previewerState02 = rememberPreviewerState(
+    transformItemStateMap = itemStateMap02,
+    pageCount = { imageIds.size },
+    getKey = { imageIds[it] },
+)
+
+CompositionLocalProvider(LocalTransformItemStateMap provides itemStateMap01) {
+    imageIds.forEach {
+        ImagePreviewer(
+            state = previewerState01,
+            imageLoader = {  }
+        )
+    }
+}
+
+CompositionLocalProvider(LocalTransformItemStateMap provides itemStateMap02) {
+    imageIds.forEach {
+        ImagePreviewer(
+            state = previewerState02,
+            imageLoader = {  }
+        )
+    }
+}
+```
+
 如果`TransformImageView`无法满足功能需求时，可以考虑使用`TransformItemView`，使用方式见文档：[`Previewer 过渡动效`](previewer.md#transformitemview)
 
 ## 🥪 编辑图层

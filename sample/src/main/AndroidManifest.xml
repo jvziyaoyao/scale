@@ -59,6 +59,10 @@
             android:name=".page.PicturesActivity"
             android:exported="true"
             android:theme="@style/Theme.ImageViewer.NoActionBar" />
+        <activity
+            android:name=".page.DuplicateActivity"
+            android:exported="true"
+            android:theme="@style/Theme.ImageViewer.NoActionBar" />
     </application>
 
 </manifest>

@@ -3,10 +3,8 @@ package com.jvziyaoyao.scale.zoomable.pager
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.snapping.SnapFlingBehavior
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -126,6 +124,7 @@ fun rememberSupportedPagerState(
  * @param state pager状态获取与控制
  * @param itemSpacing 每个item之间的间隔
  * @param beyondViewportPageCount 页面外缓存个数
+ * @param userScrollEnabled 是否允许页面滚动
  * @param content 页面内容
  */
 @OptIn(ExperimentalFoundationApi::class)
@@ -135,6 +134,7 @@ fun SupportedHorizonPager(
     state: SupportedPagerState,
     itemSpacing: Dp = 0.dp,
     beyondViewportPageCount: Int = 0,
+    userScrollEnabled: Boolean = true,
 //    flingBehavior: SnapFlingBehavior = PagerDefaults.flingBehavior(state = state.pagerState),
     content: @Composable (page: Int) -> Unit,
 ) {
@@ -143,6 +143,7 @@ fun SupportedHorizonPager(
         modifier = modifier,
         pageSpacing = itemSpacing,
         beyondBoundsPageCount = beyondViewportPageCount,
+        userScrollEnabled = userScrollEnabled,
 //        flingBehavior = flingBehavior
 //        flingBehavior = defaultFlingBehavior(pagerState = state),
     ) { page ->

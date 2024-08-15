@@ -19,6 +19,12 @@ The latest version:
 
 <br/>
 
+🌟 案例
+--------
+#### 📷 RawCamera 👉 [GITHUB](https://github.com/jvziyaoyao/raw-camera)
+
+#### 🌆 ImagePicker 👉 [GITHUB](https://github.com/jvziyaoyao/ImagePicker)
+
 👌 特性
 --------
 - 基于Jetpack Compose开发；
@@ -52,7 +58,7 @@ repositories {
     mavenCentral()
 }
 
-val version = "1.1.0-alpha.4"
+val version = "1.1.0-alpha.5"
 // 图片浏览库
 implementation("com.jvziyaoyao.scale:image-viewer:$version")
 // 大型图片支持

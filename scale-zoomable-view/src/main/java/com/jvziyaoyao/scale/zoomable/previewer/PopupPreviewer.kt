@@ -140,7 +140,7 @@ open class PopupPreviewerState(
      * @param visible Boolean
      * @param visibleTarget Boolean?
      */
-    private suspend fun updateState(animating: Boolean, visible: Boolean, visibleTarget: Boolean?) {
+    suspend fun updateState(animating: Boolean, visible: Boolean, visibleTarget: Boolean?) {
         mutex.withLock {
             this.animating = animating
             this.visible = visible
@@ -245,6 +245,8 @@ fun PopupPreviewer(
                     beyondViewportPageCount = beyondViewportPageCount,
                     detectGesture = detectGesture,
                     zoomablePolicy = zoomablePolicy,
+                    // 正在动画中不允许页面滚动
+                    userScrollEnabled = !animating
                 )
             }
         }

@@ -43,6 +43,7 @@ val activityList = listOf(
     TransformActivity::class.java,
     DecoderActivity::class.java,
     PicturesActivity::class.java,
+    DuplicateActivity::class.java,
 )
 
 @Composable

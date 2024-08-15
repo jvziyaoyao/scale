@@ -126,12 +126,13 @@ ZoomablePager(state = pagerState) { page ->
 }
 ```
 
-与`Pager`一样，可以通过`itemSpacing`设置每一页的间隙，`beyondViewportPageCount`设置预加载的页数：
+与`Pager`一样，可以通过`itemSpacing`设置每一页的间隙，`beyondViewportPageCount`设置预加载的页数，`userScrollEnabled`设置是否允许用户滚动页面：
 
 ```kotlin
 ZoomablePager(
     itemSpacing = 20.dp, // 设置页面的间隙
     beyondViewportPageCount = 2, // 除当前页面外，预先加载其他页面的数量
+    userScrollEnabled = true, // 允许用户滚动页面
 ) {  }
 ```
 
