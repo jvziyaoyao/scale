@@ -1,15 +1,15 @@
-import scale.compileSdk
 import scale.minSdk
 import scale.targetSdk
 
 plugins {
     alias(libs.plugins.android.application)
     id("kotlin-android")
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
     namespace = "com.jvziyaoyao.scale.sample"
-    compileSdk = project.compileSdk
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.jvziyaoyao.scale.sample"

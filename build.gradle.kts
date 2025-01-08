@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin) apply false
     alias(libs.plugins.jetbrains.dokka)
     alias(libs.plugins.vanniktech.maven.publish) apply false
+    alias(libs.plugins.kotlin.compose) apply false
 }
 
 tasks.dokkaHtmlMultiModule {
