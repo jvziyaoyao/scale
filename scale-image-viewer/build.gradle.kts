@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin)
     alias(libs.plugins.jetbrains.dokka)
     alias(libs.plugins.vanniktech.maven.publish)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
