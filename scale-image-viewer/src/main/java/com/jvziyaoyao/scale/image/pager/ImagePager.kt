@@ -1,5 +1,6 @@
 package com.jvziyaoyao.scale.image.pager
 
+import androidx.compose.foundation.gestures.TargetedFlingBehavior
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.CircularProgressIndicator
@@ -18,6 +19,7 @@ import com.jvziyaoyao.scale.zoomable.pager.PagerGestureScope
 import com.jvziyaoyao.scale.zoomable.pager.PagerZoomablePolicyScope
 import com.jvziyaoyao.scale.zoomable.pager.ZoomablePager
 import com.jvziyaoyao.scale.zoomable.pager.ZoomablePagerState
+import com.jvziyaoyao.scale.zoomable.pager.defaultFlingBehavior
 
 /**
  * 基于Pager实现的图片浏览器
@@ -40,6 +42,7 @@ fun ImagePager(
     pagerState: ZoomablePagerState,
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     beyondViewportPageCount: Int = DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT,
+    flingBehavior: TargetedFlingBehavior = defaultFlingBehavior(pagerState.pagerState),
     userScrollEnabled: Boolean = true,
     detectGesture: PagerGestureScope = PagerGestureScope(),
     processor: ModelProcessor = ModelProcessor(),
@@ -54,6 +57,7 @@ fun ImagePager(
         state = pagerState,
         itemSpacing = itemSpacing,
         beyondViewportPageCount = beyondViewportPageCount,
+        flingBehavior = flingBehavior,
         userScrollEnabled = userScrollEnabled,
         detectGesture = detectGesture,
     ) { page ->

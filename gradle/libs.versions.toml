@@ -1,6 +1,6 @@
 [versions]
 composeCompiler = "1.5.0"
-compose = "1.6.8"
+compose = "1.7.8"
 coil = "2.3.0"
 accompanist = "0.24.1-alpha"
 androidGradlePlugin = "8.2.2"

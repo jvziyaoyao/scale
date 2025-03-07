@@ -2,6 +2,7 @@ package com.jvziyaoyao.scale.zoomable.pager
 
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
+import androidx.compose.foundation.gestures.TargetedFlingBehavior
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -138,6 +139,7 @@ class PagerGestureScope(
  * @param state pager状态获取与控制
  * @param itemSpacing 每张图片之间的间隔
  * @param beyondViewportPageCount 页面外缓存个数
+ * @param flingBehavior 手势效果
  * @param userScrollEnabled 是否允许页面滚动
  * @param detectGesture 检测手势
  * @param zoomablePolicy 图层本体
@@ -148,6 +150,7 @@ fun ZoomablePager(
     state: ZoomablePagerState,
     itemSpacing: Dp = DEFAULT_ITEM_SPACE,
     beyondViewportPageCount: Int = DEFAULT_BEYOND_VIEWPORT_ITEM_COUNT,
+    flingBehavior: TargetedFlingBehavior = defaultFlingBehavior(state.pagerState),
     userScrollEnabled: Boolean = true,
     detectGesture: PagerGestureScope = PagerGestureScope(),
     zoomablePolicy: @Composable PagerZoomablePolicyScope.(page: Int) -> Unit,
@@ -160,6 +163,7 @@ fun ZoomablePager(
             .fillMaxSize(),
         itemSpacing = itemSpacing,
         beyondViewportPageCount = beyondViewportPageCount,
+        flingBehavior = flingBehavior,
         userScrollEnabled = userScrollEnabled,
     ) { page ->
         Box(modifier = Modifier.fillMaxSize()) {
