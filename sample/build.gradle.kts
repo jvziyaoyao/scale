@@ -53,12 +53,12 @@ android {
 }
 
 dependencies {
-    implementation(project(":scale-image-viewer-classic"))
-    implementation(project(":scale-image-viewer"))
-    implementation(project(":scale-sampling-decoder"))
-//    implementation(libs.scale.image.viewer)
-//    implementation(libs.scale.image.viewer.classic)
-//    implementation(libs.scale.sampling.decoder)
+//    implementation(project(":scale-image-viewer-classic"))
+//    implementation(project(":scale-image-viewer"))
+//    implementation(project(":scale-sampling-decoder"))
+    implementation(libs.scale.image.viewer)
+    implementation(libs.scale.image.viewer.classic)
+    implementation(libs.scale.sampling.decoder)
 
     implementation(libs.androidx.exif)
 
