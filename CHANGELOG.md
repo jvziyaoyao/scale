@@ -1,6 +1,9 @@
 # **Change Log**
 All notable changes to this project will be documented in this file.
 
+## 1.1.0-alpha.7 (Apr 18, 2025)
+- Fix: 修复部分手机下拉关闭时闪烁的问题;
+
 ## 1.1.0-alpha.6 (Mar 7, 2025)
 - Feat: Compose版本更新支持1.7.8;
 
