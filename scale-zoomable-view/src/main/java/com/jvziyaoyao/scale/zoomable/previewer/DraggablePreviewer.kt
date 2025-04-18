@@ -33,6 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
@@ -253,6 +254,8 @@ open class DraggablePreviewerState(
             // 关闭动画组件
             animateContainerVisibleState = MutableTransitionState(false)
 
+            // 有一些手机会出现闪烁问题
+            delay(24)
             // 恢复原来的状态
             draggableContainerState.resetImmediately()
 

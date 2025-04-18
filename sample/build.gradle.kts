@@ -4,6 +4,7 @@ import scale.targetSdk
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.compiler)
     id("kotlin-android")
 }
 

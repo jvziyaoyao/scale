@@ -61,7 +61,7 @@ repositories {
     mavenCentral()
 }
 
-val version = "1.1.0-alpha.6"
+val version = "1.1.0-alpha.7"
 // 图片浏览库
 implementation("com.jvziyaoyao.scale:image-viewer:$version")
 // 大型图片支持
