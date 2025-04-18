@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
@@ -84,9 +83,7 @@ fun PreviewerBody(
         )
     }
 
-    val previewerState =
-        rememberPreviewerState(pageCount = { images.size })
-//    val previewerState = rememberPopupPreviewerState(pageCount = { images.size })
+    val previewerState = rememberPreviewerState(pageCount = { images.size })
     if (previewerState.visible) BackHandler {
         scope.launch {
             previewerState.close()
@@ -96,12 +93,13 @@ fun PreviewerBody(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        val horizontal = maxWidth > maxHeight
+        val horizontal = this@BoxWithConstraints.maxWidth > this@BoxWithConstraints.maxHeight
         val lineCount = if (horizontal) 6 else 3
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .systemBarsPadding()
+                .padding(horizontal = 12.dp)
+                .padding(top = 100.dp)
         ) {
             LazyVerticalGrid(columns = GridCells.Fixed(lineCount)) {
                 images.forEachIndexed { index, item ->
@@ -154,34 +152,5 @@ fun PreviewerBody(
                 Pair(painter, painter.intrinsicSize)
             }
         )
-//        PopupPreviewer(
-//            state = previewerState,
-//            detectGesture = PagerGestureScope(
-//                onTap = {
-//                    scope.launch {
-//                        previewerState.close()
-//                    }
-//                }
-//            ),
-//            previewerDecoration = { innerBox ->
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxSize()
-//                        .background(Color.Black.copy(0.8F))
-//                ) {
-//                    innerBox()
-//                }
-//            },
-//            zoomablePolicy = { index ->
-//                val painter = painterResource(id = images[index])
-//                ZoomablePolicy(intrinsicSize = painter.intrinsicSize) {
-//                    Image(
-//                        modifier = Modifier.fillMaxSize(),
-//                        painter = painterResource(id = images[index]),
-//                        contentDescription = null
-//                    )
-//                }
-//            }
-//        )
     }
 }
