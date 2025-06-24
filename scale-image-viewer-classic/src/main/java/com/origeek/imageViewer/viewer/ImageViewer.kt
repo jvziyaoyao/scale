@@ -50,7 +50,6 @@ import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
 import com.jvziyaoyao.scale.image.sampling.SamplingDecoder
-import com.jvziyaoyao.scale.zoomable.zoomable.panTransformAndScale
 import com.origeek.imageViewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -9,7 +9,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.jvziyaoyao.scale.zoomable.zoomable.ZoomableGestureScope
-import com.jvziyaoyao.scale.zoomable.zoomable.ZoomableView
 import com.jvziyaoyao.scale.zoomable.zoomable.ZoomableViewState
 import kotlin.reflect.KClass
 

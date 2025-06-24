@@ -12,6 +12,12 @@ appcompat = "1.7.0"
 material = "1.12.0"
 scale = "1.1.0-alpha.7"
 kotlin = "2.0.20"
+kotlinStdlib = "2.0.20"
+kotlinTest = "2.0.20"
+runner = "1.5.2"
+core = "1.5.0"
+compose-plugin = "1.7.1"
+kotlin-datetime = "0.6.1"
 
 [libraries]
 androidx-exif = "androidx.exifinterface:exifinterface:1.4.0"
@@ -49,10 +55,20 @@ material = { group = "com.google.android.material", name = "material", version.r
 scale-image-viewer = { group = "com.jvziyaoyao.scale", name = "image-viewer", version.ref = "scale" }
 scale-image-viewer-classic = { group = "com.jvziyaoyao.scale", name = "image-viewer-classic", version.ref = "scale" }
 scale-sampling-decoder = { group = "com.jvziyaoyao.scale", name = "sampling-decoder", version.ref = "scale" }
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlinStdlib" }
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlinTest" }
+androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
+androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
+
+org-jetbrains-kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlin-datetime" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 jetbrains-kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 jetbrains-dokka = { id = "org.jetbrains.dokka", version = "1.9.20" }
 vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version = "0.28.0" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "androidGradlePlugin" }

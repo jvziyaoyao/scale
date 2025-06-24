@@ -27,6 +27,7 @@
             <option value="$PROJECT_DIR$/scale-image-viewer-classic" />
             <option value="$PROJECT_DIR$/scale-sampling-decoder" />
             <option value="$PROJECT_DIR$/scale-zoomable-view" />
+            <option value="$PROJECT_DIR$/shared" />
           </set>
         </option>
       </GradleProjectSettings>
