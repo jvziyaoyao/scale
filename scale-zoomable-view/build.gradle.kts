@@ -14,15 +14,6 @@ kotlin {
         namespace = "com.jvziyaoyao.scale.zoomable"
         compileSdk = project.compileSdk
         minSdk = project.minSdk
-
-        withHostTestBuilder {
-        }
-
-        withDeviceTestBuilder {
-            sourceSetTreeName = "test"
-        }.configure {
-            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        }
     }
 
     val xcfName = "zoomableViewKit"
@@ -68,14 +59,6 @@ kotlin {
 
         androidMain {
             dependencies {}
-        }
-
-        getByName("androidDeviceTest") {
-            dependencies {
-                implementation(libs.androidx.runner)
-                implementation(libs.androidx.core)
-                implementation(libs.androidx.test.ext.junit)
-            }
         }
 
         iosMain {

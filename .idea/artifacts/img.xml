@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="img">
+    <output-path>$PROJECT_DIR$/img/build/libs</output-path>
+    <root id="archive" name="img.jar">
+      <element id="module-output" name="scale.img.androidMain" />
+    </root>
+  </artifact>
+</component>
