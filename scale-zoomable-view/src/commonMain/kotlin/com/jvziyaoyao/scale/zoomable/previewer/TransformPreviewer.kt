@@ -186,6 +186,9 @@ open class TransformPreviewerState(
                     false
                 }
 
+                // 25/6/25 在加载结束前标记动画结束
+                updateState(animating = false, visible = true, visibleTarget = null)
+
                 // 等待挂载成功
                 if (alreadyScroll2Current) awaitMounted()
                 // 动画结束，开启预览
@@ -193,8 +196,8 @@ open class TransformPreviewerState(
                 // 恢复
                 enterIndex.value = null
 
-//                stateOpenEnd()
-                updateState(animating = false, visible = true, visibleTarget = null)
+                // 25/6/25 在加载结束前标记动画结束
+                // updateState(animating = false, visible = true, visibleTarget = null)
             }
         } else {
             open(index)

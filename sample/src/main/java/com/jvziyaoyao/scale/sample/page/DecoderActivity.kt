@@ -89,7 +89,7 @@ fun DecoderBody() {
         val itemState = rememberTransformItemState(
             intrinsicSize = painter.intrinsicSize,
         )
-        val horizontal = maxWidth > maxHeight
+        val horizontal = this@BoxWithConstraints.maxWidth > maxHeight
         // Save
         var transformEnable by rememberSaveable { mutableStateOf(true) }
         var loadDelay by rememberSaveable { mutableStateOf(0F) }
