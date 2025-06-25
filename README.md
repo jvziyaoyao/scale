@@ -9,7 +9,7 @@
 The latest version:  
 <img alt="version badge" src="https://img.shields.io/github/v/release/jvziyaoyao/scale?filter=*.*.*">
 
-### 🥳 1.1.0 全新版本～ `ImageViewer`现已更名为`Scale`
+### 🥳 1.1.1 全新版本～`Scale`支持`Multiplatform`啦！
 
 #### 📓 开发文档 👉 [DOCS](https://jvziyaoyao.github.io/scale)
 
@@ -39,6 +39,15 @@ The latest version:
 - 支持定制化可扩展性高；
 - 不依赖第三方图片库；
 
+🖇️ 跨平台
+--------
+| 兼容性                        | Android | KMP  |
+|----------------------------|:--------:|:--------:|
+| scale-zoomable-view        | ✅       | ✅    |
+| scale-image-viewer         | ✅     | ✅    |
+| scale-sampling-decoder     | ✅     | ⛔️   |
+| scale-image-viewer-classic | ⚠️废弃    | ⚠️废弃 |
+
 🧐 预览
 --------
 <img src="doc/docs/image/huge_image.gif" height="413" width="200"></img>
@@ -61,7 +70,7 @@ repositories {
     mavenCentral()
 }
 
-val version = "1.1.0-alpha.7"
+val version = "1.1.1-beta.1"
 // 图片浏览库
 implementation("com.jvziyaoyao.scale:image-viewer:$version")
 // 大型图片支持
