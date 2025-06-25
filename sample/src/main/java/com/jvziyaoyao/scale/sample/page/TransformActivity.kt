@@ -189,7 +189,7 @@ fun TransformBody(
         }
     }
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val horizontal = maxWidth > maxHeight
+        val horizontal = this.maxWidth > maxHeight
         val lineCount = if (horizontal) 6 else 3
         Column(
             modifier = Modifier
@@ -224,7 +224,7 @@ fun TransformBody(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .aspectRatio(1F)
-                                    .animateItemPlacement()
+                                    .animateItem()
                                     .padding(start = if (needStart) 2.dp else 0.dp, bottom = 2.dp),
                                 contentAlignment = Alignment.Center
                             ) {

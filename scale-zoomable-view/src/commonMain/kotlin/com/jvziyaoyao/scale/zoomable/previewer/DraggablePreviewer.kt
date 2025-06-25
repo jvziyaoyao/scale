@@ -6,7 +6,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -115,7 +115,7 @@ open class DraggablePreviewerState(
             // 标记是否为下拉关闭
             var orientationDown by mutableStateOf<Boolean?>(null)
             // 如果getKay不为空才开始检测手势
-            if (verticalDragType != VerticalDragType.None) detectVerticalDragGestures(
+            if (verticalDragType != VerticalDragType.None) detectDragGestures(
                 onDragStart = OnDragStart@{
                     val zoomableState = zoomableViewState.value
                     if (zoomableState != null) {
@@ -160,9 +160,9 @@ open class DraggablePreviewerState(
                         }
                     }
                 },
-                onVerticalDrag = OnVerticalDrag@{ change, dragAmount ->
+                onDrag = OnVerticalDrag@{ change, dragAmount ->
                     if (startOffset == null) return@OnVerticalDrag
-                    if (orientationDown == null) orientationDown = dragAmount > 0
+                    if (orientationDown == null) orientationDown = dragAmount.y > 0
                     if (orientationDown == true || verticalDragType == VerticalDragType.UpAndDown) {
                         val offsetY = change.position.y - startOffset!!.y
                         val offsetX = change.position.x - startOffset!!.x
