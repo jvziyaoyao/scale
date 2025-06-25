@@ -19,13 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.jvziyaoyao.scale.image.previewer.ImagePreviewer
 import com.jvziyaoyao.scale.image.previewer.TransformImageView
-import com.jvziyaoyao.scale.sample.R
 import com.jvziyaoyao.scale.zoomable.previewer.TransformLayerScope
 import com.jvziyaoyao.scale.zoomable.previewer.rememberPreviewerState
 import kotlinx.coroutines.delay

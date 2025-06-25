@@ -1,6 +1,13 @@
 # **Change Log**
 All notable changes to this project will be documented in this file.
 
+## 1.1.1-beta.1 (Jun 25, 2025)
+- Feat: Zoomable支持KMP;
+- Feat: ImageViewer支持KMP;
+- Fix: 移除底层对Material的依赖;
+- Fix: 修复下拉关闭手势异常的问题;
+- Fix: 修复图片未加载完成按返回退出页面的问题;
+
 ## 1.1.0-alpha.7 (Apr 18, 2025)
 - Fix: 修复部分手机下拉关闭时闪烁的问题;
 
