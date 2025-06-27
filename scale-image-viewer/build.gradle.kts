@@ -41,7 +41,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
-                // Add KMP dependencies here
+
                 api(project(":scale-zoomable-view"))
 
                 implementation(libs.kotlin.stdlib)
