@@ -1,10 +1,9 @@
-package com.jvziyaoyao.scale.image.sampling
+package com.jvziyaoyao.scale.decoder.kmp
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -15,16 +14,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.DecimalMode
+import com.ionspin.kotlin.bignum.decimal.RoundingMode
+import com.jvziyaoyao.scale.zoomable.util.getMilliseconds
 import com.jvziyaoyao.scale.zoomable.zoomable.ZoomableViewState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
-import java.math.RoundingMode
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * @program: SamplingCanvas
@@ -79,10 +85,10 @@ fun ZoomableViewState.getViewPort(): SamplingCanvasViewPort {
 }
 
 internal fun intersectRect(rect1: Rect, rect2: Rect): Rect {
-    val left = java.lang.Float.max(rect1.left, rect2.left)
-    val top = java.lang.Float.max(rect1.top, rect2.top)
-    val right = java.lang.Float.min(rect1.right, rect2.right)
-    val bottom = java.lang.Float.min(rect1.bottom, rect2.bottom)
+    val left = max(rect1.left, rect2.left)
+    val top = max(rect1.top, rect2.top)
+    val right = min(rect1.right, rect2.right)
+    val bottom = min(rect1.bottom, rect2.bottom)
 
     return if (left < right && top < bottom) {
         Rect(left, top, right, bottom)
@@ -149,9 +155,11 @@ fun SamplingCanvas(
         val needRenderHeightTexture by remember(maxWidthPx, maxHeightPx) {
             derivedStateOf {
                 // 目前策略：原图的面积大于容器面积，就要渲染高画质
-                BigDecimal(samplingDecoder.decoderWidth)
-                    .multiply(BigDecimal(samplingDecoder.decoderHeight)) > BigDecimal(maxHeightPx.toDouble())
-                    .multiply(BigDecimal(maxWidthPx.toDouble()))
+                BigDecimal.fromInt(samplingDecoder.decoderWidth)
+                    .multiply(BigDecimal.fromInt(samplingDecoder.decoderHeight)) > BigDecimal.fromDouble(
+                    maxHeightPx.toDouble()
+                )
+                    .multiply(BigDecimal.fromDouble(maxWidthPx.toDouble()))
             }
         }
         // 标识当前是否开启高画质渲染，如果需要高画质渲染，并且缩放大于1
@@ -188,30 +196,32 @@ fun SamplingCanvas(
         LaunchedEffect(backgroundInputSample) {
             scope.launch(Dispatchers.IO) {
                 bitmap = samplingDecoder.decodeRegion(
-                    backgroundInputSample, android.graphics.Rect(
-                        0,
-                        0,
-                        samplingDecoder.decoderWidth,
-                        samplingDecoder.decoderHeight
+                    backgroundInputSample, Rect(
+                        Offset.Zero,
+                        Size(
+                            samplingDecoder.decoderWidth.toFloat(),
+                            samplingDecoder.decoderHeight.toFloat(),
+                        )
                     )
                 )
             }
         }
 
-        DisposableEffect(Unit) {
-            onDispose {
-                bitmap?.recycle()
-                bitmap = null
-            }
-        }
+//        DisposableEffect(Unit) {
+//            onDispose {
+//                bitmap?.recycle()
+//                bitmap = null
+//            }
+//        }
 
         // 更新时间戳，用于通知canvas更新方块
         var renderUpdateTimeStamp by remember { mutableStateOf(0L) }
         // 开启解码队列的循环
         LaunchedEffect(key1 = Unit) {
             samplingDecoder.startRenderQueue {
+
                 // 解码器解码一个，就更新一次时间戳
-                renderUpdateTimeStamp = System.currentTimeMillis()
+                renderUpdateTimeStamp = getMilliseconds()
             }
         }
         // 切换到不需要高画质渲染时，需要清除解码队列，清除全部的bitmap
@@ -244,6 +254,7 @@ fun SamplingCanvas(
         val visualRectWidth = maxWidth.times(viewPort.visualRect.width)
         val visualRectHeight = maxHeight.times(viewPort.visualRect.height)
 
+        val mutex = remember { Mutex() }
 
         // 更新渲染方块的信息
         fun updateRenderList() {
@@ -339,11 +350,13 @@ fun SamplingCanvas(
                 }
             }
             scope.launch(Dispatchers.IO) {
-                synchronized(samplingDecoder.renderQueue) {
+                mutex.withLock {
                     insertList.forEach {
+                        println("insertList.forEach ---> $it")
                         samplingDecoder.renderQueue.putFirst(it)
                     }
                     removeList.forEach {
+                        println("removeList.forEach ---> $it")
                         samplingDecoder.renderQueue.remove(it)
                     }
                 }
@@ -352,16 +365,17 @@ fun SamplingCanvas(
 
         LaunchedEffect(realWidth, realHeight, viewPort.visualRect) {
             // 可视区域面积
-            val rectArea = BigDecimal(visualRectWidth.value.toDouble())
-                .multiply(BigDecimal(visualRectHeight.value.toDouble()))
+            val rectArea = BigDecimal.fromDouble(visualRectWidth.value.toDouble())
+                .multiply(BigDecimal.fromDouble(visualRectHeight.value.toDouble()))
             // 实际大小面积
             val realArea =
-                BigDecimal(realWidth.toDouble()).multiply(BigDecimal(realHeight.toDouble()))
+                BigDecimal.fromDouble(realWidth.toDouble())
+                    .multiply(BigDecimal.fromDouble(realHeight.toDouble()))
             // 被除数不能为0
-            if (realArea.toFloat() == 0F) return@LaunchedEffect
+            if (realArea.toPlainString().toFloat() == 0F) return@LaunchedEffect
             // 计算实际面积的可视率
             val renderAreaPercentage =
-                rectArea.divide(realArea, 2, RoundingMode.HALF_EVEN).toFloat()
+                rectArea.divide(realArea, DecimalMode(2, RoundingMode.ROUND_HALF_TO_EVEN))
             // 根据不同可视率，匹配合适的方块数，最大只能到8
             val goBlockDividerCount = when {
                 renderAreaPercentage > 0.6F -> 1
@@ -396,7 +410,7 @@ fun SamplingCanvas(
             }) {
                 if (bitmap != null) {
                     drawImage(
-                        image = bitmap!!.asImageBitmap(),
+                        image = bitmap!!,
                         dstSize = IntSize(realWidth.toInt(), realHeight.toInt()),
                     )
                 }
@@ -406,7 +420,7 @@ fun SamplingCanvas(
                     samplingDecoder.forEachBlock { block, _, _ ->
                         block.getBitmap()?.let {
                             drawImage(
-                                image = it.asImageBitmap(),
+                                image = it,
                                 dstSize = block.renderSize,
                                 dstOffset = block.renderOffset
                             )
