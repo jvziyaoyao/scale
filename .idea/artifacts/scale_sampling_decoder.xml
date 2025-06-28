@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="scale-sampling-decoder">
+    <output-path>$PROJECT_DIR$/scale-sampling-decoder/build/libs</output-path>
+    <root id="archive" name="scale-sampling-decoder.jar">
+      <element id="module-output" name="scale.scale-sampling-decoder.androidMain" />
+    </root>
+  </artifact>
+</component>

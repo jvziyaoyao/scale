@@ -28,9 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.rememberAsyncImagePainter
-import com.jvziyaoyao.scale.decoder.kmp.SamplingDecoder
-import com.jvziyaoyao.scale.decoder.kmp.rememberSamplingDecoder
-import com.jvziyaoyao.scale.decoder.kmp.samplingProcessorPair
+import com.jvziyaoyao.scale.image.sampling.SamplingDecoder
+import com.jvziyaoyao.scale.image.sampling.rememberSamplingDecoder
+import com.jvziyaoyao.scale.image.sampling.samplingProcessorPair
 import com.jvziyaoyao.scale.image.previewer.ImagePreviewer
 import com.jvziyaoyao.scale.image.viewer.ModelProcessor
 import com.jvziyaoyao.scale.sample.base.BackHandler

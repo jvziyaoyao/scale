@@ -33,7 +33,7 @@ kotlin {
             dependencies {
                 implementation(project(":scale-image-viewer"))
                 implementation(project(":scale-zoomable-view"))
-                implementation(project(":scale-sampling-decoder-kmp"))
+                implementation(project(":scale-sampling-decoder"))
 
                 implementation(compose.materialIconsExtended)
 

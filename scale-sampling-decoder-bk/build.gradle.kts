@@ -11,7 +11,7 @@ plugins {
 }
 
 android {
-    namespace = "com.origeek.imageViewer"
+    namespace = "com.jvziyaoyao.scale.image.sampling"
     compileSdk = project.compileSdk
 
     defaultConfig {
@@ -42,8 +42,9 @@ android {
 }
 
 dependencies {
-    api("com.jvziyaoyao.scale:image-viewer:1.1.0-alpha.7")
-    api("com.jvziyaoyao.scale:sampling-decoder:1.1.0-alpha.7")
+    implementation(project(":scale-image-viewer"))
+
+    implementation(libs.androidx.exif)
 
     implementation(libs.androidx.compose.ui.util)
     implementation(libs.androidx.compose.ui)

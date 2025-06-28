@@ -11,10 +11,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import com.jvziyaoyao.scale.decoder.kmp.SamplingCanvas
-import com.jvziyaoyao.scale.decoder.kmp.getViewPort
-import com.jvziyaoyao.scale.decoder.kmp.rememberSamplingDecoder
-import com.jvziyaoyao.scale.decoder.kmp.samplingProcessorPair
+import com.jvziyaoyao.scale.image.sampling.SamplingCanvas
+import com.jvziyaoyao.scale.image.sampling.getViewPort
+import com.jvziyaoyao.scale.image.sampling.rememberSamplingDecoder
+import com.jvziyaoyao.scale.image.sampling.samplingProcessorPair
 import com.jvziyaoyao.scale.image.viewer.ImageViewer
 import com.jvziyaoyao.scale.image.viewer.ModelProcessor
 import com.jvziyaoyao.scale.zoomable.zoomable.ZoomableGestureScope
