@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
 import com.jvziyaoyao.scale.image.viewer.AnyComposable
 import com.jvziyaoyao.scale.image.viewer.ImageViewer
 import com.jvziyaoyao.scale.image.viewer.ModelProcessor

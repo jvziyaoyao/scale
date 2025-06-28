@@ -15,7 +15,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import coil3.compose.rememberAsyncImagePainter
 import com.jvziyaoyao.scale.sample.ui.component.rememberCoilImagePainter
 import com.jvziyaoyao.scale.zoomable.zoomable.ZoomableGestureScope
 import com.jvziyaoyao.scale.zoomable.zoomable.ZoomableView

@@ -8,6 +8,39 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.exifinterface.media.ExifInterface
+
+actual fun getReginDecoder(model: Any?): RegionDecoder? {
+    val bitmapRegionDecoder = if (model is ByteArray) {
+        getReginDecoder(model)
+    } else {
+        throw IllegalDecoderModelException()
+    }
+    return AndroidRegionDecoder(bitmapRegionDecoder)
+}
+
+fun getReginDecoder(byteArray: ByteArray): BitmapRegionDecoder {
+    return BitmapRegionDecoder.newInstance(byteArray, 0, byteArray.size, false)
+}
+
+
+/**
+ * 通过Exif接口获取SamplingDecoder的旋转方向
+ *
+ * @return
+ */
+fun ExifInterface.getDecoderRotation(): SamplingDecoder.Rotation {
+    val orientation = getAttributeInt(
+        ExifInterface.TAG_ORIENTATION,
+        ExifInterface.ORIENTATION_NORMAL
+    )
+    return when (orientation) {
+        ExifInterface.ORIENTATION_ROTATE_90 -> SamplingDecoder.Rotation.ROTATION_90
+        ExifInterface.ORIENTATION_ROTATE_180 -> SamplingDecoder.Rotation.ROTATION_180
+        ExifInterface.ORIENTATION_ROTATE_270 -> SamplingDecoder.Rotation.ROTATION_270
+        else -> SamplingDecoder.Rotation.ROTATION_0
+    }
+}
 
 fun Rect.toAndroidRect(): android.graphics.Rect {
     return android.graphics.Rect(left.toInt(), top.toInt(), right.toInt(), bottom.toInt())

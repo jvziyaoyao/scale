@@ -16,7 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
 import com.jvziyaoyao.scale.image.pager.ImagePager
 import com.jvziyaoyao.scale.image.pager.defaultProceedPresentation
 import com.jvziyaoyao.scale.sample.R

@@ -6,6 +6,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import com.jvziyaoyao.scale.sample.ui.theme.ScaleSampleTheme
 import com.jvziyaoyao.scale.sample.ui.theme.ViewerDemoTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -34,7 +35,7 @@ open class BaseActivity : ComponentActivity(), CoroutineScope by MainScope() {
             navigationBarStyle = systemBarStyle,
         )
         setContent {
-            ViewerDemoTheme {
+            ScaleSampleTheme {
                 content()
             }
         }

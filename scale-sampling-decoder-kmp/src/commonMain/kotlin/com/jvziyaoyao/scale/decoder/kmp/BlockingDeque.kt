@@ -27,22 +27,6 @@ class BlockingDeque<T> {
         return removeFirst()
     }
 
-//    // 堵塞获取，队列空时挂起，直到有元素
-//    suspend fun take(): T = mutex.withLock {
-//        if (deque.isNotEmpty()) {
-//            deque.removeFirst()
-//        } else {
-//            val deferred = CompletableDeferred<T>()
-//            waitingReceivers.add(deferred)
-//            // 先释放锁再挂起等待
-//            // 这里要先退出withLock块，所以用下面写法
-//            return@withLock null
-//        }
-//    } ?: run {
-//        // 如果上面返回了null，说明刚刚添加了deferred，挂起等待
-//        waitingReceivers.last().await()
-//    }
-
     suspend fun clear() = mutex.withLock {
         deque.clear()
     }

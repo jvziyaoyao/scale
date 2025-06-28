@@ -24,9 +24,11 @@
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/img" />
             <option value="$PROJECT_DIR$/sample" />
+            <option value="$PROJECT_DIR$/sample-kmp" />
             <option value="$PROJECT_DIR$/scale-image-viewer" />
             <option value="$PROJECT_DIR$/scale-image-viewer-classic" />
             <option value="$PROJECT_DIR$/scale-sampling-decoder" />
+            <option value="$PROJECT_DIR$/scale-sampling-decoder-kmp" />
             <option value="$PROJECT_DIR$/scale-zoomable-view" />
             <option value="$PROJECT_DIR$/shared" />
           </set>

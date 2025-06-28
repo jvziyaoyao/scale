@@ -21,7 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
 import com.jvziyaoyao.scale.sample.R
 import com.jvziyaoyao.scale.zoomable.pager.PagerGestureScope
 import kotlinx.coroutines.launch

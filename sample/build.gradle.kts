@@ -5,7 +5,14 @@ import scale.targetSdk
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.jetbrainsCompose)
     id("kotlin-android")
+}
+
+val kmpResDir = "composeResources/scale.sample_kmp.generated.resources"
+tasks.register<Copy>("copySharedResources") {
+    from(project(":sample-kmp").file("src/commonMain/composeResources"))
+    into(layout.buildDirectory.dir("generated/kmpCopy/$kmpResDir"))
 }
 
 android {
@@ -51,6 +58,19 @@ android {
         }
     }
 
+    sourceSets.getByName("main") {
+        assets.srcDirs(
+            "src/main/assets",
+            layout.buildDirectory.dir("generated/kmpCopy"),
+        )
+    }
+
+    // composeResources/scale.sample_kmp.generated.resources/files/a350.jpg
+    applicationVariants.all {
+        this.mergeAssetsProvider.configure {
+            dependsOn("copySharedResources")
+        }
+    }
 }
 
 dependencies {
@@ -59,19 +79,23 @@ dependencies {
     implementation(project(":scale-sampling-decoder"))
     implementation(project(":scale-sampling-decoder-kmp"))
     implementation(project(":scale-zoomable-view"))
+
+    implementation(project(":sample-kmp"))
 //    implementation(libs.scale.image.viewer)
 //    implementation(libs.scale.image.viewer.classic)
 //    implementation(libs.scale.sampling.decoder)
 
     implementation(libs.androidx.exif)
 
+    implementation(compose.components.resources)
+
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.jvziyaoyao.origeek.ui)
 
-    implementation(libs.coil)
+//    implementation(libs.coil)
     implementation(libs.coil.svg)
-    implementation(libs.coil.gif)
+//    implementation(libs.coil.gif)
     implementation(libs.coil.compose)
 
     implementation(libs.google.accompanist.permissions)

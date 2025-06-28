@@ -6,13 +6,14 @@
 //
 
 import SwiftUI
-import sampe_kmpKit
 
 @main
 struct iosSampleApp: App {
     var body: some Scene {
         WindowGroup {
-            MainPageView()
+            NavigationPageView {
+                HomePageView()
+            }
         }
     }
 }
