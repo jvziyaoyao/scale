@@ -186,7 +186,6 @@ fun DecoderBody() {
             state = previewerState,
             processor = ModelProcessor(samplingProcessorPair),
             imageLoader = { _ ->
-
                 val decoderRotation = when (rotation.toInt()) {
                     SamplingDecoder.Rotation.ROTATION_90.radius -> SamplingDecoder.Rotation.ROTATION_90
                     SamplingDecoder.Rotation.ROTATION_180.radius -> SamplingDecoder.Rotation.ROTATION_180
