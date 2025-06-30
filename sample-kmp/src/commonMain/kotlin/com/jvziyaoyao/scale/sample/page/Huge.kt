@@ -30,7 +30,7 @@ fun HugeBody() {
     LaunchedEffect(Unit) {
         bytes.value = Res.readBytes("files/a350.jpg")
     }
-    val (samplingDecoder) = rememberSamplingDecoder(model = bytes.value)
+    val (samplingDecoder) = rememberSamplingDecoder(bytes = bytes.value)
     if (samplingDecoder != null) {
         val state = rememberZoomableState(contentSize = samplingDecoder.intrinsicSize)
         ImageViewer(
@@ -59,7 +59,7 @@ fun HugeBody01() {
     LaunchedEffect(Unit) {
         bytes.value = Res.readBytes("files/a350.jpg")
     }
-    val (samplingDecoder) = rememberSamplingDecoder(model = bytes.value)
+    val (samplingDecoder) = rememberSamplingDecoder(bytes = bytes.value)
     val zoomableState = rememberZoomableState(
         contentSize = if (samplingDecoder == null) Size.Zero else Size(
             width = samplingDecoder.decoderWidth.toFloat(),

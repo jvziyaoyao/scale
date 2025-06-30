@@ -91,7 +91,7 @@ fun DecoderBody() {
             else -> SamplingDecoder.Rotation.ROTATION_0
         }
         val (samplingDecoder, error) = rememberSamplingDecoder(
-            model = bytes.value,
+            bytes = bytes.value,
             rotation = decoderRotation
         )
 

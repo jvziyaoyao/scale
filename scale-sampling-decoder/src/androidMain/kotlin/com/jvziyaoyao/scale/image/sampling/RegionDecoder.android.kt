@@ -10,19 +10,11 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.exifinterface.media.ExifInterface
 
-actual fun getReginDecoder(model: Any?): RegionDecoder? {
-    val bitmapRegionDecoder = if (model is ByteArray) {
-        getReginDecoder(model)
-    } else {
-        throw IllegalDecoderModelException()
-    }
+actual fun getReginDecoder(bytes: ByteArray?): RegionDecoder? {
+    if (bytes == null) return null
+    val bitmapRegionDecoder = BitmapRegionDecoder.newInstance(bytes, 0, bytes.size, false)
     return AndroidRegionDecoder(bitmapRegionDecoder)
 }
-
-fun getReginDecoder(byteArray: ByteArray): BitmapRegionDecoder {
-    return BitmapRegionDecoder.newInstance(byteArray, 0, byteArray.size, false)
-}
-
 
 /**
  * 通过Exif接口获取SamplingDecoder的旋转方向

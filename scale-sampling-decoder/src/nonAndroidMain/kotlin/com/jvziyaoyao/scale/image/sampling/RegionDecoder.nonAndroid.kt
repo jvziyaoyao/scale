@@ -13,16 +13,9 @@ import org.jetbrains.skia.Surface
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-actual fun getReginDecoder(model: Any?): RegionDecoder? {
-    return if (model is ByteArray) {
-        getReginDecoder(model)
-    } else {
-        throw IllegalDecoderModelException()
-    }
-}
-
-fun getReginDecoder(byteArray: ByteArray): RegionDecoder {
-    return SkiaRegionDecoder(bytes = byteArray)
+actual fun getReginDecoder(bytes: ByteArray?): RegionDecoder? {
+    if (bytes == null) return null
+    return SkiaRegionDecoder(bytes = bytes)
 }
 
 class SkiaRegionDecoder(

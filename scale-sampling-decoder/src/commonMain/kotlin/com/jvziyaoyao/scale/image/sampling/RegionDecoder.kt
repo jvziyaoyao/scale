@@ -32,21 +32,21 @@ interface RegionDecoder {
 
 class IllegalDecoderModelException : RuntimeException("illegal region decoder model type!")
 
-expect fun getReginDecoder(model: Any?): RegionDecoder?
+expect fun getReginDecoder(bytes: ByteArray?): RegionDecoder?
 
 @Composable
 fun rememberSamplingDecoder(
-    model: Any?,
+    bytes: ByteArray?,
     rotation: SamplingDecoder.Rotation = SamplingDecoder.Rotation.ROTATION_0,
 ): Pair<SamplingDecoder?, Exception?> {
     val scope = rememberCoroutineScope()
     val samplingDecoder = remember { mutableStateOf<SamplingDecoder?>(null) }
     val expectation = remember { mutableStateOf<Exception?>(null) }
-    DisposableEffect(model, rotation) {
+    DisposableEffect(bytes, rotation) {
         scope.launch(Dispatchers.IO) {
-            if (model != null) {
+            if (bytes != null) {
                 try {
-                    val reginDecoder = getReginDecoder(model = model)
+                    val reginDecoder = getReginDecoder(bytes = bytes)
                     if (reginDecoder != null) {
                         samplingDecoder.value = SamplingDecoder(
                             decoder = reginDecoder,
