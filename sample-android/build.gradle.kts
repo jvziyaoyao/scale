@@ -3,9 +3,9 @@ import scale.minSdk
 import scale.targetSdk
 
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.jetbrainsCompose)
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("com.android.application")
+    id("org.jetbrains.compose")
     id("kotlin-android")
 }
 
@@ -50,13 +50,13 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
+        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
-    packagingOptions {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
+//    packagingOptions {
+//        resources {
+//            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+//        }
+//    }
 
     sourceSets.getByName("main") {
         assets.srcDirs(

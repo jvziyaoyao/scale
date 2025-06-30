@@ -7,7 +7,7 @@
         <compositeConfiguration>
           <compositeBuild compositeDefinitionSource="SCRIPT">
             <builds>
-              <build path="$PROJECT_DIR$/buildSrc" name="buildSrc">
+              <build path="$PROJECT_DIR$/buildSrc" name="scale">
                 <projects>
                   <project path="$PROJECT_DIR$/buildSrc" />
                 </projects>

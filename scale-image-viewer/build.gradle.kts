@@ -2,11 +2,12 @@ import scale.compileSdk
 import scale.minSdk
 
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.kotlin.multiplatform.library)
-    alias(libs.plugins.jetbrainsCompose)
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.vanniktech.maven.publish)
+    id("com.android.kotlin.multiplatform.library")
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.multiplatform")
+    id("com.vanniktech.maven.publish")
+    id("org.jetbrains.compose")
+    id("org.jetbrains.dokka")
 }
 
 kotlin {

@@ -3,11 +3,11 @@ import scale.minSdk
 
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.jetbrains.kotlin)
-    alias(libs.plugins.jetbrains.dokka)
-    alias(libs.plugins.vanniktech.maven.publish)
+//    alias(libs.plugins.android.library)
+//    alias(libs.plugins.compose.compiler)
+//    alias(libs.plugins.jetbrains.kotlin)
+//    alias(libs.plugins.jetbrains.dokka)
+//    alias(libs.plugins.vanniktech.maven.publish)
 }
 
 android {
