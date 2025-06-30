@@ -214,12 +214,6 @@ class SamplingDecoder(
         }
     }
 
-//    fun getRotateBitmap(bitmap: Bitmap, degree: Float): Bitmap {
-//        val matrix = Matrix()
-//        matrix.postRotate(degree)
-//        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, false)
-//    }
-
     fun getRotationSize(rotation: Rotation): IntSize {
         return when (rotation) {
             Rotation.ROTATION_0, Rotation.ROTATION_180 -> {
@@ -231,42 +225,6 @@ class SamplingDecoder(
             }
         }
     }
-
-//    fun getRealDecodeRect(rect: Rect): Rect {
-//        return if (rotation == Rotation.ROTATION_0) rect else {
-//            val size = getRotationSize(rotation)
-//            val decoderWidth = size.width
-//            val decoderHeight = size.height
-//            val newRect = when (rotation) {
-//                Rotation.ROTATION_90 -> {
-//                    val nextX1 = rect.top
-//                    val nextX2 = rect.bottom
-//                    val nextY1 = decoderWidth - rect.right
-//                    val nextY2 = decoderWidth - rect.left
-//                    Rect(nextX1, nextY1, nextX2, nextY2)
-//                }
-//
-//                Rotation.ROTATION_180 -> {
-//                    val nextX1 = decoderWidth - rect.right
-//                    val nextX2 = decoderWidth - rect.left
-//                    val nextY1 = decoderHeight - rect.bottom
-//                    val nextY2 = decoderHeight - rect.top
-//                    Rect(nextX1, nextY1, nextX2, nextY2)
-//                }
-//
-//                Rotation.ROTATION_270 -> {
-//                    val nextX1 = decoderHeight - rect.bottom
-//                    val nextX2 = decoderHeight - rect.top
-//                    val nextY1 = rect.left
-//                    val nextY2 = rect.right
-//                    Rect(nextX1, nextY1, nextX2, nextY2)
-//                }
-//
-//                else -> throw RotationIllegalException()
-//            }
-//            newRect
-//        }
-//    }
 
     /**
      * 解码渲染区域
@@ -313,34 +271,13 @@ class SamplingDecoder(
             }
         }
     }
-//    suspend fun decodeRegion(inSampleSize: Int, rect: Rect): ImageBitmap? {
-//        return mutex.withLock {
-//            val realRect = getRealDecodeRect(rect)
-//            if (rect == realRect) {
-//                decoder.decodeRegion(inSampleSize, rect)
-//            } else {
-//                val bitmap = decoder.decodeRegion(inSampleSize, realRect)
-//                if (bitmap == null) bitmap else {
-//                    decoder.rotate(bitmap, rotation.radius.toFloat())
-//                }
-//            }
-//        }
-//    }
-//    suspend fun decodeRegion(inSampleSize: Int, rect: Rect): ImageBitmap? {
-//        return mutex.withLock {
-//            decoder.decodeRegion(inSampleSize, rotation, rect)
-//        }
-//    }
 
     // 开启堵塞队列的循环
     fun startRenderQueue(onUpdate: () -> Unit) {
-        println("startRenderQueue start")
         launch(Dispatchers.IO) {
             try {
                 while (!decoder.isRecycled()) {
-                    println("startRenderQueue before take")
                     val block = renderQueue.take()
-                    println("startRenderQueue block $block")
                     if (decoder.isRecycled()) break
                     val bitmap = decodeRegion(block.inSampleSize, block.sliceRect)
                     if (bitmap != null) block.setBitmap(bitmap)

@@ -25,13 +25,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import coil3.compose.rememberAsyncImagePainter
+import com.jvziyaoyao.scale.image.previewer.ImagePreviewer
 import com.jvziyaoyao.scale.image.sampling.SamplingDecoder
 import com.jvziyaoyao.scale.image.sampling.rememberSamplingDecoder
 import com.jvziyaoyao.scale.image.sampling.samplingProcessorPair
-import com.jvziyaoyao.scale.image.previewer.ImagePreviewer
 import com.jvziyaoyao.scale.image.viewer.ModelProcessor
 import com.jvziyaoyao.scale.sample.base.BackHandler
 import com.jvziyaoyao.scale.sample.ui.component.DetectScaleGridGesture
@@ -46,6 +47,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import scale.sample_kmp.generated.resources.Res
 import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 @Composable
 fun DecoderBody() {
@@ -61,17 +63,6 @@ fun DecoderBody() {
             getKey = { key },
         )
 
-
-        val bytes = remember { mutableStateOf<ByteArray?>(null) }
-        LaunchedEffect(Unit) {
-            bytes.value = Res.readBytes("files/a350.jpg")
-        }
-        val painter = rememberAsyncImagePainter(bytes.value)
-
-
-        val itemState = rememberTransformItemState(
-            intrinsicSize = painter.intrinsicSize,
-        )
         val horizontal = this@BoxWithConstraints.maxWidth > maxHeight
         // Save
         var transformEnable by rememberSaveable { mutableStateOf(true) }
@@ -86,6 +77,36 @@ fun DecoderBody() {
                 }
             }
         }
+
+        val bytes = remember { mutableStateOf<ByteArray?>(null) }
+        LaunchedEffect(Unit) {
+            bytes.value = Res.readBytes("files/a350.jpg")
+        }
+
+        val realRotation = roundToNearest90(rotation)
+        val decoderRotation = when (realRotation) {
+            SamplingDecoder.Rotation.ROTATION_90.radius -> SamplingDecoder.Rotation.ROTATION_90
+            SamplingDecoder.Rotation.ROTATION_180.radius -> SamplingDecoder.Rotation.ROTATION_180
+            SamplingDecoder.Rotation.ROTATION_270.radius -> SamplingDecoder.Rotation.ROTATION_270
+            else -> SamplingDecoder.Rotation.ROTATION_0
+        }
+        val (samplingDecoder, error) = rememberSamplingDecoder(
+            model = bytes.value,
+            rotation = decoderRotation
+        )
+
+        val imageBitmap = remember { mutableStateOf<ImageBitmap?>(null) }
+        val itemState = rememberTransformItemState(
+            intrinsicSize = imageBitmap.value?.let {
+                Size(it.width.toFloat(), it.height.toFloat())
+            },
+        )
+        LaunchedEffect(samplingDecoder) {
+            if (samplingDecoder != null) {
+                imageBitmap.value = samplingDecoder.createTempBitmap()
+            }
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -113,12 +134,14 @@ fun DecoderBody() {
                         itemState = itemState,
                         transformState = previewerState,
                     ) {
-                        Image(
-                            modifier = Modifier.fillMaxSize(),
-                            painter = painter,
-                            contentScale = ContentScale.Crop,
-                            contentDescription = null,
-                        )
+                        imageBitmap.value?.let {
+                            Image(
+                                modifier = Modifier.fillMaxSize(),
+                                bitmap = it,
+                                contentScale = ContentScale.Crop,
+                                contentDescription = null,
+                            )
+                        }
                     }
                 }
             }
@@ -186,16 +209,6 @@ fun DecoderBody() {
             state = previewerState,
             processor = ModelProcessor(samplingProcessorPair),
             imageLoader = { _ ->
-                val decoderRotation = when (rotation.toInt()) {
-                    SamplingDecoder.Rotation.ROTATION_90.radius -> SamplingDecoder.Rotation.ROTATION_90
-                    SamplingDecoder.Rotation.ROTATION_180.radius -> SamplingDecoder.Rotation.ROTATION_180
-                    SamplingDecoder.Rotation.ROTATION_270.radius -> SamplingDecoder.Rotation.ROTATION_270
-                    else -> SamplingDecoder.Rotation.ROTATION_0
-                }
-                val (samplingDecoder, error) = rememberSamplingDecoder(
-                    model = bytes.value,
-                    rotation = decoderRotation
-                )
                 val realSamplingDecoder = remember { mutableStateOf<SamplingDecoder?>(null) }
                 LaunchedEffect(samplingDecoder) {
                     if (samplingDecoder != null) {
@@ -210,4 +223,10 @@ fun DecoderBody() {
             }
         )
     }
+}
+
+fun roundToNearest90(rotation: Float): Int {
+    val normalized = rotation % 360f
+    val rounded = (normalized / 90f).roundToInt() * 90
+    return (rounded % 360 + 360) % 360 // 确保结果在 0..359
 }

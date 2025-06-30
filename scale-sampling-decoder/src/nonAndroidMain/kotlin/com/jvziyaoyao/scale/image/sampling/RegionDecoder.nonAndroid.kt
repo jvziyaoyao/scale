@@ -9,9 +9,9 @@ import androidx.compose.ui.graphics.toSkiaRect
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Image
-import org.jetbrains.skia.Matrix33
 import org.jetbrains.skia.Surface
 import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 actual fun getReginDecoder(model: Any?): RegionDecoder? {
     return if (model is ByteArray) {
@@ -47,35 +47,49 @@ class SkiaRegionDecoder(
         return image.isClosed
     }
 
-    override fun rotate(
-        imageBitmap: ImageBitmap,
-        degree: Float
-    ): ImageBitmap {
-        // 将 Compose 的 ImageBitmap 转为 Skia Image
+    override fun rotate(imageBitmap: ImageBitmap, degree: Float): ImageBitmap {
         val skiaBitmap = imageBitmap.asSkiaBitmap()
         val skiaImage = Image.makeFromBitmap(skiaBitmap)
-
         val width = skiaImage.width
         val height = skiaImage.height
 
-        // 创建目标 Surface（用来绘制旋转后的图像）
-        val surface = Surface.makeRasterN32Premul(width, height)
+        val normalizedDegree = (((degree % 360) + 360) % 360).roundToInt()
+        val rotation = when (normalizedDegree) {
+            in 45..134 -> 90
+            in 135..224 -> 180
+            in 225..314 -> 270
+            else -> 0
+        }
+
+        val (outWidth, outHeight) = if (rotation == 90 || rotation == 270) {
+            height to width
+        } else {
+            width to height
+        }
+
+        val surface = Surface.makeRasterN32Premul(outWidth, outHeight)
         val canvas = surface.canvas
 
-        // 设置旋转矩阵：绕中心点旋转
-        val rotationMatrix = Matrix33.makeRotate(
-            degree,
-            width / 2f,
-            height / 2f
-        )
-        canvas.setMatrix(rotationMatrix)
+        // 关键：调整坐标原点后再旋转
+        when (rotation) {
+            90 -> {
+                canvas.translate(outWidth.toFloat(), 0f)
+                canvas.rotate(90f)
+            }
+            180 -> {
+                canvas.translate(outWidth.toFloat(), outHeight.toFloat())
+                canvas.rotate(180f)
+            }
+            270 -> {
+                canvas.translate(0f, outHeight.toFloat())
+                canvas.rotate(270f)
+            }
+            // 0 -> 不需要变换
+        }
 
-        // 绘制原图到目标 surface 上（旋转后）
         canvas.drawImage(skiaImage, 0f, 0f)
 
-        // 获取绘制后的图像，并转为 Compose 的 ImageBitmap
-        val rotatedImage = surface.makeImageSnapshot()
-        return rotatedImage.toComposeImageBitmap()
+        return surface.makeImageSnapshot().toComposeImageBitmap()
     }
 
     override suspend fun decodeRegion(

@@ -2,7 +2,6 @@ package com.jvziyaoyao.scale.image.sampling
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -43,9 +42,9 @@ fun rememberSamplingDecoder(
     val scope = rememberCoroutineScope()
     val samplingDecoder = remember { mutableStateOf<SamplingDecoder?>(null) }
     val expectation = remember { mutableStateOf<Exception?>(null) }
-    LaunchedEffect(model) {
-        launch(Dispatchers.IO) {
-            if (model != null && samplingDecoder.value == null) {
+    DisposableEffect(model, rotation) {
+        scope.launch(Dispatchers.IO) {
+            if (model != null) {
                 try {
                     val reginDecoder = getReginDecoder(model = model)
                     if (reginDecoder != null) {
@@ -61,8 +60,6 @@ fun rememberSamplingDecoder(
                 }
             }
         }
-    }
-    DisposableEffect(Unit) {
         onDispose {
             scope.launch {
                 samplingDecoder.value?.release()
