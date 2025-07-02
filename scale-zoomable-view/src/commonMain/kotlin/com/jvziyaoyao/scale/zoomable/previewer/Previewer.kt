@@ -23,18 +23,18 @@ import kotlinx.coroutines.CoroutineScope
  * @param defaultAnimationSpec 默认动画窗格
  * @param initialPage 初始化页码
  * @param verticalDragType 垂直手势类型
+ * @param transformItemStateMap 帮助Previewer获取转换动画的小图map
  * @param pageCount 总页数
- * @param getKey 获取某一页的key的方法
+ * @param getKey 获取某一页的索引key的方法
  * @return 返回一个PreviewerState
  */
 @Composable
 fun rememberPreviewerState(
     scope: CoroutineScope = rememberCoroutineScope(),
     defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
-//    @IntRange(from = 0)
     initialPage: Int = 0,
     verticalDragType: VerticalDragType = VerticalDragType.Down,
-    transformItemStateMap: ItemStateMap = LocalTransformItemStateMap.current,
+    transformItemStateMap: ItemStateMap = mutableMapOf(),
     pageCount: () -> Int,
     getKey: (Int) -> Any = {},
 ): PreviewerState {

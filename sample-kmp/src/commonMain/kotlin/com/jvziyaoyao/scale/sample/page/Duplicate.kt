@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -23,7 +22,6 @@ import com.jvziyaoyao.scale.image.previewer.ImagePreviewer
 import com.jvziyaoyao.scale.sample.base.BackHandler
 import com.jvziyaoyao.scale.sample.ui.component.DetectScaleGridGesture
 import com.jvziyaoyao.scale.sample.ui.component.ScaleGrid
-import com.jvziyaoyao.scale.zoomable.previewer.LocalTransformItemStateMap
 import com.jvziyaoyao.scale.zoomable.previewer.PreviewerState
 import com.jvziyaoyao.scale.zoomable.previewer.TransformItemState
 import com.jvziyaoyao.scale.zoomable.previewer.TransformItemView
@@ -73,19 +71,15 @@ fun DuplicateBody() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        CompositionLocalProvider(LocalTransformItemStateMap provides itemStateMap01) {
-            DuplicateRow(
-                imageIds = imageIds,
-                previewerState = previewerState01,
-            )
-        }
+        DuplicateRow(
+            imageIds = imageIds,
+            previewerState = previewerState01,
+        )
         Spacer(modifier = Modifier.height(20.dp))
-        CompositionLocalProvider(LocalTransformItemStateMap provides itemStateMap02) {
-            DuplicateRow(
-                imageIds = imageIds,
-                previewerState = previewerState02,
-            )
-        }
+        DuplicateRow(
+            imageIds = imageIds,
+            previewerState = previewerState02,
+        )
     }
 
     ImagePreviewer(
