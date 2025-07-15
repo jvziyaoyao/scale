@@ -1,7 +1,6 @@
 package com.jvziyaoyao.scale.sample.page
 
 import android.os.Bundle
-import com.jvziyaoyao.scale.samLayout.padding.ple.page.TransformBody
 import com.jvziyaoyao.scale.sample.base.BaseActivity
 
 /**

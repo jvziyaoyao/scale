@@ -5,7 +5,7 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.uikit.OnFocusBehavior
 import androidx.compose.ui.window.ComposeUIViewController
-import com.jvziyaoyao.scale.samLayout.padding.ple.page.TransformBody
+import com.jvziyaoyao.scale.sample.page.TransformBody
 import com.jvziyaoyao.scale.sample.page.DecoderBody
 import com.jvziyaoyao.scale.sample.page.DuplicateBody
 import com.jvziyaoyao.scale.sample.page.GalleryBody

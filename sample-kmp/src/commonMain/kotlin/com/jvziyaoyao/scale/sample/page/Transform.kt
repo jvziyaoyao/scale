@@ -1,4 +1,4 @@
-package com.jvziyaoyao.scale.samLayout.padding.ple.page
+package com.jvziyaoyao.scale.sample.page
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -67,6 +67,7 @@ import com.jvziyaoyao.scale.sample.ui.component.ScaleGrid
 import com.jvziyaoyao.scale.sample.ui.theme.Layout
 import com.jvziyaoyao.scale.sample.ui.theme.getSlideColors
 import com.jvziyaoyao.scale.sample.ui.theme.getSwitchColors
+import com.jvziyaoyao.scale.zoomable.pager.PagerGestureScope
 import com.jvziyaoyao.scale.zoomable.previewer.TransformItemView
 import com.jvziyaoyao.scale.zoomable.previewer.VerticalDragType
 import com.jvziyaoyao.scale.zoomable.previewer.rememberPreviewerState
@@ -266,6 +267,13 @@ fun TransformBody() {
 
         ImagePreviewer(
             state = previewerState,
+            detectGesture = PagerGestureScope(
+                onTap = {
+                    scope.launch {
+                        previewerState.exitTransform()
+                    }
+                }
+            ),
             imageLoader = { index ->
                 val painter = if (settingState.loaderError && (index % 2 == 0)) null
                 else painterResource(images[index].res)

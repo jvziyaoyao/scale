@@ -243,7 +243,7 @@ fun PopupPreviewer(
                     state = state,
                     itemSpacing = itemSpacing,
                     beyondViewportPageCount = beyondViewportPageCount,
-                    detectGesture = detectGesture,
+                    detectGesture = if (animating) PagerGestureScope() else detectGesture,
                     zoomablePolicy = zoomablePolicy,
                     // 正在动画中不允许页面滚动
                     userScrollEnabled = !animating
