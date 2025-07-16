@@ -27,9 +27,7 @@ class BlockingDeque<T> {
         return removeFirst()
     }
 
-    suspend fun clear() = mutex.withLock {
-        deque.clear()
-    }
+    suspend fun clear() = mutex.withLock { deque.clear() }
 
     suspend fun size(): Int = mutex.withLock { deque.size }
 
@@ -41,6 +39,6 @@ class BlockingDeque<T> {
 
     fun contains(element: T): Boolean = deque.contains(element)
 
-    fun remove(element: T) = deque.remove(element)
+    suspend fun remove(element: T) = mutex.withLock { deque.remove(element) }
 
 }
