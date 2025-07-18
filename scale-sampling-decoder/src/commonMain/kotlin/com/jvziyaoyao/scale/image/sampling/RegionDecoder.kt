@@ -43,17 +43,19 @@ fun rememberSamplingDecoder(
     val samplingDecoder = remember { mutableStateOf<SamplingDecoder?>(null) }
     val expectation = remember { mutableStateOf<Exception?>(null) }
     DisposableEffect(bytes, rotation) {
+        var currentSamplingDecoder: SamplingDecoder? = null
         scope.launch(Dispatchers.IO) {
             if (bytes != null) {
                 try {
                     val reginDecoder = getReginDecoder(bytes = bytes)
                     if (reginDecoder != null) {
-                        samplingDecoder.value = SamplingDecoder(
+                        currentSamplingDecoder = SamplingDecoder(
                             decoder = reginDecoder,
                             rotation = rotation,
                         ).apply {
                             thumbnail = createTempBitmap()
                         }
+                        samplingDecoder.value = currentSamplingDecoder
                     }
                 } catch (e: Exception) {
                     expectation.value = e
@@ -62,7 +64,7 @@ fun rememberSamplingDecoder(
         }
         onDispose {
             scope.launch {
-                samplingDecoder.value?.release()
+                currentSamplingDecoder?.release()
             }
         }
     }
