@@ -352,11 +352,9 @@ fun SamplingCanvas(
             scope.launch(Dispatchers.IO) {
                 mutex.withLock {
                     insertList.forEach {
-                        println("insertList.forEach ---> $it")
                         samplingDecoder.renderQueue.putFirst(it)
                     }
                     removeList.forEach {
-                        println("removeList.forEach ---> $it")
                         samplingDecoder.renderQueue.remove(it)
                     }
                 }
