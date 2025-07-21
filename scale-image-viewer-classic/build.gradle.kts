@@ -3,11 +3,11 @@ import scale.minSdk
 
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.jetbrains.kotlin)
-    alias(libs.plugins.jetbrains.dokka)
-    alias(libs.plugins.vanniktech.maven.publish)
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.android")
+    id("com.vanniktech.maven.publish")
+    id("com.android.library")
+    id("org.jetbrains.dokka")
 }
 
 android {
@@ -34,7 +34,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
+        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
     kotlinOptions {
         jvmTarget = "1.8"
@@ -42,8 +42,8 @@ android {
 }
 
 dependencies {
-    api(project(":scale-image-viewer"))
-    api(project(":scale-sampling-decoder"))
+    api("com.jvziyaoyao.scale:image-viewer:1.1.0-alpha.7")
+    api("com.jvziyaoyao.scale:sampling-decoder:1.1.0-alpha.7")
 
     implementation(libs.androidx.compose.ui.util)
     implementation(libs.androidx.compose.ui)

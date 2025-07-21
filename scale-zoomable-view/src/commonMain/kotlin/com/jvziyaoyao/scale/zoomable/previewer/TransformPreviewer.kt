@@ -76,7 +76,7 @@ open class TransformPreviewerState(
     // 预览状态
     pagerState: SupportedPagerState,
     // 用于获取transformItemState
-    private var itemStateMap: ItemStateMap,
+    val itemStateMap: ItemStateMap,
     // 获取当前key
     val getKey: (Int) -> Any,
 ) : PopupPreviewerState(pagerState) {
@@ -490,11 +490,12 @@ fun TransformPreviewer(
     zoomablePolicy: @Composable PagerZoomablePolicyScope.(page: Int) -> Boolean,
 ) {
     state.apply {
-        Box(modifier = modifier
-            .fillMaxSize()
-            .onSizeChanged {
-                containerSize.value = it.toSize()
-            }) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .onSizeChanged {
+                    containerSize.value = it.toSize()
+                }) {
             PopupPreviewer(
                 modifier = modifier.fillMaxSize(),
                 state = this@apply,
@@ -596,6 +597,7 @@ fun TransformItemView(
             modifier = modifier,
             key = key,
             itemState = itemState,
+            itemStateMap = transformState.itemStateMap,
             itemVisible = if (!itemContentVisible.value) {
                 if (previewerAlpha.value == 1F) {
                     if (!visible) true else isCurrentPage

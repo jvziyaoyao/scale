@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="17" />
+    <bytecodeTargetLevel target="17">
+      <module name="scale.buildSrc" target="21" />
+      <module name="scale.buildSrc.main" target="21" />
+      <module name="scale.buildSrc.test" target="21" />
+      <module name="scale.sampe-kmp" target="21" />
+      <module name="scale.sample" target="21" />
+      <module name="scale.scale-sampling-decoder-kmp" target="21" />
+    </bytecodeTargetLevel>
   </component>
 </project>

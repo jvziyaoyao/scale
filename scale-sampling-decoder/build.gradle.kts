@@ -1,62 +1,86 @@
+import scale.applyScaleHierarchyTemplate
 import scale.compileSdk
 import scale.minSdk
 
-@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.jetbrains.kotlin)
-    alias(libs.plugins.jetbrains.dokka)
-    alias(libs.plugins.vanniktech.maven.publish)
+    id("com.android.kotlin.multiplatform.library")
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.multiplatform")
+    id("com.vanniktech.maven.publish")
+    id("org.jetbrains.compose")
+    id("org.jetbrains.dokka")
 }
 
-android {
-    namespace = "com.jvziyaoyao.scale.image.sampling"
-    compileSdk = project.compileSdk
+kotlin {
+    applyScaleHierarchyTemplate()
 
-    defaultConfig {
+    androidLibrary {
+        namespace = "com.jvziyaoyao.scale.image.sampling"
+        compileSdk = project.compileSdk
         minSdk = project.minSdk
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+    val xcfName = "samplingDecoderKit"
+
+    iosX64 {
+        binaries.framework {
+            baseName = xcfName
         }
     }
-    buildFeatures {
-        compose = true
+
+    iosArm64 {
+        binaries.framework {
+            baseName = xcfName
+        }
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
+
+    iosSimulatorArm64 {
+        binaries.framework {
+            baseName = xcfName
+        }
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation(project(":scale-image-viewer"))
+                implementation(project(":scale-zoomable-view"))
+
+                implementation(libs.bignum)
+
+                implementation(libs.kotlin.stdlib)
+
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+
+                implementation(libs.org.jetbrains.kotlinx.datetime)
+            }
+        }
+
+        commonTest {
+            dependencies {
+                implementation(libs.kotlin.test)
+            }
+        }
+
+        androidMain {
+            dependencies {
+                implementation(libs.androidx.exif)
+            }
+        }
+
+        named("nonAndroidMain") {
+            dependencies {
+                implementation(libs.skiko)
+            }
+        }
+
+        iosMain {
+            dependencies {}
+        }
     }
-}
 
-dependencies {
-    implementation(project(":scale-image-viewer"))
-
-    implementation(libs.androidx.exif)
-
-    implementation(libs.androidx.compose.ui.util)
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.material)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    androidTestImplementation(libs.androidx.compose.ui.test)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-
-    implementation(libs.core.ktx)
-    implementation(libs.appcompat)
-    implementation(libs.material)
-    testImplementation(libs.junit.junit)
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.espresso.core)
 }

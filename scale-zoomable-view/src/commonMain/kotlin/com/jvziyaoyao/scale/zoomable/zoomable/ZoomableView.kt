@@ -87,10 +87,10 @@ fun ZoomableView(
                 .graphicsLayer {
                     clip = boundClip
                 }
-                .pointerInput(state) {
+                .pointerInput(state, detectGesture) {
                     detectTapGestures(onLongPress = { detectGesture.onLongPress(it) })
                 }
-                .pointerInput(state) {
+                .pointerInput(state, detectGesture) {
                     detectTransformGestures(
                         onTap = { detectGesture.onTap(it) },
                         onDoubleTap = { detectGesture.onDoubleTap(it) },

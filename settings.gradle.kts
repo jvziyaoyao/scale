@@ -15,10 +15,9 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "scale"
-include(":sample")
-include(":scale-image-viewer")
-include(":scale-image-viewer-classic")
+include(":sample-android")
+include(":sample-kmp")
 include(":scale-zoomable-view")
 include(":scale-sampling-decoder")
-include(":shared")
-include(":img")
+include(":scale-image-viewer")
+include(":scale-image-viewer-classic")
