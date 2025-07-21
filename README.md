@@ -60,7 +60,9 @@ The latest version:
 👓 示例
 --------
 👋 示例代码请参考:
+
 Android 👉 [SAMPLE-ANDROID](https://github.com/jvziyaoyao/scale/tree/dev/sample/src/main/java/com/jvziyaoyao/scale/sample-android)
+
 IOS 👉 [SAMPLE-IOS](https://github.com/jvziyaoyao/scale/tree/dev/sample/src/main/java/com/jvziyaoyao/scale/sample-ios)
 
 🛒 引入
