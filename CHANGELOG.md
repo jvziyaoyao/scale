@@ -1,6 +1,11 @@
 # **Change Log**
 All notable changes to this project will be documented in this file.
 
+## 1.1.1-beta.2 (Jul 21, 2025)
+- Feat: SamplingDecoder支持KMP;
+- Feat: 移除LocalTransformItemStateMap;
+- Fix: 动画进行中禁止页面手势;
+
 ## 1.1.1-beta.1 (Jun 25, 2025)
 - Feat: Zoomable支持KMP;
 - Feat: ImageViewer支持KMP;

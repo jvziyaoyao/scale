@@ -2,9 +2,9 @@
 
 ----
 
-🖼 An image viewer for jetpack compose.
+🖼 An image viewer for jetpack compose multiplatform.
 
-一款基于`Jetpack Compose`开发的图片浏览库，支持过渡变换和超大图片的显示
+一款基于`Jetpack Compose Multiplatform`开发的图片浏览库，支持过渡变换和超大图片的显示
 
 The latest version:  
 <img alt="version badge" src="https://img.shields.io/github/v/release/jvziyaoyao/scale?filter=*.*.*">
@@ -30,7 +30,7 @@ The latest version:
 
 👌 特性
 --------
-- 基于Jetpack Compose开发；
+- 基于Jetpack Compose Multiplatform开发；
 - 符合直觉的手势动效；
 - 支持超大图片显示；
 - 提供图片列表浏览组件；
@@ -45,7 +45,7 @@ The latest version:
 |----------------------------|:--------:|:--------:|
 | scale-zoomable-view        | ✅       | ✅    |
 | scale-image-viewer         | ✅     | ✅    |
-| scale-sampling-decoder     | ✅     | ⛔️   |
+| scale-sampling-decoder     | ✅     | ✅   |
 | scale-image-viewer-classic | ⚠️废弃    | ⚠️废弃 |
 
 🧐 预览
@@ -59,7 +59,9 @@ The latest version:
 
 👓 示例
 --------
-👋 示例代码请参考 👉 [SAMPLE](https://github.com/jvziyaoyao/scale/tree/dev/sample/src/main/java/com/jvziyaoyao/scale/sample)
+👋 示例代码请参考:
+Android 👉 [SAMPLE-ANDROID](https://github.com/jvziyaoyao/scale/tree/dev/sample/src/main/java/com/jvziyaoyao/scale/sample-android)
+IOS 👉 [SAMPLE-IOS](https://github.com/jvziyaoyao/scale/tree/dev/sample/src/main/java/com/jvziyaoyao/scale/sample-ios)
 
 🛒 引入
 --------
@@ -70,10 +72,10 @@ repositories {
     mavenCentral()
 }
 
-val version = "1.1.1-beta.1"
+val version = "1.1.1-beta.2"
 // 图片浏览库
 implementation("com.jvziyaoyao.scale:image-viewer:$version")
-// 大型图片支持
+// 大型图片支持（可选）
 implementation("com.jvziyaoyao.scale:sampling-decoder:$version")
 ```
 
@@ -121,10 +123,9 @@ implementation("com.jvziyaoyao.scale:sampling-decoder:$version")
 
 ‼ 仅在`model`类型为`SamplingDecoder`才会被当做大图进行加载
 ```kotlin
-val context = LocalContext.current
-val scope = rememberCoroutineScope()
-val inputStream = remember { context.assets.open("a350.jpg") }
-val (samplingDecoder) = rememberSamplingDecoder(inputStream = inputStream)
+val bytes = remember { mutableStateOf<ByteArray?>(null) }
+LaunchedEffect(Unit) { bytes.value = Res.readBytes("files/a350.jpg") }
+val (samplingDecoder) = rememberSamplingDecoder(bytes.value)
 if (samplingDecoder != null) {
     val state = rememberZoomableState(
         contentSize = samplingDecoder.intrinsicSize
