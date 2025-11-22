@@ -41,12 +41,12 @@ The latest version:
 
 🖇️ 跨平台
 --------
-| 兼容性                        | Android | KMP  |
-|----------------------------|:--------:|:--------:|
-| scale-zoomable-view        | ✅       | ✅    |
-| scale-image-viewer         | ✅     | ✅    |
-| scale-sampling-decoder     | ✅     | ✅   |
-| scale-image-viewer-classic | ⚠️废弃    | ⚠️废弃 |
+| 兼容性                        | Android | IOS  | Desktop | JS/WasmJS |
+|----------------------------|:--------:|:--------:|:-------:|:---------:|
+| scale-zoomable-view        | ✅       | ✅    |    ✅    |    ⛔️     |
+| scale-image-viewer         | ✅     | ✅    |    ✅    |    ⛔️     |
+| scale-sampling-decoder     | ✅     | ✅   |    ✅    |    ⛔️     |
+| scale-image-viewer-classic | ⚠️废弃    | ⚠️废弃 |  ⚠️废弃   |    ⛔️     |
 
 🧐 预览
 --------
@@ -74,7 +74,7 @@ repositories {
     mavenCentral()
 }
 
-val version = "1.1.1-beta.2"
+val version = "1.1.1-beta.3"
 // 图片浏览库
 implementation("com.jvziyaoyao.scale:image-viewer:$version")
 // 大型图片支持（可选）

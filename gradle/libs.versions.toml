@@ -12,7 +12,6 @@ espresso-core = "3.6.1"
 appcompat = "1.7.0"
 material = "1.12.0"
 material-icons = "1.7.8"
-scale = "1.1.0-alpha.7"
 kotlin = "2.2.21"
 kotlinStdlib = "2.2.21"
 kotlinTest = "2.1.0"
@@ -25,6 +24,8 @@ maven-publish = "0.32.0"
 skiko = "0.9.4.2"
 dokka = "1.9.20"
 kotlinx-coroutines = "1.10.2"
+
+scale = "1.1.1-beta.3"
 
 [libraries]
 androidx-exif = "androidx.exifinterface:exifinterface:1.4.0"
