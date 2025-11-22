@@ -695,7 +695,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/index.html" class="md-nav__link">
+      <a href="reference/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -990,8 +990,8 @@
 
 <p><img src="image/scale_logo.svg" alt="Scale" width="200"></p>
 <hr />
-<p>🖼 An image viewer for jetpack compose.</p>
-<p>一款基于<code>Jetpack Compose</code>开发的图片浏览库，支持过渡变换和超大图片的显示</p>
+<p>🖼 An image viewer for jetpack compose multiplatform.</p>
+<p>一款基于<code>Jetpack Compose Multiplatform</code>开发的图片浏览库，支持过渡变换和超大图片的显示</p>
 <p>The latest version:<br />
 <img alt="version badge" src="https://img.shields.io/github/v/release/jvziyaoyao/scale?filter=*.*.*"></p>
 <h3 id="111-scalemultiplatform">🥳 1.1.1 全新版本～<code>Scale</code>支持<code>Multiplatform</code>啦！</h3>
@@ -1005,7 +1005,7 @@
 <h4 id="imagepicker-github">🌆 ImagePicker 👉 <a href="https://github.com/jvziyaoyao/ImagePicker">GITHUB</a></h4>
 <h2 id="_3">👌 特性</h2>
 <ul>
-<li>基于Jetpack Compose开发；</li>
+<li>基于Jetpack Compose Multiplatform开发；</li>
 <li>符合直觉的手势动效；</li>
 <li>支持超大图片显示；</li>
 <li>提供图片列表浏览组件；</li>
@@ -1020,7 +1020,9 @@
 <tr>
 <th>兼容性</th>
 <th style="text-align: center;">Android</th>
-<th style="text-align: center;">KMP</th>
+<th style="text-align: center;">IOS</th>
+<th style="text-align: center;">Desktop</th>
+<th style="text-align: center;">JS/WasmJS</th>
 </tr>
 </thead>
 <tbody>
@@ -1028,14 +1030,20 @@
 <td>scale-zoomable-view</td>
 <td style="text-align: center;">✅</td>
 <td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">⛔️</td>
 </tr>
 <tr>
 <td>scale-image-viewer</td>
 <td style="text-align: center;">✅</td>
 <td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">⛔️</td>
 </tr>
 <tr>
 <td>scale-sampling-decoder</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
 <td style="text-align: center;">✅</td>
 <td style="text-align: center;">⛔️</td>
 </tr>
@@ -1043,6 +1051,8 @@
 <td>scale-image-viewer-classic</td>
 <td style="text-align: center;">⚠️废弃</td>
 <td style="text-align: center;">⚠️废弃</td>
+<td style="text-align: center;">⚠️废弃</td>
+<td style="text-align: center;">⛔️</td>
 </tr>
 </tbody>
 </table>
@@ -1052,7 +1062,9 @@
 <h2 id="api">📓 API</h2>
 <p>💽 接口文档 👉 <a href="https://jvziyaoyao.github.io/scale/reference">API REFERENCE</a></p>
 <h2 id="_6">👓 示例</h2>
-<p>👋 示例代码请参考 👉 <a href="https://github.com/jvziyaoyao/scale/tree/dev/sample/src/main/java/com/jvziyaoyao/scale/sample">SAMPLE</a></p>
+<p>👋 示例代码请参考:</p>
+<p>Android 👉 <a href="https://github.com/jvziyaoyao/scale/tree/dev/sample/src/main/java/com/jvziyaoyao/scale/sample-android">SAMPLE-ANDROID</a></p>
+<p>IOS 👉 <a href="https://github.com/jvziyaoyao/scale/tree/dev/sample/src/main/java/com/jvziyaoyao/scale/sample-ios">SAMPLE-IOS</a></p>
 <h2 id="_7">🛒 引入</h2>
 <p>Scale is available on <code>mavenCentral()</code></p>
 <pre><code class="language-kotlin">// 使用MavenCentral仓库
@@ -1060,10 +1072,10 @@ repositories {
     mavenCentral()
 }
 
-val version = &quot;1.1.1-beta.1&quot;
+val version = &quot;1.1.1-beta.3&quot;
 // 图片浏览库
 implementation(&quot;com.jvziyaoyao.scale:image-viewer:$version&quot;)
-// 大型图片支持
+// 大型图片支持（可选）
 implementation(&quot;com.jvziyaoyao.scale:sampling-decoder:$version&quot;)
 </code></pre>
 <h2 id="_8">🛵 使用方式</h2>
@@ -1100,10 +1112,9 @@ ImageViewer(
 <pre><code class="language-kotlin">implementation(&quot;com.jvziyaoyao.scale:sampling-decoder:$version&quot;)
 </code></pre>
 <p>‼ 仅在<code>model</code>类型为<code>SamplingDecoder</code>才会被当做大图进行加载</p>
-<pre><code class="language-kotlin">val context = LocalContext.current
-val scope = rememberCoroutineScope()
-val inputStream = remember { context.assets.open(&quot;a350.jpg&quot;) }
-val (samplingDecoder) = rememberSamplingDecoder(inputStream = inputStream)
+<pre><code class="language-kotlin">val bytes = remember { mutableStateOf&lt;ByteArray?&gt;(null) }
+LaunchedEffect(Unit) { bytes.value = Res.readBytes(&quot;files/a350.jpg&quot;) }
+val (samplingDecoder) = rememberSamplingDecoder(bytes.value)
 if (samplingDecoder != null) {
     val state = rememberZoomableState(
         contentSize = samplingDecoder.intrinsicSize

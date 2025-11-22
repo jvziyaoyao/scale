@@ -1,0 +1,407 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>com.jvziyaoyao.scale.zoomable.zoomable</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../index.html">
+                            Scale
+                    </a>            </div>
+            <div class="library-version">1.1.1-beta.3
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":scale-zoomable-view:dokkaHtmlPartial/commonMain">common</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="package" id="content" pageids="scale-zoomable-view::com.jvziyaoyao.scale.zoomable.zoomable////PointingToDeclaration//-298816861">
+  <div class="breadcrumbs"><a href="../index.html">scale-zoomable-view</a><span class="delimiter">/</span><span class="current">com.jvziyaoyao.scale.zoomable.zoomable</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button><button class="section-tab" data-togglable="PROPERTY,EXTENSION_PROPERTY">Properties</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="-1276903666%2FClasslikes%2F-298816861" anchor-label="ZoomableGestureScope" id="-1276903666%2FClasslikes%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-zoomable-gesture-scope/index.html"><span>Zoomable</span><wbr><span>Gesture</span><wbr><span><span>Scope</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1276903666%2FClasslikes%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-zoomable-gesture-scope/index.html">ZoomableGestureScope</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">var </span>onTap<span class="token operator">: </span><span class="token punctuation">(</span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{}<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>onDoubleTap<span class="token operator">: </span><span class="token punctuation">(</span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{}<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>onLongPress<span class="token operator">: </span><span class="token punctuation">(</span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{}</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">ZoomableView手势对象</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="229588669%2FClasslikes%2F-298816861" anchor-label="ZoomableViewState" id="229588669%2FClasslikes%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-zoomable-view-state/index.html"><span>Zoomable</span><wbr><span>View</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="229588669%2FClasslikes%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="-zoomable-view-state/index.html">ZoomableViewState</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>maxScale<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span>MAX_SCALE_RATE<span class="token punctuation">, </span></span><span class="parameter ">offsetX<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span>DEFAULT_OFFSET_X<span class="token punctuation">, </span></span><span class="parameter ">offsetY<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span>DEFAULT_OFFSET_Y<span class="token punctuation">, </span></span><span class="parameter ">scale<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span>DEFAULT_SCALE<span class="token punctuation">, </span></span><span class="parameter ">rotation<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span>DEFAULT_ROTATION<span class="token punctuation">, </span></span><span class="parameter ">animationSpec<span class="token operator">: </span><span data-unresolved-link="androidx.compose.animation.core/AnimationSpec///PointingToDeclaration/">AnimationSpec</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span> : <span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span></div><div class="brief "><p class="paragraph">viewer状态对象，用于记录compose组件状态</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="878178031%2FProperties%2F-298816861" anchor-label="DEFAULT_OFFSET_X" id="878178031%2FProperties%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-d-e-f-a-u-l-t_-o-f-f-s-e-t_-x.html"><span><span>DEFAULT_OFFSET_X</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="878178031%2FProperties%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-d-e-f-a-u-l-t_-o-f-f-s-e-t_-x.html">DEFAULT_OFFSET_X</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span><span class="token constant">0.0f</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="909197838%2FProperties%2F-298816861" anchor-label="DEFAULT_OFFSET_Y" id="909197838%2FProperties%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-d-e-f-a-u-l-t_-o-f-f-s-e-t_-y.html"><span><span>DEFAULT_OFFSET_Y</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="909197838%2FProperties%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-d-e-f-a-u-l-t_-o-f-f-s-e-t_-y.html">DEFAULT_OFFSET_Y</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span><span class="token constant">0.0f</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-78836899%2FProperties%2F-298816861" anchor-label="DEFAULT_ROTATION" id="-78836899%2FProperties%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-d-e-f-a-u-l-t_-r-o-t-a-t-i-o-n.html"><span><span>DEFAULT_ROTATION</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-78836899%2FProperties%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-d-e-f-a-u-l-t_-r-o-t-a-t-i-o-n.html">DEFAULT_ROTATION</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span><span class="token constant">0.0f</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1230038325%2FProperties%2F-298816861" anchor-label="DEFAULT_SCALE" id="1230038325%2FProperties%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-d-e-f-a-u-l-t_-s-c-a-l-e.html"><span><span>DEFAULT_SCALE</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1230038325%2FProperties%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-d-e-f-a-u-l-t_-s-c-a-l-e.html">DEFAULT_SCALE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span><span class="token constant">1.0f</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1092533239%2FProperties%2F-298816861" anchor-label="MAX_SCALE_RATE" id="-1092533239%2FProperties%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-m-a-x_-s-c-a-l-e_-r-a-t-e.html"><span><span>MAX_SCALE_RATE</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1092533239%2FProperties%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-m-a-x_-s-c-a-l-e_-r-a-t-e.html">MAX_SCALE_RATE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span><span class="token constant">4.0f</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1565082969%2FProperties%2F-298816861" anchor-label="MIN_GESTURE_FINGER_DISTANCE" id="1565082969%2FProperties%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-m-i-n_-g-e-s-t-u-r-e_-f-i-n-g-e-r_-d-i-s-t-a-n-c-e.html"><span><span>MIN_GESTURE_FINGER_DISTANCE</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1565082969%2FProperties%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-m-i-n_-g-e-s-t-u-r-e_-f-i-n-g-e-r_-d-i-s-t-a-n-c-e.html">MIN_GESTURE_FINGER_DISTANCE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">200</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2109620988%2FProperties%2F-298816861" anchor-label="MIN_SCALE" id="-2109620988%2FProperties%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-m-i-n_-s-c-a-l-e.html"><span><span>MIN_SCALE</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2109620988%2FProperties%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-m-i-n_-s-c-a-l-e.html">MIN_SCALE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span><span class="token constant">0.5f</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-919087258%2FFunctions%2F-298816861" anchor-label="assertInRange" id="-919087258%2FFunctions%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="assert-in-range.html"><span>assert</span><wbr><span>In</span><wbr><span><span>Range</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-919087258%2FFunctions%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">.</span><a href="assert-in-range.html"><span class="token function">assertInRange</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">min<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">max<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">"value"</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1305430477%2FFunctions%2F-298816861" anchor-label="detectTransformGestures" id="1305430477%2FFunctions%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="detect-transform-gestures.html"><span>detect</span><wbr><span>Transform</span><wbr><span><span>Gestures</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1305430477%2FFunctions%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="androidx.compose.ui.input.pointer/PointerInputScope///PointingToDeclaration/">PointerInputScope</span><span class="token punctuation">.</span><a href="detect-transform-gestures.html"><span class="token function">detectTransformGestures</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">panZoomLock<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter ">gestureStart<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{}<span class="token punctuation">, </span></span><span class="parameter ">gestureEnd<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{}<span class="token punctuation">, </span></span><span class="parameter ">onTap<span class="token operator">: </span><span class="token punctuation">(</span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{}<span class="token punctuation">, </span></span><span class="parameter ">onDoubleTap<span class="token operator">: </span><span class="token punctuation">(</span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{}<span class="token punctuation">, </span></span><span class="parameter ">onGesture<span class="token operator">: </span><span class="token punctuation">(</span>centroid<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span><span class="token punctuation">, </span>pan<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span><span class="token punctuation">, </span>zoom<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span>rotation<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span>event<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.input.pointer/PointerEvent///PointingToDeclaration/">PointerEvent</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">重写事件监听方法</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1833700222%2FFunctions%2F-298816861" anchor-label="getBound" id="-1833700222%2FFunctions%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-bound.html"><span>get</span><wbr><span><span>Bound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1833700222%2FFunctions%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-bound.html"><span class="token function">getBound</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">scale<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">bw<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">dw<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">获取移动边界</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1691283425%2FFunctions%2F-298816861" anchor-label="inBound" id="1691283425%2FFunctions%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="in-bound.html"><span>in</span><wbr><span><span>Bound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1691283425%2FFunctions%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="in-bound.html"><span class="token function">inBound</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">offset<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">bound<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">判断位移是否在边界内</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1079803160%2FFunctions%2F-298816861" anchor-label="limitToBound" id="1079803160%2FFunctions%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="limit-to-bound.html"><span>limit</span><wbr><span>To</span><wbr><span><span>Bound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1079803160%2FFunctions%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="limit-to-bound.html"><span class="token function">limitToBound</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">offset<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">bound<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a></div><div class="brief "><p class="paragraph">把位移限制在边界内</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1819000996%2FFunctions%2F-298816861" anchor-label="onGesture" id="-1819000996%2FFunctions%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-gesture.html"><span>on</span><wbr><span><span>Gesture</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1819000996%2FFunctions%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-zoomable-view-state/index.html">ZoomableViewState</a><span class="token punctuation">.</span><a href="on-gesture.html"><span class="token function">onGesture</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">scope<span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span><span class="token punctuation">, </span></span><span class="parameter ">center<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span><span class="token punctuation">, </span></span><span class="parameter ">pan<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span><span class="token punctuation">, </span></span><span class="parameter ">zoom<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">rotate<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">event<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.input.pointer/PointerEvent///PointingToDeclaration/">PointerEvent</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">输入手势事件</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="713440631%2FFunctions%2F-298816861" anchor-label="onGestureEnd" id="713440631%2FFunctions%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-gesture-end.html"><span>on</span><wbr><span>Gesture</span><wbr><span><span>End</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="713440631%2FFunctions%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-zoomable-view-state/index.html">ZoomableViewState</a><span class="token punctuation">.</span><a href="on-gesture-end.html"><span class="token function">onGestureEnd</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">scope<span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span><span class="token punctuation">, </span></span><span class="parameter ">transformOnly<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">标记手势事件结束</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1947329612%2FFunctions%2F-298816861" anchor-label="onGestureStart" id="-1947329612%2FFunctions%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-gesture-start.html"><span>on</span><wbr><span>Gesture</span><wbr><span><span>Start</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1947329612%2FFunctions%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-zoomable-view-state/index.html">ZoomableViewState</a><span class="token punctuation">.</span><a href="on-gesture-start.html"><span class="token function">onGestureStart</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">scope<span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">标记手势事件开始</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1855899048%2FFunctions%2F-298816861" anchor-label="panTransformAndScale" id="1855899048%2FFunctions%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="pan-transform-and-scale.html"><span>pan</span><wbr><span>Transform</span><wbr><span>And</span><wbr><span><span>Scale</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1855899048%2FFunctions%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="pan-transform-and-scale.html"><span class="token function">panTransformAndScale</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">offset<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">center<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">bh<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">uh<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">fromScale<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">toScale<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a></div><div class="brief "><p class="paragraph">追踪缩放过程中的中心点</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-854814451%2FFunctions%2F-298816861" anchor-label="rememberZoomableState" id="-854814451%2FFunctions%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remember-zoomable-state.html"><span>remember</span><wbr><span>Zoomable</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-854814451%2FFunctions%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="remember-zoomable-state.html"><span class="token function">rememberZoomableState</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">contentSize<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Size///PointingToDeclaration/">Size</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">maxScale<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span>MAX_SCALE_RATE<span class="token punctuation">, </span></span><span class="parameter ">animationSpec<span class="token operator">: </span><span data-unresolved-link="androidx.compose.animation.core/AnimationSpec///PointingToDeclaration/">AnimationSpec</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-zoomable-view-state/index.html">ZoomableViewState</a></div><div class="brief "><p class="paragraph">返回一个ZoomableState</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="97955575%2FFunctions%2F-298816861" anchor-label="sameDirection" id="97955575%2FFunctions%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="same-direction.html"><span>same</span><wbr><span><span>Direction</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="97955575%2FFunctions%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="same-direction.html"><span class="token function">sameDirection</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">b<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a></div><div class="brief "><p class="paragraph">让后一个数与前一个数的符号保持一致</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1051215877%2FFunctions%2F-298816861" anchor-label="ZoomableView" id="1051215877%2FFunctions%2F-298816861" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":scale-zoomable-view:dokkaHtmlPartial/commonMain" data-filterable-set=":scale-zoomable-view:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-zoomable-view.html"><span>Zoomable</span><wbr><span><span>View</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1051215877%2FFunctions%2F-298816861"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scale-zoomable-view:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="-zoomable-view.html"><span class="token function">ZoomableView</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">modifier<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui/Modifier///PointingToDeclaration/">Modifier</span><span class="token operator"> = </span>Modifier<span class="token punctuation">, </span></span><span class="parameter ">boundClip<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">state<span class="token operator">: </span><a href="-zoomable-view-state/index.html">ZoomableViewState</a><span class="token punctuation">, </span></span><span class="parameter ">detectGesture<span class="token operator">: </span><a href="-zoomable-gesture-scope/index.html">ZoomableGestureScope</a><span class="token operator"> = </span>ZoomableGestureScope()<span class="token punctuation">, </span></span><span class="parameter ">content<span class="token operator">: </span><span><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span>&nbsp;</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">支持对Composable就行手势缩放的组件</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2025 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
