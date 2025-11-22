@@ -20,6 +20,8 @@ kotlin {
         minSdk = project.minSdk
     }
 
+    jvm()
+
     val xcfName = "samplingDecoderKit"
 
     iosX64 {

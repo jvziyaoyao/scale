@@ -1,6 +1,10 @@
 # **Change Log**
 All notable changes to this project will be documented in this file.
 
+## 1.1.1-beta.3 (Nov 22, 2025)
+- Fix: Maven包添加Desktop Target;
+- Fix: KotlinDateTime升级至0.7.1;
+
 ## 1.1.1-beta.2 (Jul 21, 2025)
 - Feat: SamplingDecoder支持KMP;
 - Feat: 移除LocalTransformItemStateMap;

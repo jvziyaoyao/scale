@@ -1,7 +1,7 @@
 [versions]
 bignum = "0.3.10"
 compose-compiler = "1.5.0"
-compose = "1.8.1"
+compose = "1.9.3"
 coil = "3.0.0-rc01"
 accompanist = "0.34.0"
 android-gradle-plugin = "8.10.1"
@@ -12,18 +12,20 @@ espresso-core = "3.6.1"
 appcompat = "1.7.0"
 material = "1.12.0"
 material-icons = "1.7.8"
-scale = "1.1.0-alpha.7"
-kotlin = "2.1.0"
-kotlinStdlib = "2.1.0"
+kotlin = "2.2.21"
+kotlinStdlib = "2.2.21"
 kotlinTest = "2.1.0"
 runner = "1.5.2"
-core = "1.5.0"
+core = "1.7.0"
 compose-plugin = "1.8.1"
-kotlin-datetime = "0.6.1"
+kotlin-datetime = "0.7.1"
 ktor = "3.0.0"
 maven-publish = "0.32.0"
 skiko = "0.9.4.2"
 dokka = "1.9.20"
+kotlinx-coroutines = "1.10.2"
+
+scale = "1.1.1-beta.3"
 
 [libraries]
 androidx-exif = "androidx.exifinterface:exifinterface:1.4.0"
@@ -56,6 +58,8 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+
+kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 
 google-accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
 google-accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist" }
