@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="scale-zoomable-view-wasm-js">
+    <output-path>$PROJECT_DIR$/scale-zoomable-view/build/libs</output-path>
+    <root id="archive" name="scale-zoomable-view-wasm-js.jar" />
+  </artifact>
+</component>

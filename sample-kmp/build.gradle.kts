@@ -9,12 +9,13 @@ plugins {
 }
 
 kotlin {
-
     androidLibrary {
         namespace = "com.jvziyaoyao.scale.sample"
         compileSdk = project.compileSdk
         minSdk = project.minSdk
     }
+
+    jvm()
 
     listOf(
         iosX64(),
@@ -76,3 +77,15 @@ kotlin {
     }
 
 }
+
+//compose.desktop {
+//    application {
+//        mainClass = "com.jvziyaoyao.scale.sampe.MainKt"
+//
+//        nativeDistributions {
+//            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+//            packageName = "com.jvziyaoyao.scale.sampe"
+//            packageVersion = "1.0.1"
+//        }
+//    }
+//}

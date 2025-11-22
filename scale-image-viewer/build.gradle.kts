@@ -18,6 +18,8 @@ kotlin {
         minSdk = project.minSdk
     }
 
+    jvm()
+
     val xcfName = "imageViewerKit"
 
     iosX64 {

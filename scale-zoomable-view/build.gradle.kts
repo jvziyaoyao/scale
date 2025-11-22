@@ -17,6 +17,8 @@ kotlin {
         minSdk = project.minSdk
     }
 
+    jvm()
+
     val xcfName = "zoomableViewKit"
 
     iosX64 {
